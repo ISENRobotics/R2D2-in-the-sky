@@ -10,4 +10,4 @@ Python application :
   3. Congrats ! You now have a python script automatically launched and which will be restarted if a problem ever arise
 
 Android Application:
-  The .apk is available on Google Play, or in the ISEN ENT.
+  1. The .apk is available on Google Play, or in the ISEN ENT.
