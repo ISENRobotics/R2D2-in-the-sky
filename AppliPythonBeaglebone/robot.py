@@ -1,6 +1,10 @@
+#/usr/bin/env python
 import Adafruit_BBIO.UART as UART
 import serial
 import socket
+
+import os
+import sys
 
 ###   Préparation du programme
 
@@ -56,4 +60,17 @@ class Robot(object):
 ### Programme principal
 
 if __name__ == '__main__':
-	temp = Robot()
+	#On prépare un fichier temporaire tant que le script est lancé
+	pid = str(os.getpid())
+	pidfile = "/tmp/mydaemon.pid"
+
+	if os.path.isfile(pidfile):
+    	print "%s already exists, exiting" % pidfile
+	    sys.exit()
+	file(pidfile, 'w').write(pid)
+	#On effectue le vrai travail ici
+	try:
+	    temp = Robot()
+	#Quand on a fini toute l'application (si celle-ci a une fin), on efface le fichier disant que l'application est lancée
+	finally:
+	    os.unlink(pidfile)
