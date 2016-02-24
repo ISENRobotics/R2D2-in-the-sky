@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context="fr.pierreyvesmingam.robotr2d2.MainActivity"
+    android:id="@+id/ee">
+
+    
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Déplacement du Robot"
+        android:id="@+id/textView"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="AIDE"
+        android:id="@+id/button"
+        android:onClick="aide"
+        android:layout_alignParentTop="true"
+        android:layout_toLeftOf="@+id/button2"
+        android:layout_toStartOf="@+id/button2" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="photo"
+        android:id="@+id/button2"
+        android:layout_alignParentTop="true"
+        android:layout_toLeftOf="@+id/button3"
+        android:layout_toStartOf="@+id/button3" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="autonome"
+        android:id="@+id/button3"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="ARRET d&apos;urgence"
+        android:id="@+id/button4"
+        android:background="#ff0000"
+        android:layout_alignBottom="@+id/layout_joystick2"
+        android:layout_centerHorizontal="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Vitesse:"
+        android:id="@+id/vitesse"
+        android:textColor="#444444"
+        android:textSize="20dp"
+
+        android:layout_alignBaseline="@+id/etatBatterie"
+        android:layout_alignBottom="@+id/etatBatterie"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Etat batterie:"
+        android:id="@+id/etatBatterie"
+        android:textColor="#444444"
+        android:textSize="20dp"
+        android:layout_alignParentBottom="true"
+        android:layout_toLeftOf="@+id/button"
+        android:layout_toStartOf="@+id/button" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Problème:"
+        android:id="@+id/probleme"
+        android:textColor="#444444"
+        android:textSize="20dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignRight="@+id/button3"
+        android:layout_alignEnd="@+id/button3" />
+
+
+
+
+
+
+
+
+
+
+
+
+    <LinearLayout
+        android:id="@+id/linearLayout1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:orientation="vertical" >
+
+    </LinearLayout>
+    <RelativeLayout
+        android:id="@+id/layout_joystick3"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:background="@drawable/jaune"
+        android:layout_alignTop="@+id/layout_joystick2"
+        android:layout_alignLeft="@+id/linearLayout1"
+        android:layout_alignStart="@+id/linearLayout1">
+
+        <RelativeLayout
+            android:id="@+id/layout_joystick3"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:background="@drawable/rouge"
+            android:layout_centerVertical="true"
+            android:layout_centerHorizontal="true">
+        </RelativeLayout>
+
+    </RelativeLayout>
+
+
+    <TextView
+        android:id="@+id/textView4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Distance G"
+        android:textColor="#444444"
+        android:textSize="10dp"
+        android:layout_marginTop="56dp"
+        android:singleLine="false"
+        android:layout_below="@+id/button"
+        android:layout_alignLeft="@+id/button4"
+        android:layout_alignStart="@+id/button4" />
+
+    <TextView
+        android:id="@+id/textView5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Direction G"
+        android:textColor="#444444"
+        android:textSize="10dp"
+        android:layout_below="@+id/textView4"
+        android:layout_alignLeft="@+id/textView4"
+        android:layout_alignStart="@+id/textView4" />
+
+    <RelativeLayout
+        android:id="@+id/layout_joystick2"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:background="@drawable/jaune"
+        android:layout_centerVertical="true"
+        android:layout_toRightOf="@+id/button4"
+        android:layout_toEndOf="@+id/button4">
+
+        <RelativeLayout
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:background="@drawable/rouge"
+            android:layout_centerVertical="true"
+            android:layout_centerHorizontal="true" />
+    </RelativeLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Distance D"
+        android:id="@+id/textView2"
+        android:textColor="#444444"
+        android:textSize="10dp"
+        android:layout_below="@+id/textView5"
+        android:layout_alignLeft="@+id/textView5"
+        android:layout_alignStart="@+id/textView5" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Direction D"
+        android:id="@+id/textView18"
+        android:textColor="#444444"
+        android:textSize="10dp"
+        android:layout_below="@+id/textView2"
+        android:layout_alignRight="@+id/textView5"
+        android:layout_alignEnd="@+id/textView5" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Vitesse moteur gauche"
+        android:id="@+id/textView19"
+        android:layout_below="@+id/layout_joystick3"
+        android:layout_toLeftOf="@+id/etatBatterie"
+        android:layout_toStartOf="@+id/etatBatterie" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Vitesse moteur droit"
+        android:id="@+id/textView20"
+        android:layout_below="@+id/layout_joystick2"
+        android:layout_alignLeft="@+id/button2"
+        android:layout_alignStart="@+id/button2" />
+
+
+</RelativeLayout>
