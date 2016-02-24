@@ -35,7 +35,7 @@ ser.close()
 #On crée le socket de connexion
 connexion_principale = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-#Port à définir suivant les possibilités de l'application Android, ici port 12800
+#Adresse et Port à définir suivant les possibilités de l'application Android, ici port 12800
 connexion_principale.bind(('', 12800))
 
 #Une connexion maximale possible au socket, histoire d'éviter le chevauchement des ordres si deux applications tentent de controler le robot
@@ -54,4 +54,5 @@ connexion_avec_client, infos_connexion = connexion_principale.accept()
 connexion_avec_serveur = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 #On connecte le socket sur l'adresse et le port désiré
-connexion_avec_serveur.connect(('localhost', 12800))
+#Idée : attribuer une IP fixe grâce au routeur au téléphone Android, voir réseau en 255.255.255.252
+connexion_avec_serveur.connect(('192.168.1.3', 12800))
