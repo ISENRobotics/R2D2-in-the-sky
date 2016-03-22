@@ -28,8 +28,10 @@ class Serveur(object):
 
 		#On accepte la connexion
 		#Attention, la méthode accept bloque le programme tant qu'aucun client ne s'est présenté
-		#connexion_avec_client, infos_connexion = socket_serveur.accept()
+		connexion_avec_client, infos_connexion = socket_serveur.accept()
 
+
+	def connection(self):
 		### Socket client
 		#On crée le socket de connexion
 		self.socket_client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -45,6 +47,3 @@ class Serveur(object):
 			return self.socket_serveur.recv(1024)
 		else:
 			self.socket_client.send(infos)
-
-	def reception(self):
-		
