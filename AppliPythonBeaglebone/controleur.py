@@ -18,12 +18,20 @@ import Robot
 if __name__ == '__main__':
 	#On prépare un fichier temporaire tant que le script est lancé
 	pid = str(os.getpid())
-	pidfile = "/tmp/mydaemon.pid"
+	pidfile = "/tmp/controleur.pid"
 
-	if os.path.isfile(pidfile):
-    	print "%s already exists, exiting" % pidfile
+	try:
+		if os.path.isfile(pidfile):
+			os.link(pidfile,"daemon_python")
+		else
+			file(pidfile, 'w').write(pid)
+			os.link(pidfile,"daemon_python")
+	except IOError as e:
+    	print "I/O error({0}): {1}".format(e.errno, e.strerror)
+    except:
+	    print "Unexpected error:", sys.exc_info()[0]
+	    raise
 	    sys.exit()
-	file(pidfile, 'w').write(pid)
 	#On effectue le vrai travail ici
 	try:
 	    robot = Robot()
@@ -70,4 +78,9 @@ if __name__ == '__main__':
 		stdscr.keypad(0)
 		curses.echo()
 		curses.endwin()
-	    os.unlink(pidfile)
+		try:
+        	os.remove(pidfile)
+        	#os.unlink("daemon_python") est équivalent selon la documentation python, version liens Unix
+		except OSError, e:  ## si l'opération échoue, on affiche l'erreur rencontrée (voir au niveau des permissions)
+		    print ("Error: %s - %s." % (e.filename,e.strerror))
+	    
