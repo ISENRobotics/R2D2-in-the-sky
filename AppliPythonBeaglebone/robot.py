@@ -22,12 +22,14 @@ class Robot(object):
 	MODE = 0
 
 	def __init__(self, sel_uart =1):
+		if(sel_uart not in [1,2,4,5]):
+				return "Erreur : la liaison série spécifiée n'est pas valide"
 		### Liaison série
-		#On choisir la liaison série 1
-		UART.setup("UART"+sel_uart)
+		#On choisir la liaison série 1 par défaut, la liaison série spécifiée sinon
+		UART.setup("UART"+str(sel_uart))
 
 		#Ouverture de la liaison série
-		self.ser = serial.Serial(port = "/dev/ttyO"+sel_uart, baudrate=38400,bytesize=8, stopbits=1,timeout=None)
+		self.ser = serial.Serial(port = "/dev/ttyO"+str(sel_uart), baudrate=38400,bytesize=8, stopbits=1,timeout=None)
 		self.ser.close()
 
 	#Fonction chargée d'effectuer l'envoi sur la liaison série des commandes moteurs
