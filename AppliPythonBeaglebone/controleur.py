@@ -75,6 +75,30 @@ if __name__ == '__main__':
 			elif c == curses.KEY_ESC
 				continue = False
 			pass
+	#On récupère toutes exceptions génantes (Ctrl-C de l'utilisateur, arrêt brutal du système)
+	except KeyboardInterrupt as key:
+		print("User-generated interrupt, exiting....")
+		curses.nocbreak()
+		stdscr.keypad(0)
+		curses.echo()
+		curses.endwin()
+		try:
+        	os.remove("daemon_python")
+        	#os.unlink("daemon_python") est équivalent selon la documentation python, version liens Unix
+		except OSError, e:  ## si l'opération échoue, on affiche l'erreur rencontrée (voir au niveau des permissions)
+		    print ("Error: %s - %s." % (e.filename,e.strerror))
+
+	except SystemExit as exit_sys:
+		print("An exception forcing the interpreter to stop has been detected, shutting down....")
+		curses.nocbreak()
+		stdscr.keypad(0)
+		curses.echo()
+		curses.endwin()
+		try:
+        	os.remove("daemon_python")
+        	#os.unlink("daemon_python") est équivalent selon la documentation python, version liens Unix
+		except OSError, e:  ## si l'opération échoue, on affiche l'erreur rencontrée (voir au niveau des permissions)
+		    print ("Error: %s - %s." % (e.filename,e.strerror))
 	#Quand on a fini toute l'application (si celle-ci a une fin), on efface le fichier disant que l'application est lancée (et on restaure le terminal initial)
 	finally:
 		curses.nocbreak()
