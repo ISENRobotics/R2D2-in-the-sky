@@ -8,6 +8,8 @@ import curses
 import os
 import sys
 
+import thread
+
 """
 	On importe les classes personnalisées python
 """
@@ -21,6 +23,7 @@ if __name__ == '__main__':
 	pidfile = "/tmp/controleur.pid"
 
 	try:
+		#On teste si le fichier existe déja
 		if os.path.isfile(pidfile):
 			os.link(pidfile,"daemon_python")
 		else
@@ -79,7 +82,7 @@ if __name__ == '__main__':
 		curses.echo()
 		curses.endwin()
 		try:
-        	os.remove(pidfile)
+        	os.remove("daemon_python")
         	#os.unlink("daemon_python") est équivalent selon la documentation python, version liens Unix
 		except OSError, e:  ## si l'opération échoue, on affiche l'erreur rencontrée (voir au niveau des permissions)
 		    print ("Error: %s - %s." % (e.filename,e.strerror))
