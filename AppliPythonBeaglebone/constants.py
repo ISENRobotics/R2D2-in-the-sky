@@ -49,6 +49,9 @@ GET_MODE = "2B"
 #Mot renvoyant la concaténation de GET_VOLTS et GET_CURRENTS
 GET_VOLTS_AND_CURRENTS = "2C"
 
+#Liste python regroupant tous les GET, ne sert que dans l'algorithmique
+LIST_GET = [GET_SPEED_1,GET_SPEED_2,GET_ENCODER_1,GET_ENCODER_2,GET_ENCODERS,GET_VOLTS,GET_CURRENT_1,GET_CURRENT_2,GET_VERSION,GET_ACCELERATION,GET_MODE,GET_VOLTS_AND_CURRENTS]
+
 #Mot permettant d'assigner une valeur pour la vitesse du moteur 1
 #Valeurs acceptées : cf GET_MODE
 #MODES ACCEPTES : 0 et 1

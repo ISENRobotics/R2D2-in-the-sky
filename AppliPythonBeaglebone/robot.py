@@ -21,38 +21,38 @@ class Robot(object):
 	"""
 	MODE = 0
 
-	def __init__(self):
+	def __init__(self, sel_uart =1):
 		### Liaison série
 		#On choisir la liaison série 1
-		UART.setup("UART1")
+		UART.setup("UART"+sel_uart)
 
 		#Ouverture de la liaison série
-		self.ser = serial.Serial(port = "/dev/ttyO1", baudrate=38400,bytesize=8, stopbits=1,timeout=None)
+		self.ser = serial.Serial(port = "/dev/ttyO"+sel_uart, baudrate=38400,bytesize=8, stopbits=1,timeout=None)
 		self.ser.close()
 
 	#Fonction chargée d'effectuer l'envoi sur la liaison série des commandes moteurs
-	def ordre_moteurs(self,commande):
+	def ordre_moteurs(self,commande,parameter):
 		#On vérifie que la commande et son paramètre correspondent à des valeurs autorisées
 		AUTORISATION = True
 		if(commande == constants.SET_SPEED_1 || commande == constants.SET_SPEED_2):
 			if(MODE == 0 || MODE == 1):
-				AUTORISATION = verif_commande_SETSPEED_01()
+				AUTORISATION = verif_commande_SETSPEED_01(parameter)
 			else
 				if(commande == constants.SET_SPEED):
-					AUTORISATION = verif_commande_SETSPEED_23()
+					AUTORISATION = verif_commande_SETSPEED_23(parameter)
 				else
-					AUTORISATION = verif_commande_TURN()
+					AUTORISATION = verif_commande_TURN(parameter)
 		else if(commande == constants.SET_ACCELERATION):
-			AUTORISATION = verif_commande_SETACCELERATION
+			AUTORISATION = verif_commande_SETACCELERATION(parameter)
 		else if(commande == constants.SET_MODE):
-			AUTORISATION = verif_commande_SETMODE
+			AUTORISATION = verif_commande_SETMODE(parameter)
 
 		if(AUTORISATION):
 			self.ser.open()
 			if self.ser.isOpen():
-				self.ser.write(commande)
-				#Si la commande est de connaitre la vitesse des moteurs 1 ou 2, on retourne cette valeur
-				if (commande == '0x21' || commande == '0x22'):
+				self.ser.write(constants.CMD+commande+parameter)
+				#Si la commande est une commande GET, on lit la réponse et on la retourne
+				if (commande in constants.LIST_GET):
 						return self.ser.read()
 			self.ser.close()
 	
