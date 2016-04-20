@@ -8,6 +8,8 @@ import curses
 import os
 import sys
 
+import thread
+
 """
 	On importe les classes personnalisées python
 """
@@ -18,12 +20,21 @@ import Robot
 if __name__ == '__main__':
 	#On prépare un fichier temporaire tant que le script est lancé
 	pid = str(os.getpid())
-	pidfile = "/tmp/mydaemon.pid"
+	pidfile = "/tmp/controleur.pid"
 
-	if os.path.isfile(pidfile):
-    	print "%s already exists, exiting" % pidfile
-	    sys.exit()
-	file(pidfile, 'w').write(pid)
+	try:
+		#On teste si le fichier existe déja
+		if os.path.isfile(pidfile):
+			os.link(pidfile,"daemon_python")
+		else:
+			file(pidfile, 'w').write(pid)
+			os.link(pidfile,"daemon_python")
+	except IOError as e:
+    	print "I/O error({0}): {1}".format(e.errno,e.strerror)
+    #except:
+	#    print "Unexpected error:", sys.exc_info()[0]
+	#    raise
+	#    sys.exit()
 	#On effectue le vrai travail ici
 	try:
 	    robot = Robot()
@@ -64,10 +75,39 @@ if __name__ == '__main__':
 			elif c == curses.KEY_ESC
 				continue = False
 			pass
+	#On récupère toutes exceptions génantes (Ctrl-C de l'utilisateur, arrêt brutal du système)
+	except KeyboardInterrupt as key:
+		print("User-generated interrupt, exiting....")
+		curses.nocbreak()
+		stdscr.keypad(0)
+		curses.echo()
+		curses.endwin()
+		try:
+        	os.remove("daemon_python")
+        	#os.unlink("daemon_python") est équivalent selon la documentation python, version liens Unix
+		except OSError, e:  ## si l'opération échoue, on affiche l'erreur rencontrée (voir au niveau des permissions)
+		    print ("Error: %s - %s." % (e.filename,e.strerror))
+
+	except SystemExit as exit_sys:
+		print("An exception forcing the interpreter to stop has been detected, shutting down....")
+		curses.nocbreak()
+		stdscr.keypad(0)
+		curses.echo()
+		curses.endwin()
+		try:
+        	os.remove("daemon_python")
+        	#os.unlink("daemon_python") est équivalent selon la documentation python, version liens Unix
+		except OSError, e:  ## si l'opération échoue, on affiche l'erreur rencontrée (voir au niveau des permissions)
+		    print ("Error: %s - %s." % (e.filename,e.strerror))
 	#Quand on a fini toute l'application (si celle-ci a une fin), on efface le fichier disant que l'application est lancée (et on restaure le terminal initial)
 	finally:
 		curses.nocbreak()
 		stdscr.keypad(0)
 		curses.echo()
 		curses.endwin()
-	    os.unlink(pidfile)
+		try:
+        	os.remove("daemon_python")
+        	#os.unlink("daemon_python") est équivalent selon la documentation python, version liens Unix
+		except OSError, e:  ## si l'opération échoue, on affiche l'erreur rencontrée (voir au niveau des permissions)
+		    print ("Error: %s - %s." % (e.filename,e.strerror))
+	    
