@@ -2,7 +2,6 @@
 # -*-coding:Utf-8 -*
 import Adafruit_BBIO.UART as UART
 import serial
-import socket
 import curses
 
 import os
@@ -36,17 +35,17 @@ class Robot(object):
 	def ordre_moteurs(self,commande,parameter):
 		#On vérifie que la commande et son paramètre correspondent à des valeurs autorisées
 		AUTORISATION = True
-		if(commande == constants.SET_SPEED_1 || commande == constants.SET_SPEED_2):
-			if(MODE == 0 || MODE == 1):
+		if(commande == constants.SET_SPEED_1 | commande == constants.SET_SPEED_2):
+			if(MODE == 0 | MODE == 1):
 				AUTORISATION = verif_commande_SETSPEED_01(parameter)
-			else
+			else:
 				if(commande == constants.SET_SPEED):
 					AUTORISATION = verif_commande_SETSPEED_23(parameter)
-				else
+				else:
 					AUTORISATION = verif_commande_TURN(parameter)
-		else if(commande == constants.SET_ACCELERATION):
+		elif(commande == constants.SET_ACCELERATION):
 			AUTORISATION = verif_commande_SETACCELERATION(parameter)
-		else if(commande == constants.SET_MODE):
+		elif(commande == constants.SET_MODE):
 			AUTORISATION = verif_commande_SETMODE(parameter)
 
 		if(AUTORISATION):
@@ -65,7 +64,7 @@ class Robot(object):
 	def verif_commande_SETSPEED_01(self,parameter):
 		if(MODE == 0):
 			return (parameter >= 0) & (parameter <= 255)
-		else if (MODE == 1):
+		elif (MODE == 1):
 			return (parameter >= -128) & (parameter <= 127)
 		else :
 			return False;
@@ -74,7 +73,7 @@ class Robot(object):
 	def verif_commande_SETSPEED_23(self,parameter):
 		if(MODE == 2):
 			return (parameter >= 0) & (parameter <= 255)
-		else if (MODE == 3):
+		elif (MODE == 3):
 			return (parameter >= -128) & (parameter <= 127)
 		else :
 			return False;
@@ -82,7 +81,7 @@ class Robot(object):
 	def verif_commande_TURN(self,parameter):
 		if(MODE == 2):
 			return (parameter >= 0) & (parameter <= 255)
-		else if (MODE == 3):
+		elif (MODE == 3):
 			return (parameter >= -128) & (parameter <= 127)
 		else :
 			return False;

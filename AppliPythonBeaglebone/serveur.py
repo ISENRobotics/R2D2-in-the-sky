@@ -1,13 +1,6 @@
 #/usr/bin/env python
 # -*-coding:Utf-8 -*
-import Adafruit_BBIO.UART as UART
-import serial
 import socket
-import curses
-
-import os
-import sys
-
 
 class Serveur(object):
 	"""
@@ -28,8 +21,11 @@ class Serveur(object):
 
 		#On accepte la connexion
 		#Attention, la méthode accept bloque le programme tant qu'aucun client ne s'est présenté
-		connexion_avec_client, infos_connexion = socket_serveur.accept()
-
+		connexion_avec_client, infos_connexion = self.socket_serveur.accept()
+		print(infos_connexion)
+		msg_recu = connexion_avec_client.recv(1024);
+		print(msg_recu)
+		connexion_avec_client.close();
 
 	def connection(self):
 		### Socket client
@@ -38,7 +34,7 @@ class Serveur(object):
 
 		#On connecte le socket sur l'adresse et le port désiré
 		#Idée : attribuer une IP fixe grâce au routeur au téléphone Android, voir réseau en 255.255.255.252
-		self.socket_client.connect(('192.168.1.3', 12800))
+		self.socket_client.connect(('192.168.0.3', 12800))
 
 	#TODO
 	def transmission(self,destination,infos):

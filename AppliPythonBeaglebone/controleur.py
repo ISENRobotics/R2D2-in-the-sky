@@ -26,15 +26,15 @@ if __name__ == '__main__':
 		#On teste si le fichier existe déja
 		if os.path.isfile(pidfile):
 			os.link(pidfile,"daemon_python")
-		else
+		else:
 			file(pidfile, 'w').write(pid)
 			os.link(pidfile,"daemon_python")
 	except IOError as e:
-    	print "I/O error({0}): {1}".format(e.errno, e.strerror)
-    except:
-	    print "Unexpected error:", sys.exc_info()[0]
-	    raise
-	    sys.exit()
+    	print "I/O error({0}): {1}".format(e.errno,e.strerror)
+    #except:
+	#    print "Unexpected error:", sys.exc_info()[0]
+	#    raise
+	#    sys.exit()
 	#On effectue le vrai travail ici
 	try:
 	    robot = Robot()
