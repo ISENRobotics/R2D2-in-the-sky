@@ -121,6 +121,10 @@ public class JoyStickClass {
 
     public float getDistance() {
         if(distance > min_distance && touch_state) {
+            if (distance > 100)
+            {
+                return 100;
+            }
             return distance;
         }
         return 0;

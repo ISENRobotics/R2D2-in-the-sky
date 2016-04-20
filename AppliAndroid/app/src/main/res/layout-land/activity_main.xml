@@ -116,15 +116,15 @@
         android:id="@+id/layout_joystick3"
         android:layout_width="200dp"
         android:layout_height="200dp"
-        android:background="@drawable/jaune"
+        android:background="@drawable/fleche"
         android:layout_alignTop="@+id/layout_joystick2"
         android:layout_alignLeft="@+id/linearLayout1"
         android:layout_alignStart="@+id/linearLayout1">
 
         <RelativeLayout
             android:id="@+id/layout_joystick3"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
             android:background="@drawable/rouge"
             android:layout_centerVertical="true"
             android:layout_centerHorizontal="true">
@@ -161,14 +161,14 @@
         android:id="@+id/layout_joystick2"
         android:layout_width="200dp"
         android:layout_height="200dp"
-        android:background="@drawable/jaune"
+        android:background="@drawable/fleche"
         android:layout_centerVertical="true"
         android:layout_toRightOf="@+id/button4"
         android:layout_toEndOf="@+id/button4">
 
         <RelativeLayout
-            android:layout_width="50dp"
-            android:layout_height="50dp"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
             android:background="@drawable/rouge"
             android:layout_centerVertical="true"
             android:layout_centerHorizontal="true" />
