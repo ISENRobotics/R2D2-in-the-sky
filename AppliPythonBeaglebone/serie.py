@@ -39,15 +39,18 @@ class Serie(Thread):
 
 	def run(self):
 		while not self.stoprequest.isSet():
-            try:
-                infos = self.input.get(True, 0.05)
-                MODE = infos[0]
-                resultG = ordre_moteurs(constants.SET_SPEED_1,infos[1])
-                resultD = ordre_moteurs(constants.SET_SPEED_2,infos[2])
-                resultA = ordre_moteurs(constants.SET_ACCELERATION,infos[3])
-                self.output.put((resultG, resultD, resultA))
-            except Queue.Empty:
-                continue
+			try:
+				infos = self.input.get(True, 0.05)
+				resultM = 0
+				if(MODE != infos[0]):
+					resultM = ordre_moteurs(constants.SET_MODE)
+				MODE = infos[0]
+				resultG = ordre_moteurs(constants.SET_SPEED_1,infos[1])
+				resultD = ordre_moteurs(constants.SET_SPEED_2,infos[2])
+				resultA = ordre_moteurs(constants.SET_ACCELERATION,infos[3])
+				self.output.put((resultM, resultG, resultD, resultA))
+			except Queue.Empty:
+				continue
 
 	#Fonction chargée d'effectuer l'envoi sur la liaison série des commandes moteurs
 	def ordre_moteurs(self,commande,parameter):
