@@ -8,13 +8,15 @@ import curses
 import os
 import sys
 
+import Queue
+
 import thread
 
 """
 	On importe les classes personnalisées python
 """
 import Serveur
-import Robot
+import Serie
 
 ### Programme principal
 if __name__ == '__main__':
@@ -30,15 +32,25 @@ if __name__ == '__main__':
 			file(pidfile, 'w').write(pid)
 			os.link(pidfile,"daemon_python")
 	except IOError as e:
-    	print "I/O error({0}): {1}".format(e.errno,e.strerror)
+    	print "I/O error({0}): {1}".format(e.errno,e.strerror)	
     #except:
 	#    print "Unexpected error:", sys.exc_info()[0]
 	#    raise
 	#    sys.exit()
 	#On effectue le vrai travail ici
 	try:
-	    robot = Robot()
-		serveur = Serveur()
+		#on déclare les queues nous servant à communiquer avec les threads
+		queue_input_serie = Queue.Queue()
+		queue_output_serie = Queue.Queue()
+		queue_input_serveur = Queue.Queue()
+		queue_output_serveur = Queue.Queue()
+		
+	    thread_serie = Serie(queue_input_serie,queue_output_serie)
+		thread_serveur = Serveur(queue_input_serveur,queue_output_serveur)
+
+		thread_serie.start()
+		thread_serveur.start()
+
 		#on initialise la fenetre graphique mode terminal
 		stdscr = curses.initscr()
 		#On n'affiche pas les entrées saisies à l'écran
@@ -75,6 +87,8 @@ if __name__ == '__main__':
 			elif c == curses.KEY_ESC
 				continue = False
 			pass
+		thread_serie.join()
+		thread_serveur.join()
 	#On récupère toutes exceptions génantes (Ctrl-C de l'utilisateur, arrêt brutal du système)
 	except KeyboardInterrupt as key:
 		print("User-generated interrupt, exiting....")

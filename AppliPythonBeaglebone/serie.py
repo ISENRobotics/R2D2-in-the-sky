@@ -4,6 +4,8 @@ import Adafruit_BBIO.UART as UART
 import serial
 import curses
 
+import threading
+
 import os
 import sys
 
@@ -11,18 +13,22 @@ import constants
 
 ###   Préparation du programme
 
-class Robot(object):
+class Serie(Thread):
 	"""
 	Classe regroupant l'application générale du robot
 		Contient:
 			Une connexion série UART
 			L'algorythmique de surveillance et la transmission des commandes aux moteurs
 	"""
-	MODE = 0
+	self.MODE = 0
 
-	def __init__(self, sel_uart =1):
+	def __init__(self, queue_input, queue_output, sel_uart =1):
 		if(sel_uart not in [1,2,4,5]):
 				return "Erreur : la liaison série spécifiée n'est pas valide"
+		threading.Thread.__init__(self)
+		self.input = queue_input
+		self.output = queue_output
+		self.stoprequest = threading.Event()
 		### Liaison série
 		#On choisir la liaison série 1 par défaut, la liaison série spécifiée sinon
 		UART.setup("UART"+str(sel_uart))
@@ -30,6 +36,18 @@ class Robot(object):
 		#Ouverture de la liaison série
 		self.ser = serial.Serial(port = "/dev/ttyO"+str(sel_uart), baudrate=38400,bytesize=8, stopbits=1,timeout=None)
 		self.ser.close()
+
+	def run(self):
+		while not self.stoprequest.isSet():
+            try:
+                infos = self.input.get(True, 0.05)
+                MODE = infos[0]
+                resultG = ordre_moteurs(constants.SET_SPEED_1,infos[1])
+                resultD = ordre_moteurs(constants.SET_SPEED_2,infos[2])
+                resultA = ordre_moteurs(constants.SET_ACCELERATION,infos[3])
+                self.output.put((resultG, resultD, resultA))
+            except Queue.Empty:
+                continue
 
 	#Fonction chargée d'effectuer l'envoi sur la liaison série des commandes moteurs
 	def ordre_moteurs(self,commande,parameter):
@@ -49,14 +67,18 @@ class Robot(object):
 				#Si la commande est une commande GET, on lit la réponse et on la retourne
 				if (commande in constants.LIST_GET):
 						return self.ser.read()
+			else:
+				#Si la liaison série n'est pas ouverte, on renvoie l'erreur 1000
+				return 1000
 			self.ser.close()
+		return 0
 	
 	def get_serial(self):
 		return self.ser.name
 
 
 	def verif_commande_SETSPEED(self,parameter):
-		if(MODE % 2):
+		if(self.MODE % 2):
 			return (parameter >= 0) & (parameter <= 255)
 		else :
 			return (parameter >= -128) & (parameter <= 127)
