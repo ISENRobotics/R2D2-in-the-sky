@@ -4,7 +4,7 @@ import socket
 import json
 import threading
 
-class Serveur(Thread):
+class Serveur(threading.Thread):
 	"""
 	Classe englobant le socket serveur permettant la transmission d'infos du robot au smartphone, et inversement
 		Contient:
@@ -46,4 +46,4 @@ class Serveur(Thread):
 				infos = self.input.get(True, 0.05)
 				self.socket_client.send(infos)
 			except Queue.Empty:
-                continue
+				continue

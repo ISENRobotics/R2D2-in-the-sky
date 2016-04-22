@@ -13,14 +13,14 @@ import constants
 
 ###   Préparation du programme
 
-class Serie(Thread):
+class Serie(threading.Thread):
 	"""
 	Classe regroupant l'application générale du robot
 		Contient:
 			Une connexion série UART
 			L'algorythmique de surveillance et la transmission des commandes aux moteurs
 	"""
-	self.MODE = 0
+	MODE = 0
 
 	def __init__(self, queue_input, queue_output, sel_uart =1):
 		if(sel_uart not in [1,2,4,5]):

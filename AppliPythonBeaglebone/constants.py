@@ -1,3 +1,4 @@
+# coding: utf8
 #constants.py
 
 #Mot de commande, a envoyer avant chaque commande
