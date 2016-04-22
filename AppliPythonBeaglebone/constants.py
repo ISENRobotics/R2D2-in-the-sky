@@ -72,6 +72,8 @@ SET_SPEED = "31"
 #MODES ACCEPTES : 2 et 3
 TURN = "32"
 
+LIST_SET = [SET_SPEED_1,SET_SPEED_2]
+
 #Mot permettant d'assigner une valeur pour l'accélération des moteurs
 #Valeurs acceptées : 1 à 10
 SET_ACCELERATION = "33"

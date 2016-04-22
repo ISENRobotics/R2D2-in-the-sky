@@ -35,14 +35,8 @@ class Robot(object):
 	def ordre_moteurs(self,commande,parameter):
 		#On vérifie que la commande et son paramètre correspondent à des valeurs autorisées
 		AUTORISATION = True
-		if(commande == constants.SET_SPEED_1 | commande == constants.SET_SPEED_2):
-			if(MODE == 0 | MODE == 1):
-				AUTORISATION = verif_commande_SETSPEED_01(parameter)
-			else:
-				if(commande == constants.SET_SPEED):
-					AUTORISATION = verif_commande_SETSPEED_23(parameter)
-				else:
-					AUTORISATION = verif_commande_TURN(parameter)
+		if(commande in constants.LIST_SET):
+			AUTORISATION = verif_commande_SETSPEED(parameter)
 		elif(commande == constants.SET_ACCELERATION):
 			AUTORISATION = verif_commande_SETACCELERATION(parameter)
 		elif(commande == constants.SET_MODE):
@@ -61,30 +55,11 @@ class Robot(object):
 		return self.ser.name
 
 
-	def verif_commande_SETSPEED_01(self,parameter):
-		if(MODE == 0):
+	def verif_commande_SETSPEED(self,parameter):
+		if(MODE % 2):
 			return (parameter >= 0) & (parameter <= 255)
-		elif (MODE == 1):
-			return (parameter >= -128) & (parameter <= 127)
 		else :
-			return False;
-
-
-	def verif_commande_SETSPEED_23(self,parameter):
-		if(MODE == 2):
-			return (parameter >= 0) & (parameter <= 255)
-		elif (MODE == 3):
 			return (parameter >= -128) & (parameter <= 127)
-		else :
-			return False;
-
-	def verif_commande_TURN(self,parameter):
-		if(MODE == 2):
-			return (parameter >= 0) & (parameter <= 255)
-		elif (MODE == 3):
-			return (parameter >= -128) & (parameter <= 127)
-		else :
-			return False;
 
 	def verif_commande_SETACCELERATION(self,parameter):
 		return (parameter >= 1) & (parameter <= 10)
