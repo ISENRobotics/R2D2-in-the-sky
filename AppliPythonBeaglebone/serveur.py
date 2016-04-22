@@ -45,12 +45,16 @@ class Serveur(threading.Thread):
 		#self.socket_client.connect(('192.168.0.3', 12800))
 
 	def run(self):
+		#Tant que le controleur ne demande pas au thread de s'arreter
 		while not self.stoprequest.isSet():
 			try:
+				#On attend les informations du smartphone
 				msg_recu = connexion_avec_client.recv(49)
 				msg_recu_json = json.loads(msg_recu)
 				if('mode' in msg_recu_json & 'vitesseG' in msg_recu_json & 'vitesseD' in msg_recu_json & 'accel' in msg_recu_json ):
+					#On envoie au controleur les informations parsées
 					self.output.put((msg_recu_json['mode'],msg_recu_json['vitesseG'],msg_recu_json['vitesseD'],msg_recu_json['accel']))
+					#On attend le retour des ordres que la liaison série envoie au controleur après éxécution des ordres
 					infos = self.input.get(True, 0.05)
 					self.socket_client.send(infos)
 				else:

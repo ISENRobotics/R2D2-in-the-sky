@@ -29,7 +29,7 @@ class Serie(threading.Thread):
 		threading.Thread.__init__(self)
 		self.input = queue_input
 		self.output = queue_output
-		
+
 		#variable écoutant l'arrêt du thread par le controleur
 		self.stoprequest = threading.Event()
 		### Liaison série
@@ -41,8 +41,15 @@ class Serie(threading.Thread):
 		self.ser.close()
 
 	def run(self):
+		#Tant que le controleur ne demande pas au thread de s'arreter
 		while not self.stoprequest.isSet():
 			try:
+				#On regarde si un nouveau jeu d'instructions a été mis en queue
+				#Les jeux d'instructions se décomposent de la manière suivante : 
+				#	infos[0] : valeur du mode de fonctionnement demandé
+				#	infos[1] : valeur de la vitesse 1 demandée
+				#	infos[2] : valeur de la vitesse 2 demandée
+				#	infos[3] : valeur de l'acceleration demandée
 				infos = self.input.get(True, 0.05)
 				resultM = 0
 				if(MODE != infos[0]):
@@ -51,6 +58,7 @@ class Serie(threading.Thread):
 				resultG = ordre_moteurs(constants.SET_SPEED_1,infos[1])
 				resultD = ordre_moteurs(constants.SET_SPEED_2,infos[2])
 				resultA = ordre_moteurs(constants.SET_ACCELERATION,infos[3])
+				#On renvoie au controleur les résultats des ordres
 				self.output.put((resultM, resultG, resultD, resultA))
 			except Queue.Empty:
 				continue
