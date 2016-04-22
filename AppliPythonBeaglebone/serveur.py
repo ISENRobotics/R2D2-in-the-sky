@@ -10,11 +10,18 @@ class Serveur(threading.Thread):
 		Contient:
 			Socket serveur réceptionnant les informations du smartphone
 			Socket client transmettant les informations vers le smartphone
+
+		Prend en entrée:
+			queue_input : Une queue d'items input, les informations que le controleur envoie à la classe Serveur : le retour des commandes de la liaison série
+			queue_output : Une queue d'items output, les informations que le serveur transmet au controleur : les commandes demandées par smartphone
+			
 	"""
 	def __init__(self, queue_input, queue_output):
 		threading.Thread.__init__(self)
 		self.input = queue_input
 		self.output = queue_output
+
+		#variable écoutant l'arrêt du thread par le controleur
 		self.stoprequest = threading.Event()
 		### Socket serveur
 		self.socket_serveur = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -42,8 +49,11 @@ class Serveur(threading.Thread):
 			try:
 				msg_recu = connexion_avec_client.recv(49)
 				msg_recu_json = json.loads(msg_recu)
-				self.output.put((msg_recu_json['mode'],msg_recu_json['vitesseG'],msg_recu_json['vitesseD'],msg_recu_json['accel']))
-				infos = self.input.get(True, 0.05)
-				self.socket_client.send(infos)
+				if('mode' in msg_recu_json & 'vitesseG' in msg_recu_json & 'vitesseD' in msg_recu_json & 'accel' in msg_recu_json ):
+					self.output.put((msg_recu_json['mode'],msg_recu_json['vitesseG'],msg_recu_json['vitesseD'],msg_recu_json['accel']))
+					infos = self.input.get(True, 0.05)
+					self.socket_client.send(infos)
+				else:
+					self.socket_client.send("Les commandes demandées ont été anormalement changées, elles n'ont pas été exécutées...")
 			except Queue.Empty:
 				continue

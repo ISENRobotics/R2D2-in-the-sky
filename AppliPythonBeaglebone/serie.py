@@ -15,10 +15,11 @@ import constants
 
 class Serie(threading.Thread):
 	"""
-	Classe regroupant l'application générale du robot
-		Contient:
-			Une connexion série UART
-			L'algorythmique de surveillance et la transmission des commandes aux moteurs
+	Classe regroupant la communication par liaison série avec les moteurs
+		Prend en entrée:
+			queue_input : Une queue d'items input, les informations que le controleur envoie à la classe Série : les paramètres des commandes
+			queue_output : Une queue d'items output, les informations que la liaison série envoie au controleur : les retours des commandes effectuées
+			sel_uart : variable sélectionnant la liaison série à ouvrir, valant 1 par défaut (UART1)
 	"""
 	MODE = 0
 
@@ -28,9 +29,11 @@ class Serie(threading.Thread):
 		threading.Thread.__init__(self)
 		self.input = queue_input
 		self.output = queue_output
+		
+		#variable écoutant l'arrêt du thread par le controleur
 		self.stoprequest = threading.Event()
 		### Liaison série
-		#On choisir la liaison série 1 par défaut, la liaison série spécifiée sinon
+		#On choisit la liaison série 1 par défaut, la liaison série spécifiée sinon
 		UART.setup("UART"+str(sel_uart))
 
 		#Ouverture de la liaison série
