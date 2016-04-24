@@ -29,8 +29,12 @@ public class MainActivity extends AppCompatActivity implements Client.ClientList
 
     JoyStickClass js,js2,js3;
 
+    String vitesseG,vitesseD,valAccel;
+    float intVitesseG,intVitesseD;
+
     JSONObject donneEnvoiJSON = new JSONObject();
     private  Client socketLandscape;
+
 
     public static boolean IS_LANDSCAPE = false;
 
@@ -52,14 +56,30 @@ public class MainActivity extends AppCompatActivity implements Client.ClientList
         layout_joystick3 = (RelativeLayout) findViewById(R.id.layout_joystick3);
 
 
+        valAccel = new String();
+
+        boolean mega = false;
+
+
         MainActivity.IS_LANDSCAPE = getResources().getBoolean(R.bool.isLandscape);
 
         if(MainActivity.IS_LANDSCAPE) {
             //paysage
+           // System.out.println(valAccel);
+           /*
+            Toast.makeText(MainActivity.this, "Accélération:" + valAccel,
+                    Toast.LENGTH_SHORT).show();*/
             socketLandscape = new Client(); //creation socket
 
             socketLandscape.startClient();
-            Toast.makeText(getApplicationContext(), "Connected", Toast.LENGTH_SHORT).show();
+            if(socketLandscape.getConnected())
+            {
+                Toast.makeText(getApplicationContext(), "Connected", Toast.LENGTH_SHORT).show();
+            }
+            else
+            {
+                Toast.makeText(getApplicationContext(), "Connection refused", Toast.LENGTH_SHORT).show();
+            }
 
             //joystick 1, a gauche sur vu paysage
             js3 = new JoyStickClass(getApplicationContext(), layout_joystick3, R.drawable.rouge);
@@ -78,8 +98,26 @@ public class MainActivity extends AppCompatActivity implements Client.ClientList
                     if (arg1.getAction() == MotionEvent.ACTION_DOWN
                             || arg1.getAction() == MotionEvent.ACTION_MOVE) {
 
+                        vitesseG = new String(String.valueOf(Math.round(js3.getDistance())));
+                        textView4.setText("Vitesse G : " + vitesseG);
 
-                        textView4.setText("Distance G : " + String.valueOf(js3.getDistance()));
+                        //mise en forme pour le JSON des vitesse
+                        boolean megaG = false;
+                        if (Math.round(js3.getDistance()) <0)
+                        {
+                            megaG = true;
+                        }
+                        if (megaG)
+                        {
+                            if (vitesseG.length()==2){ vitesseG = "00" + vitesseG;}
+                            if (vitesseG.length()==3){ vitesseG = "0" + vitesseG;}
+                        }
+                        else
+                        {
+                            if (vitesseG.length()==1){ vitesseG = "000" + vitesseG;}
+                            else if (vitesseG.length()==2){ vitesseG = "00" + vitesseG;}
+                            else if(vitesseG.length()==3){ vitesseG = "0" + vitesseG;}
+                        }
 
                         int direction = js3.get8Direction();
                         if (direction == JoyStickClass.STICK_UP) {
@@ -107,6 +145,20 @@ public class MainActivity extends AppCompatActivity implements Client.ClientList
                         textView4.setText("Distance G:");
                         textView5.setText("Direction G:");
                     }
+
+
+                    /*System.out.println(String.valueOf(Math.round(js3.getDistance())));
+                    try {
+                        donneEnvoiJSON.put("mode", "0"); //mode 0 pour landscape
+                        donneEnvoiJSON.put("vitesseG", String.valueOf(Math.round(js3.getDistance()))); //vitesse moteur de gauche
+                        donneEnvoiJSON.put("vitesseD", String.valueOf(Math.round(js2.getDistance()))); //vitesse moteur de gauche
+                    } catch (JSONException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+
+                    String donneJsonToString = donneEnvoiJSON.toString(); // convertie le JSON en string pour l'envoyer
+                    socketLandscape.sendMessage(donneJsonToString);*/
                     return true;
                 }
 
@@ -129,7 +181,9 @@ public class MainActivity extends AppCompatActivity implements Client.ClientList
                             || arg1.getAction() == MotionEvent.ACTION_MOVE) {
 
 
-                        textView2.setText("Distance D: " + String.valueOf(js2.getDistance()));
+                        vitesseD = new String(String.valueOf(Math.round(js2.getDistance())));
+
+                        textView2.setText("Vitesse D: " + vitesseD);
 
                         int direction = js2.get8Direction();
                         if (direction == JoyStickClass.STICK_UP) {
@@ -157,10 +211,38 @@ public class MainActivity extends AppCompatActivity implements Client.ClientList
                         textView2.setText("Distance D:");
                         textView18.setText("Direction D:");
                     }
+                    //cast vitesse en string pour la formaliser a 3 chiffres
+                  /*  intVitesseD = js2.getDistance();
+                    intVitesseG = js3.getDistance();
+                    //String vitesseG = Integer.toString(Math.round(intVitesseG));
+                    //String VitesseD = Integer.toString(Math.round(intVitesseD));
+                    System.out.println("vitesse G avant les boucle dans joy droit " +intVitesseG);
+                    System.out.println("vitesse D avant les boucle dans joy droit" +intVitesseD); */
+
+
+
+                    boolean megaD = false;
+                    if (Math.round(js2.getDistance()) <0)
+                    {
+                        megaD = true;
+                    }
+                    if (megaD)
+                    {
+                      if (vitesseD.length()==2){ vitesseD = "00" + vitesseD;}
+                      if (vitesseD.length()==3){ vitesseD = "0" + vitesseD;}
+                    }
+                    else
+                    {
+                      if (vitesseD.length()==1){ vitesseD = "000" + vitesseD;}
+                      else if (vitesseD.length()==2){ vitesseD = "00" + vitesseD;}
+                      else if(vitesseD.length()==3){ vitesseD = "0" + vitesseD;}
+                    }
+
+
                     try {
                         donneEnvoiJSON.put("mode", "0"); //mode 0 pour landscape
-                        donneEnvoiJSON.put("vitesseG", js3.getDistance()); //vitesse moteur de gauche
-                        donneEnvoiJSON.put("vitesseD", js2.getDistance()); //vitesse moteur de gauche
+                        donneEnvoiJSON.put("vitesseG", vitesseG); //vitesse moteur de gauche
+                        donneEnvoiJSON.put("vitesseD", vitesseD); //vitesse moteur de gauche
                     } catch (JSONException e) {
                         // TODO Auto-generated catch block
                         e.printStackTrace();
@@ -173,7 +255,8 @@ public class MainActivity extends AppCompatActivity implements Client.ClientList
             });
 
 
-        } else {
+        }
+        else {
             //portrait
 
             //joystick principale en mode portrait
@@ -240,6 +323,12 @@ public class MainActivity extends AppCompatActivity implements Client.ClientList
         startActivity(intent);
 
     }
+    public void config(View view){
+        Intent intent = new Intent(this, configActivity.class);
+        startActivity(intent);
+
+    }
+
 
     @Override
     public void onMessageReceived(String message) {

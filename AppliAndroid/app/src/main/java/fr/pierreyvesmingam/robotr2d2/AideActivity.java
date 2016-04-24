@@ -12,7 +12,7 @@ public class AideActivity extends AppCompatActivity {
 
     TextView response;
     EditText editTextAddress, editTextPort;
-    Button buttonConnect, buttonClear;
+    Button buttonConnect;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,7 +22,7 @@ public class AideActivity extends AppCompatActivity {
         editTextAddress = (EditText) findViewById(R.id.addressEditText);
         editTextPort = (EditText) findViewById(R.id.portEditText);
         buttonConnect = (Button) findViewById(R.id.connectButton);
-        buttonClear = (Button) findViewById(R.id.clearButton);
+
         response = (TextView) findViewById(R.id.responseTextView);
 
         buttonConnect.setOnClickListener(new View.OnClickListener() {
@@ -36,13 +36,13 @@ public class AideActivity extends AppCompatActivity {
             }
         });
 
-        buttonClear.setOnClickListener(new View.OnClickListener() {
+        /*buttonClear.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
                 response.setText("");
             }
-        });
+        });*/
 
     }
 

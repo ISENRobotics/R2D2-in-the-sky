@@ -121,11 +121,33 @@ public class JoyStickClass {
 
     public float getDistance() {
         if(distance > min_distance && touch_state) {
-            if (distance > 100)
+            System.out.println("Postion_Y : " + position_y);
+            if (position_y < 0)
             {
-                return 100;
+                if (distance > 250) {
+                    return 100;
+                }
+                if (distance > 0) {
+                    System.out.println("dans le positif");
+                    distance = (distance / 250) * 100;
+                    return distance;
+                }
             }
-            return distance;
+            if (position_y > 0)
+                {
+                    if(distance > 250)
+                    {
+                        return -100;
+                    }
+                    if (distance>0)
+                    {
+                        System.out.println("dans le negatif");
+                    distance = (distance/250)*100;
+                    return  -distance;
+                    }
+
+                }
+
         }
         return 0;
     }

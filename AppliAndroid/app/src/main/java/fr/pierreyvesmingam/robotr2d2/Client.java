@@ -3,19 +3,14 @@ package fr.pierreyvesmingam.robotr2d2;
 /**
  * Created by Pierre-yves on 18/04/2016.
  */
-import java.io.ByteArrayOutputStream;
-import java.io.Console;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
-import java.net.UnknownHostException;
 import java.util.Vector;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import android.os.AsyncTask;
-import android.webkit.ConsoleMessage;
 import android.widget.TextView;
 
 public class Client extends Thread {
@@ -25,20 +20,23 @@ public class Client extends Thread {
     private String response = "";
     private TextView textResponse;
     private AtomicBoolean stop;
+    private Boolean connected;
     private Socket socket;
     private InputStream is;
     private OutputStream os;
     private DataOutputStream dos;
     private Vector<String> outputData;
     private Vector<ClientListener> clientListeners;
-    private String envoie;
+    private String envoieMessage;
     private String donneOut;
 
 
     Client() {
         this.textResponse=textResponse;
         this.stop = new AtomicBoolean(false);
+        this.connected = false;
         this.clientListeners = new Vector<ClientListener>();
+        this.envoieMessage = new String();
     }
 
     public void initClient() throws IOException {
@@ -58,18 +56,21 @@ public class Client extends Thread {
 
     public void sendMessage(String message){
 
-        this.envoie = message;
+        this.envoieMessage = message;
+        System.out.println("initialisation message envoie");
+        System.out.println(this.envoieMessage);
     }
 
     public void run(){
         try{
 
         System.out.println("ici");
-        this.socket = new Socket("192.168.0.3", 12800);
+        this.socket = new Socket("192.168.0.2", 12800);
         this.is = socket.getInputStream();
         this.os = socket.getOutputStream();
+        dos = new DataOutputStream(os);
        // dos = DataOutputStream(OutputStream
-
+        connected= true;
 
         System.out.println("                                                                                                                        LA");
         while(!stop.get()){
@@ -77,26 +78,34 @@ public class Client extends Thread {
 
 
             // ecriture
-            if(!envoie.isEmpty()) {
-                this.dos.writeUTF(envoie);
+            if(!this.envoieMessage.isEmpty()) {
+                System.out.println("Je suis dans une magnifique boucle");
+                this.dos.writeUTF(this.envoieMessage);
                 outputData.clear();
+                this.sleep(80);
             }
 
             for(ClientListener clientListener : clientListeners)
                 clientListener.onMessageReceived("coucou");
-            try {
+                try {
                 this.sleep(80);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
         }
         }catch(Exception e){
-            // if any error occurs
-            e.printStackTrace();}
+            connected = false;
+            e.printStackTrace();
+        }
     }
 
     public interface ClientListener {
         public void onMessageReceived(String message);
     }
+
+    public Boolean getConnected() {
+        return connected;
+    }
+
 
 }
