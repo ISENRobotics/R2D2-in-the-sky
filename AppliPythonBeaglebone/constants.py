@@ -1,3 +1,4 @@
+# coding: utf8
 #constants.py
 
 #Mot de commande, a envoyer avant chaque commande
@@ -72,6 +73,8 @@ SET_SPEED = "31"
 #MODES ACCEPTES : 2 et 3
 TURN = "32"
 
+LIST_SET = [SET_SPEED_1,SET_SPEED_2]
+
 #Mot permettant d'assigner une valeur pour l'accélération des moteurs
 #Valeurs acceptées : 1 à 10
 SET_ACCELERATION = "33"
@@ -99,3 +102,19 @@ DISABLE_TIMEOUT = "38"
 
 #Mot de commande activant la cessassion de communication après 2 secondes sans communication sur la liaison
 ENABLE_TIMEOUT = "39"
+
+PROBLEM_MOTOR_1 = "Un probleme a eu lieu lors de l'envoi de la nouvelle vitesse au moteur 1. Veuillez vérifier les connexions du moteur et du controleur et réessayer."
+
+PROBLEM_MOTOR_2 = "Un probleme a eu lieu lors de l'envoi de la nouvelle vitesse au moteur 2. Veuillez vérifier les connexions du moteur et du controleur et réessayer."
+
+PROBLEM_ACCELERATION = "Un probleme a eu lieu lors de l'envoi de l'ordre au moteur 1. Veuillez vérifier les connexions du moteur et du controleur et réessayer."
+
+PROBLEM_VOLTS = "Les moteurs ont un problème électrique : la tension délivrée n'est pas suffisante. Veuillez résoudre le problème et redémarrer le système."
+
+PROBLEM_CURRENT_1 = "Les moteurs ont un problème électrique : le courant délivré au moteur 1 n'est pas suffisant. Veuillez résoudre le problème et redémarrer le système."
+
+PROBLEM_CURRENT_2 = "Les moteurs ont un problème électrique : le courant délivré au moteur 2 n'est pas suffisant. Veuillez résoudre le problème et redémarrer le système."
+
+PROBLEM_COMMUNICATION_SERIAL = "La liaison série n'a pas pu être ouverte afin d'effectuer la communication des commandes au moteur. Veuillez vérifier l'ouverture série software de la Beaglebone et réessayer."
+
+DICTIONNAIRE_PROBLEMS = {"1000" : PROBLEM_COMMUNICATION_SERIAL, "1001" : PROBLEM_MOTOR_1, "1002" : PROBLEM_MOTOR_2, "1004" : PROBLEM_ACCELERATION,"1005" : PROBLEM_VOLTS,"1006" : PROBLEM_CURRENT_1,"1007" : PROBLEM_CURRENT_2}
