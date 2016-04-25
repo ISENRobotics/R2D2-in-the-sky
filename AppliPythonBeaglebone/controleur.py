@@ -32,7 +32,8 @@ if __name__ == '__main__':
 			file(pidfile, 'w').write(pid)
 			os.link(pidfile,"daemon_python")
 	except IOError as e:
-    	print "I/O error({0}): {1}".format(e.errno,e.strerror)	
+		message = "I/O error("+str(e.errno)+"): "+str(e.strerror)
+		print(message)
     #except:
 	#    print "Unexpected error:", sys.exc_info()[0]
 	#    raise
@@ -45,7 +46,7 @@ if __name__ == '__main__':
 		queue_input_serveur = Queue.Queue()
 		queue_output_serveur = Queue.Queue()
 		
-	    thread_serie = Serie(queue_input_serie,queue_output_serie)
+		thread_serie = Serie(queue_input_serie,queue_output_serie)
 		thread_serveur = Serveur(queue_input_serveur,queue_output_serveur)
 
 		thread_serie.start()
@@ -60,8 +61,8 @@ if __name__ == '__main__':
 		#stdscr.keypad(1)
 		#On fait en sorte que getch() ne soit pas bloquant
 		#stdscr.nodelay(True)
-		continue = True
-		while continue:
+		continuer = True
+		while continuer:
 			#On récupère l'entrée utilisateur
 			'''c = stdscr.getch()
 			if c == curses.KEY_LEFT:
@@ -101,10 +102,10 @@ if __name__ == '__main__':
 		curses.echo()
 		curses.endwin()
 		try:
-        	os.remove("daemon_python")
-        	#os.unlink("daemon_python") est équivalent selon la documentation python, version liens Unix
-		except OSError, e:  ## si l'opération échoue, on affiche l'erreur rencontrée (voir au niveau des permissions)
-		    print ("Error: %s - %s." % (e.filename,e.strerror))
+			os.remove("daemon_python")
+			#os.unlink("daemon_python") est équivalent selon la documentation python, version liens Unix
+		except OSError as e:  ## si l'opération échoue, on affiche l'erreur rencontrée (voir au niveau des permissions)
+			print ("Error: %s - %s." % (e.filename,e.strerror))
 
 	except SystemExit as exit_sys:
 		print("An exception forcing the interpreter to stop has been detected, shutting down....")
@@ -113,10 +114,10 @@ if __name__ == '__main__':
 		curses.echo()
 		curses.endwin()
 		try:
-        	os.remove("daemon_python")
-        	#os.unlink("daemon_python") est équivalent selon la documentation python, version liens Unix
-		except OSError, e:  ## si l'opération échoue, on affiche l'erreur rencontrée (voir au niveau des permissions)
-		    print ("Error: %s - %s." % (e.filename,e.strerror))
+			os.remove("daemon_python")
+			#os.unlink("daemon_python") est équivalent selon la documentation python, version liens Unix
+		except OSError as e:  ## si l'opération échoue, on affiche l'erreur rencontrée (voir au niveau des permissions)
+			print ("Error: %s - %s." % (e.filename,e.strerror))
 	#Quand on a fini toute l'application (si celle-ci a une fin), on efface le fichier disant que l'application est lancée (et on restaure le terminal initial)
 	finally:
 		curses.nocbreak()
@@ -124,8 +125,7 @@ if __name__ == '__main__':
 		curses.echo()
 		curses.endwin()
 		try:
-        	os.remove("daemon_python")
-        	#os.unlink("daemon_python") est équivalent selon la documentation python, version liens Unix
-		except OSError, e:  ## si l'opération échoue, on affiche l'erreur rencontrée (voir au niveau des permissions)
-		    print ("Error: %s - %s." % (e.filename,e.strerror))
-	    
+			os.remove("daemon_python")
+			#os.unlink("daemon_python") est équivalent selon la documentation python, version liens Unix
+		except OSError as e:  ## si l'opération échoue, on affiche l'erreur rencontrée (voir au niveau des permissions)
+			print ("Error: %s - %s." % (e.filename,e.strerror))
