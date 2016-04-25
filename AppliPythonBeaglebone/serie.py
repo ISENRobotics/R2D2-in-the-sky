@@ -8,7 +8,7 @@ import threading
 
 import os
 import sys
-
+import Queue
 import constants
 
 ###   Préparation du programme
@@ -21,7 +21,6 @@ class Serie(threading.Thread):
 			queue_output : Une queue d'items output, les informations que la liaison série envoie au controleur : les retours des commandes effectuées
 			sel_uart : variable sélectionnant la liaison série à ouvrir, valant 1 par défaut (UART1)
 	"""
-	MODE = 0
 
 	def __init__(self, queue_input, queue_output, sel_uart =1):
 		if(sel_uart not in [1,2,4,5]):
@@ -29,7 +28,7 @@ class Serie(threading.Thread):
 		threading.Thread.__init__(self)
 		self.input = queue_input
 		self.output = queue_output
-
+		self.MODE = 0
 		#variable écoutant l'arrêt du thread par le controleur
 		self.stoprequest = threading.Event()
 		### Liaison série
@@ -38,6 +37,8 @@ class Serie(threading.Thread):
 
 		#Ouverture de la liaison série
 		self.ser = serial.Serial(port = "/dev/ttyO"+str(sel_uart), baudrate=38400,bytesize=8, stopbits=1,timeout=None)
+		self.test = self.ordre_moteurs("31","ff")
+		self.test2 = self.ordre_moteurs("32","ff")
 		self.ser.close()
 
 	def run(self):
@@ -51,33 +52,36 @@ class Serie(threading.Thread):
 				#	infos[2] : valeur de la vitesse 2 demandée
 				#	infos[3] : valeur de l'acceleration demandée
 				infos = self.input.get(True)
-				resultM = 0
-				if(MODE != infos[0]):
-					resultM = ordre_moteurs(constants.SET_MODE)
-				MODE = infos[0]
-				resultG = ordre_moteurs(constants.SET_SPEED_1,infos[1])
-				resultD = ordre_moteurs(constants.SET_SPEED_2,infos[2])
-				resultA = ordre_moteurs(constants.SET_ACCELERATION,infos[3])
+				self.resultM = 0
+				if(self.MODE != infos[0]):
+					self.resultM = self.ordre_moteurs(constants.SET_MODE,infos[0])
+
+				self.MODE = int(infos[0])
+				self.resultG = self.ordre_moteurs(constants.SET_SPEED_1,int(infos[1]))
+				self.resultD = self.ordre_moteurs(constants.SET_SPEED_2,int(infos[2]))
+				#self.resultA = self.ordre_moteurs(constants.SET_ACCELERATION,int(infos[3]))
 				#On renvoie au controleur les résultats des ordres
-				self.output.put((resultM, resultG, resultD, resultA))
+				print(self.resultG)
+				print(self.resultD)
+				self.output.put((self.resultM, self.resultG, self.resultD))
 			except Queue.Empty:
 				continue
 
 	#Fonction chargée d'effectuer l'envoi sur la liaison série des commandes moteurs
 	def ordre_moteurs(self,commande,parameter):
 		#On vérifie que la commande et son paramètre correspondent à des valeurs autorisées
-		AUTORISATION = True
+		self.AUTORISATION = True
 		if(commande in constants.LIST_SET):
-			AUTORISATION = verif_commande_SETSPEED(parameter)
+			self.AUTORISATION = self.verif_commande_SETSPEED(parameter)
 		elif(commande == constants.SET_ACCELERATION):
-			AUTORISATION = verif_commande_SETACCELERATION(parameter)
+			self.AUTORISATION = self.verif_commande_SETACCELERATION(parameter)
 		elif(commande == constants.SET_MODE):
-			AUTORISATION = verif_commande_SETMODE(parameter)
+			self.AUTORISATION = self.verif_commande_SETMODE(parameter)
 
-		if(AUTORISATION):
+		if(self.AUTORISATION):
 			self.ser.open()
 			if self.ser.isOpen():
-				self.ser.write(constants.CMD+commande+parameter)
+				self.ser.write(bytearray.fromhex(constants.CMD+commande+str(parameter)))
 				#Si la commande est une commande GET, on lit la réponse et on la retourne
 				if (commande in constants.LIST_GET):
 						return self.ser.read()

@@ -3,6 +3,7 @@
 import socket
 import json
 import threading
+import Queue
 
 class Serveur(threading.Thread):
 	"""
@@ -34,8 +35,8 @@ class Serveur(threading.Thread):
 
 		#On accepte la connexion
 		#Attention, la méthode accept bloque le programme tant qu'aucun client ne s'est présenté
-		connexion_avec_client, infos_connexion = self.socket_serveur.accept()
-		print(infos_connexion)
+		self.connexion_avec_client, self.infos_connexion = self.socket_serveur.accept()
+		print(self.infos_connexion)
 		### Socket client
 		#On crée le socket de connexion
 		#self.socket_client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -49,11 +50,15 @@ class Serveur(threading.Thread):
 		while not self.stoprequest.isSet():
 			try:
 				#On attend les informations du smartphone
-				msg_recu = connexion_avec_client.recv(49)
+				msg_recu = self.connexion_avec_client.recv(50)
+				print(msg_recu)
+				msg_recu = msg_recu[2:]
+				print(msg_recu)
 				msg_recu_json = json.loads(msg_recu)
-				if('mode' in msg_recu_json & 'vitesseG' in msg_recu_json & 'vitesseD' in msg_recu_json & 'accel' in msg_recu_json ):
+				print(msg_recu_json)
+				if(('mode' in msg_recu_json) & ('vitesseG' in msg_recu_json) & ('vitesseD' in msg_recu_json)):
 					#On envoie au controleur les informations parsées
-					self.output.put((msg_recu_json['mode'],msg_recu_json['vitesseG'],msg_recu_json['vitesseD'],msg_recu_json['accel']))
+					self.output.put((msg_recu_json['mode'],msg_recu_json['vitesseG'],msg_recu_json['vitesseD']))
 					#On attend le retour des ordres que la liaison série envoie au controleur après éxécution des ordres
 					infos = self.input.get(True)
 					self.socket_client.send(infos)

@@ -7,7 +7,7 @@ import curses
 
 import os
 import sys
-
+sys.path.append("classes/")
 import Queue
 
 import thread
@@ -15,8 +15,8 @@ import thread
 """
 	On importe les classes personnalisées python
 """
-import Serveur
-import Serie
+import serveur
+import serie
 
 ### Programme principal
 if __name__ == '__main__':
@@ -46,15 +46,15 @@ if __name__ == '__main__':
 		queue_input_serveur = Queue.Queue()
 		queue_output_serveur = Queue.Queue()
 		
-		thread_serie = Serie(queue_input_serie,queue_output_serie)
-		thread_serveur = Serveur(queue_input_serveur,queue_output_serveur)
+		thread_serie = serie.Serie(queue_input_serie,queue_output_serie)
+		thread_serveur = serveur.Serveur(queue_input_serveur,queue_output_serveur)
 
 		thread_serie.start()
 		thread_serveur.start()
 
 		#on initialise la fenetre graphique mode terminal
 		#stdscr = curses.initscr()
-		#On n'affiche pas les entrées saisies à l'écran
+		#On n'affiche pas les entrées saisie a l'écra
 		#curses.noecho()
 		#curses.cbreak()
 		#On active le mode keypad, permettant la transcription automatique des touches spéciales telles que les flèches en "propriétés curses"
@@ -64,30 +64,30 @@ if __name__ == '__main__':
 		continuer = True
 		while continuer:
 			#On récupère l'entrée utilisateur
-			'''c = stdscr.getch()
-			if c == curses.KEY_LEFT:
-				robot.ordre_moteurs(robot,"x21")
-				robot.ordre_moteurs(robot,"x21")
-				robot.ordre_moteurs(robot,"x21")
-				robot.ordre_moteurs(robot,"x21")
-			elif c == curses.KEY_RIGHT:
-				robot.ordre_moteurs(robot,"x21")
-				robot.ordre_moteurs(robot,"x21")
-				robot.ordre_moteurs(robot,"x21")
-				robot.ordre_moteurs(robot,"x21")
-			elif c == curses.KEY_UP:
-				robot.ordre_moteurs(robot,"x21")
-				robot.ordre_moteurs(robot,"x21")
-				robot.ordre_moteurs(robot,"x21")
-				robot.ordre_moteurs(robot,"x21")
-			elif c == curses.KEY_DOWN:
-				robot.ordre_moteurs(robot,"x21")
-				robot.ordre_moteurs(robot,"x21")
-				robot.ordre_moteurs(robot,"x21")
-				robot.ordre_moteurs(robot,"x21")
-			elif c == curses.KEY_ESC
-				continue = False
-			pass'''
+			#c = stdscr.getch()
+			#if c == curses.KEY_LEFT:
+			#	robot.ordre_moteurs(robot,"x21")
+			#	robot.ordre_moteurs(robot,"x21")
+			#	robot.ordre_moteurs(robot,"x21")
+			#	robot.ordre_moteurs(robot,"x21")
+			#elif c == curses.KEY_RIGHT:
+			#	robot.ordre_moteurs(robot,"x21")
+			#	robot.ordre_moteurs(robot,"x21")
+			#	robot.ordre_moteurs(robot,"x21")
+			#	robot.ordre_moteurs(robot,"x21")
+			#elif c == curses.KEY_UP:
+			#	robot.ordre_moteurs(robot,"x21")
+			#	robot.ordre_moteurs(robot,"x21")
+			#	robot.ordre_moteurs(robot,"x21")
+			#	robot.ordre_moteurs(robot,"x21")
+			#elif c == curses.KEY_DOWN:
+			#	robot.ordre_moteurs(robot,"x21")
+			#	robot.ordre_moteurs(robot,"x21")
+			#	robot.ordre_moteurs(robot,"x21")
+			#	robot.ordre_moteurs(robot,"x21")
+			#elif c == curses.KEY_ESC
+			#	continue = False
+			#pass
 			infos = queue_output_serveur.get(True)
 			queue_input_serie.put((infos))
 			infos = queue_output_serie.get(True)
@@ -97,10 +97,10 @@ if __name__ == '__main__':
 	#On récupère toutes exceptions génantes (Ctrl-C de l'utilisateur, arrêt brutal du système)
 	except KeyboardInterrupt as key:
 		print("User-generated interrupt, exiting....")
-		curses.nocbreak()
-		stdscr.keypad(0)
-		curses.echo()
-		curses.endwin()
+		#curses.nocbreak()
+		#stdscr.keypad(0)
+		#curses.echo()
+		#curses.endwin()
 		try:
 			os.remove("daemon_python")
 			#os.unlink("daemon_python") est équivalent selon la documentation python, version liens Unix
@@ -109,10 +109,10 @@ if __name__ == '__main__':
 
 	except SystemExit as exit_sys:
 		print("An exception forcing the interpreter to stop has been detected, shutting down....")
-		curses.nocbreak()
-		stdscr.keypad(0)
-		curses.echo()
-		curses.endwin()
+		#curses.nocbreak()
+		#stdscr.keypad(0)
+		#curses.echo()
+		#curses.endwin()
 		try:
 			os.remove("daemon_python")
 			#os.unlink("daemon_python") est équivalent selon la documentation python, version liens Unix
@@ -120,10 +120,10 @@ if __name__ == '__main__':
 			print ("Error: %s - %s." % (e.filename,e.strerror))
 	#Quand on a fini toute l'application (si celle-ci a une fin), on efface le fichier disant que l'application est lancée (et on restaure le terminal initial)
 	finally:
-		curses.nocbreak()
-		stdscr.keypad(0)
-		curses.echo()
-		curses.endwin()
+		#curses.nocbreak()
+		#stdscr.keypad(0)
+		#curses.echo()
+		#curses.endwin()
 		try:
 			os.remove("daemon_python")
 			#os.unlink("daemon_python") est équivalent selon la documentation python, version liens Unix
