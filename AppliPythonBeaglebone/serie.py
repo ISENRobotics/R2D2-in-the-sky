@@ -50,7 +50,7 @@ class Serie(threading.Thread):
 				#	infos[1] : valeur de la vitesse 1 demandée
 				#	infos[2] : valeur de la vitesse 2 demandée
 				#	infos[3] : valeur de l'acceleration demandée
-				infos = self.input.get(True, 0.05)
+				infos = self.input.get(True)
 				resultM = 0
 				if(MODE != infos[0]):
 					resultM = ordre_moteurs(constants.SET_MODE)

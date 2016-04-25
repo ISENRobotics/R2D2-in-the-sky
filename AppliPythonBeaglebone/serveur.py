@@ -55,7 +55,7 @@ class Serveur(threading.Thread):
 					#On envoie au controleur les informations parsées
 					self.output.put((msg_recu_json['mode'],msg_recu_json['vitesseG'],msg_recu_json['vitesseD'],msg_recu_json['accel']))
 					#On attend le retour des ordres que la liaison série envoie au controleur après éxécution des ordres
-					infos = self.input.get(True, 0.05)
+					infos = self.input.get(True)
 					self.socket_client.send(infos)
 				else:
 					self.socket_client.send("Les commandes demandées ont été anormalement changées, elles n'ont pas été exécutées...")

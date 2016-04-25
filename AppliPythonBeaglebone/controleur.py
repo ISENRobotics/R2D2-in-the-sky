@@ -52,18 +52,18 @@ if __name__ == '__main__':
 		thread_serveur.start()
 
 		#on initialise la fenetre graphique mode terminal
-		stdscr = curses.initscr()
+		#stdscr = curses.initscr()
 		#On n'affiche pas les entrées saisies à l'écran
-		curses.noecho()
-		curses.cbreak()
+		#curses.noecho()
+		#curses.cbreak()
 		#On active le mode keypad, permettant la transcription automatique des touches spéciales telles que les flèches en "propriétés curses"
-		stdscr.keypad(1)
+		#stdscr.keypad(1)
 		#On fait en sorte que getch() ne soit pas bloquant
-		stdscr.nodelay(True)
+		#stdscr.nodelay(True)
 		continue = True
 		while continue:
 			#On récupère l'entrée utilisateur
-			c = stdscr.getch()
+			'''c = stdscr.getch()
 			if c == curses.KEY_LEFT:
 				robot.ordre_moteurs(robot,"x21")
 				robot.ordre_moteurs(robot,"x21")
@@ -86,7 +86,11 @@ if __name__ == '__main__':
 				robot.ordre_moteurs(robot,"x21")
 			elif c == curses.KEY_ESC
 				continue = False
-			pass
+			pass'''
+			infos = queue_output_serveur.get(True)
+			queue_input_serie.put((infos))
+			infos = queue_output_serie.get(True)
+			queue_input_serveur.put((infos))
 		thread_serie.join()
 		thread_serveur.join()
 	#On récupère toutes exceptions génantes (Ctrl-C de l'utilisateur, arrêt brutal du système)
