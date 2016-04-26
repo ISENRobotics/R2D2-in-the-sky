@@ -25,16 +25,16 @@ public class AideActivity extends AppCompatActivity {
 
         response = (TextView) findViewById(R.id.responseTextView);
 
-        buttonConnect.setOnClickListener(new View.OnClickListener() {
+        /*buttonConnect.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View arg0) {
               /*  Client myClient = new Client(editTextAddress.getText()
                         .toString(), Integer.parseInt(editTextPort
                         .getText().toString()), response);
-                myClient.execute();*/
+                myClient.execute();
             }
-        });
+        });*/
 
         /*buttonClear.setOnClickListener(new View.OnClickListener() {
 

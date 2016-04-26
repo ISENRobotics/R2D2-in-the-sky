@@ -66,13 +66,12 @@ public class Client extends Thread {
 
         System.out.println("ici");
         this.socket = new Socket("192.168.0.2", 12800);
+        connected = true;
         this.is = socket.getInputStream();
         this.os = socket.getOutputStream();
         dos = new DataOutputStream(os);
        // dos = DataOutputStream(OutputStream
         connected= true;
-
-        System.out.println("                                                                                                                        LA");
         while(!stop.get()){
             // lecture
 

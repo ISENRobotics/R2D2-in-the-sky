@@ -29,12 +29,13 @@ public class MainActivity extends AppCompatActivity implements Client.ClientList
 
     JoyStickClass js,js2,js3;
 
-    String vitesseG,vitesseD,valAccel;
+    String vitesseG,vitesseD,valAccel,anglePortrait,vitessePortrait;
     float intVitesseG,intVitesseD;
 
     JSONObject donneEnvoiJSON = new JSONObject();
+    JSONObject donneEnvoiJSONPortrait = new JSONObject();
     private  Client socketLandscape;
-
+    private  Client socketPortrait;
 
     public static boolean IS_LANDSCAPE = false;
 
@@ -106,9 +107,11 @@ public class MainActivity extends AppCompatActivity implements Client.ClientList
                         if (Math.round(js3.getDistance()) <0)
                         {
                             megaG = true;
+                            //vitesseG = String.valueOf(Math.round(Math.abs(js3.getDistance())));
                         }
                         if (megaG)
                         {
+
                             if (vitesseG.length()==2){ vitesseG = "00" + vitesseG;}
                             if (vitesseG.length()==3){ vitesseG = "0" + vitesseG;}
                         }
@@ -259,6 +262,20 @@ public class MainActivity extends AppCompatActivity implements Client.ClientList
         else {
             //portrait
 
+
+            socketPortrait = new Client(); //creation socket
+
+            socketPortrait.startClient();
+            if(socketPortrait.getConnected())
+            {
+                Toast.makeText(getApplicationContext(), "Connected", Toast.LENGTH_SHORT).show();
+            }
+            else
+            {
+                Toast.makeText(getApplicationContext(), "Connection refused", Toast.LENGTH_SHORT).show();
+            }
+
+
             //joystick principale en mode portrait
             js = new JoyStickClass(getApplicationContext(), layout_joystick, R.drawable.rouge);
             js.setStickSize(150, 150);
@@ -274,8 +291,11 @@ public class MainActivity extends AppCompatActivity implements Client.ClientList
                     if (arg1.getAction() == MotionEvent.ACTION_DOWN
                             || arg1.getAction() == MotionEvent.ACTION_MOVE) {
 
-                        textView3.setText("Angle : " + String.valueOf(js.getAngle()));
-                        textView4.setText("Distance : " + String.valueOf(js.getDistance()));
+                        anglePortrait = new String(String.valueOf(Math.round(js.getAngle())));
+                        vitessePortrait = new String(String.valueOf(Math.round(js.getDistance())));
+
+                        textView3.setText("Angle : " + anglePortrait);
+                        textView4.setText("Distance : " + vitessePortrait);
 
                         int direction = js.get8Direction();
                         if (direction == JoyStickClass.STICK_UP) {
@@ -303,6 +323,20 @@ public class MainActivity extends AppCompatActivity implements Client.ClientList
                         textView4.setText("Distance :");
                         textView5.setText("Direction :");
                     }
+
+
+
+                    try {
+                        donneEnvoiJSONPortrait.put("mode", "2"); //mode 0 pour landscape
+                        donneEnvoiJSONPortrait.put("angle", anglePortrait); //vitesse moteur de gauche
+                        donneEnvoiJSONPortrait.put("vitesse", vitessePortrait); //vitesse moteur de gauche
+                    } catch (JSONException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+
+                    String donneJsonToString = donneEnvoiJSONPortrait.toString(); // convertie le JSON en string pour l'envoyer
+                    socketPortrait.sendMessage(donneJsonToString);
                     return true;
                 }
             });
