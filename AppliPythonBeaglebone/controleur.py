@@ -34,12 +34,11 @@ if __name__ == '__main__':
 	except IOError as e:
 		message = "I/O error("+str(e.errno)+"): "+str(e.strerror)
 		print(message)
-    #except:
-	#    print "Unexpected error:", sys.exc_info()[0]
-	#    raise
-	#    sys.exit()
-	#On effectue le vrai travail ici
+   #On effectue le vrai travail ici
 	try:
+		surveillance_serveur = Surveillance_serveur(self)
+		surveillance_serie   = Surveillance_serie(self)
+		algorithmique        = Algorithmique(self)
 		#on déclare les queues nous servant à communiquer avec les threads
 		queue_input_serie = Queue.Queue()
 		queue_output_serie = Queue.Queue()
@@ -52,42 +51,9 @@ if __name__ == '__main__':
 		thread_serie.start()
 		thread_serveur.start()
 
-		#on initialise la fenetre graphique mode terminal
-		#stdscr = curses.initscr()
-		#On n'affiche pas les entrées saisie a l'écra
-		#curses.noecho()
-		#curses.cbreak()
-		#On active le mode keypad, permettant la transcription automatique des touches spéciales telles que les flèches en "propriétés curses"
-		#stdscr.keypad(1)
-		#On fait en sorte que getch() ne soit pas bloquant
-		#stdscr.nodelay(True)
 		continuer = True
 		while continuer:
-			#On récupère l'entrée utilisateur
-			#c = stdscr.getch()
-			#if c == curses.KEY_LEFT:
-			#	robot.ordre_moteurs(robot,"x21")
-			#	robot.ordre_moteurs(robot,"x21")
-			#	robot.ordre_moteurs(robot,"x21")
-			#	robot.ordre_moteurs(robot,"x21")
-			#elif c == curses.KEY_RIGHT:
-			#	robot.ordre_moteurs(robot,"x21")
-			#	robot.ordre_moteurs(robot,"x21")
-			#	robot.ordre_moteurs(robot,"x21")
-			#	robot.ordre_moteurs(robot,"x21")
-			#elif c == curses.KEY_UP:
-			#	robot.ordre_moteurs(robot,"x21")
-			#	robot.ordre_moteurs(robot,"x21")
-			#	robot.ordre_moteurs(robot,"x21")
-			#	robot.ordre_moteurs(robot,"x21")
-			#elif c == curses.KEY_DOWN:
-			#	robot.ordre_moteurs(robot,"x21")
-			#	robot.ordre_moteurs(robot,"x21")
-			#	robot.ordre_moteurs(robot,"x21")
-			#	robot.ordre_moteurs(robot,"x21")
-			#elif c == curses.KEY_ESC
-			#	continue = False
-			#pass
+			
 			infos = queue_output_serveur.get(True)
 			queue_input_serie.put((infos))
 			infos = queue_output_serie.get(True)
@@ -103,6 +69,8 @@ if __name__ == '__main__':
 		#curses.endwin()
 		try:
 			os.remove("daemon_python")
+			thread_serie.join(timeout=0)
+			thread_serveur.join(timeout=0)
 			#os.unlink("daemon_python") est équivalent selon la documentation python, version liens Unix
 		except OSError as e:  ## si l'opération échoue, on affiche l'erreur rencontrée (voir au niveau des permissions)
 			print ("Error: %s - %s." % (e.filename,e.strerror))
@@ -115,6 +83,8 @@ if __name__ == '__main__':
 		#curses.endwin()
 		try:
 			os.remove("daemon_python")
+			thread_serie.join(timeout=0)
+			thread_serveur.join(timeout=0)
 			#os.unlink("daemon_python") est équivalent selon la documentation python, version liens Unix
 		except OSError as e:  ## si l'opération échoue, on affiche l'erreur rencontrée (voir au niveau des permissions)
 			print ("Error: %s - %s." % (e.filename,e.strerror))
@@ -126,6 +96,15 @@ if __name__ == '__main__':
 		#curses.endwin()
 		try:
 			os.remove("daemon_python")
+			thread_serie.join(timeout=0)
+			thread_serveur.join(timeout=0)
 			#os.unlink("daemon_python") est équivalent selon la documentation python, version liens Unix
 		except OSError as e:  ## si l'opération échoue, on affiche l'erreur rencontrée (voir au niveau des permissions)
 			print ("Error: %s - %s." % (e.filename,e.strerror))
+
+
+	
+	def mise_a_jour_serveur(self,serveur):
+        self.algorithmique.serveur=serveur
+    def mise_a_jour_serie(self,serie):
+        self.algorithmique.serie=serie
