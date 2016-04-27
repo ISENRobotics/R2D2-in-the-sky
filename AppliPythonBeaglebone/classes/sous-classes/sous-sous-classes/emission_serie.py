@@ -2,12 +2,9 @@
 # -*-coding:Utf-8 -*
 import Adafruit_BBIO.UART as UART
 import serial
-import curses
 
 import threading
 
-import os
-import sys
 import Queue
 import constants
 

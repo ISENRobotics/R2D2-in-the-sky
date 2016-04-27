@@ -41,7 +41,7 @@ class Reception_Serie(threading.Thread):
 		#Tant que le controleur ne demande pas au thread de s'arreter
 		while not self.stoprequest.isSet():
 			try:
-				$infos = self.ser.read()
+				infos = self.ser.read()
 				#On regarde si un nouveau jeu d'instructions a été mis en queue
 				#Les jeux d'instructions se décomposent de la manière suivante : 
 				#	infos[0] : valeur du mode de fonctionnement demandé

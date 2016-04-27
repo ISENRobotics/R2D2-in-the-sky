@@ -1,7 +1,6 @@
 #/usr/bin/env python
 # -*-coding:Utf-8 -*
 import socket
-import json
 import threading
 import Queue
 

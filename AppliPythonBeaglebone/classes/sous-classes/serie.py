@@ -9,7 +9,6 @@ import threading
 import os
 import sys
 import Queue
-import constants
 
 ###   Préparation du programme
 

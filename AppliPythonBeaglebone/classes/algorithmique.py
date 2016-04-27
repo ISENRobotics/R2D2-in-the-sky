@@ -1,4 +1,14 @@
-class Algorithmique(object):
+# coding: utf8
+import threading
+import logging
+import json
+from datetime import datetime
+from time import sleep
+
+import serveur
+import serie
+
+class Algorithmique(threading.Thread):
 	def __init__(self,controleur):
 		self.serveur = controleur.surveillance_serveur.serveur 
 		self.serie   = controleur.surveillance_serie.serie;
@@ -7,22 +17,16 @@ class Algorithmique(object):
 	def run(self):
 		while not self.stoprequest.isSet():
 			try:
-				#Routine de logging d'activité de la liaison série
-				if(message_input != self.serie.input[0]):
-					message_input = self.serie.input[0]
-				if(message_output != self.serie.output[0]):
-					message_output = self.serie.output[0]
-				serie_vivante = self.serie.is_alive()
-				if(not serie_vivante):
-					statut_serie = "mort"
-					kill()
-					logging.critical("Le thread Serie ne répondait plus, il a été tué et réinstancié")
-				else:
-					statut_serie = "vivant"
-				maintenant = datetime.now()
-				logging.debug("Le "+maintenant.day+"/"+maintenant.month+"/"+maintenant.year" à "+maintenant.hour+":"+maintenant.minute+":"+maintenant.second+", le thread serie est "+statut_serie+" et les messages suivants sont en attente de traitement : Emission série:"+message_input+"///// Réception série:"+message_output)
+				#On regarde si on a recu des informations, si oui, on les transmet à l'algorithmique
+				infos = self.input.get(True,0.005)
+				self.queue_output_emission.put(infos)
 			except Queue.Empty:
-				continue
+				try:
+					#Si on n'a pas recu d'informations dans le temps imparti, on regarde si un message à envoyer est arrivé
+					infos = self.queue_input_reception.get(True,0.005)
+					self.output.put(infos)
+				except Queue.Empty:
+					continue
 
 
 	def get_serial(self):

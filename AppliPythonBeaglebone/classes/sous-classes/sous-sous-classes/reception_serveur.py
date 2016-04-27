@@ -1,7 +1,6 @@
 #/usr/bin/env python
 # -*-coding:Utf-8 -*
 import socket
-import json
 import threading
 import Queue
 
@@ -40,13 +39,13 @@ class Reception_Serveur(threading.Thread):
 		
 
 	def run(self):
-		#La connexion Android envoie deux caractères au début de la connexion
-		#Il faut donc les réceptionner afin qu'ils ne perturbent pas le reste des messages
-		msg_useless = self.connexion_avec_client.recv(2)
 		#Tant que le controleur ne demande pas au thread de s'arreter
 		while not self.stoprequest.isSet():
 			try:
 				#On attend les informations du smartphone
+				#La connexion Android envoie deux caractères au début de la connexion
+				#Il faut donc les réceptionner afin qu'ils ne perturbent pas le reste des messages
+				msg_useless = self.connexion_avec_client.recv(2)
 				print("J'attends les informations du smartphone")
 				msg_recu = self.connexion_avec_client.recv(49)
 				self.output.put((msg_recu))
