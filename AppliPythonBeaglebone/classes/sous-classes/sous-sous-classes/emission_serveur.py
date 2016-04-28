@@ -17,7 +17,7 @@ class Emission_Serveur(threading.Thread):
 			queue_output : Une queue d'items output, les informations que le serveur transmet au controleur : les commandes demandées par smartphone
 			
 	"""
-	def __init__(self, queue_input):
+	def __init__(self, serveur,queue_input):
 		threading.Thread.__init__(self)
 		self.input = queue_input
 
@@ -30,7 +30,7 @@ class Emission_Serveur(threading.Thread):
 
 		#On connecte le socket sur l'adresse et le port désiré
 		#Idée : attribuer une IP fixe grâce au routeur au téléphone Android, voir réseau en 255.255.255.252
-		#self.socket_client.connect(('192.168.0.5', 12800))
+		self.socket_client.connect((serveur.infos_connexion[0], serveur.infos_connexion[1]))
 
 	def run(self):
 		sleep(1)

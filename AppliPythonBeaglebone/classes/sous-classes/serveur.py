@@ -36,8 +36,9 @@ class Serveur(threading.Thread):
 
 		#variable écoutant l'arrêt du thread par le controleur
 		self.stoprequest = threading.Event()
-		self.thread_emission_serveur = Emission_Serveur(self.queue_output_emission)
-		self.thread_reception_serveur = Reception_Serveur(self.queue_input_reception)
+		self.thread_reception_serveur = Reception_Serveur(self,self.queue_input_reception)
+		self.thread_emission_serveur = Emission_Serveur(self,self.queue_output_emission)
+
 		self.thread_emission_serveur.start()
 		self.thread_reception_serveur.start()
 		

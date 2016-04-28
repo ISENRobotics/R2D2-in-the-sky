@@ -17,12 +17,9 @@ class Algorithmique(threading.Thread):
 		self.serveur = controleur.surveillance_serveur.serveur 
 		self.serie   = controleur.surveillance_serie.serie;
 		self.stoprequest = threading.Event()
-		print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA Algorithmique initialisée")
-
+		
 	def run(self):
-		print("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB Algorithmique lancée")
 		while not self.stoprequest.isSet():
-			print("CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC Algorithmique lancée")
 			try:
 				infos = self.serveur.output.pop()
 				#Traitement des infos
@@ -84,8 +81,6 @@ class Algorithmique(threading.Thread):
 						if(result_mode & result_droite & result_gauche):
 							self.serie.input.appendleft((self.MODE,vitesse_gauche,vitesse_droite))
 						#sinon, on informe le serveur
-					else:
-						self.serveur.input.appendleft("Un des paramètres recu n'est pas bon, les instructions n'ont pas été exécutées")
 				else:
 					self.serveur.input.appendleft("Le mode recu n'est pas bon, aucune instruction n'a été exécuté")
 			else:
