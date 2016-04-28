@@ -53,34 +53,37 @@ class Algorithmique(threading.Thread):
 				result_mode = self.verif_commande_SETMODE(int(msg_recu_json['mode']))
 				if(result_mode):
 					self.MODE = int(msg_recu_json['mode']);
-					#on commence par assigner des vitesses telles que les moteurs ne bougent pas
-					if(self.MODE %2 == 0):
-						default = 128
+					if(self.MODE == 8):
+						self.serie.input.appendleft(("0","0128","0128"))
 					else:
-						default = 0
-					if(('vitesseD' in msg_recu_json) & ('vitesseG' in msg_recu_json)):
-						vitesse_gauche = int(msg_recu_json['vitesseG'])
-						vitesse_droite = int(msg_recu_json['vitesseD'])
-					elif('vitesseG' in msg_recu_json):
-						vitesse_gauche = int(msg_recu_json['vitesseG'])
-						vitesse_droite = default
-					elif('vitesseD' in msg_recu_json):
-						vitesse_gauche = default
-						vitesse_droite = int(msg_recu_json['vitesseD'])
-					#Si on est en mode 0 ou 2, on ramène les vitesses entre 0 et 255
-					else:
-						self.serveur.input.appendleft("Aucune vitesse n'a été recue, les instructions n'ont pas été exécutées")
-					if(self.MODE%2 == 0):
-						if(vitesse_gauche != default):
-							vitesse_gauche += 128
-						if(vitesse_droite != default):
-							vitesse_droite += 128
-					result_droite = self.verif_commande_SETSPEED(vitesse_droite)
-					result_gauche = self.verif_commande_SETSPEED(vitesse_gauche)
-					#Si tout est bon, on envoie à la liaison série
-					if(result_mode & result_droite & result_gauche):
-						self.serie.input.appendleft((self.MODE,vitesse_gauche,vitesse_droite))
-					#sinon, on informe le serveur
+						#on commence par assigner des vitesses telles que les moteurs ne bougent pas
+						if(self.MODE %2 == 0):
+							default = 128
+						else:
+							default = 0
+						if(('vitesseD' in msg_recu_json) & ('vitesseG' in msg_recu_json)):
+							vitesse_gauche = int(msg_recu_json['vitesseG'])
+							vitesse_droite = int(msg_recu_json['vitesseD'])
+						elif('vitesseG' in msg_recu_json):
+							vitesse_gauche = int(msg_recu_json['vitesseG'])
+							vitesse_droite = default
+						elif('vitesseD' in msg_recu_json):
+							vitesse_gauche = default
+							vitesse_droite = int(msg_recu_json['vitesseD'])
+						#Si on est en mode 0 ou 2, on ramène les vitesses entre 0 et 255
+						else:
+							self.serveur.input.appendleft("Aucune vitesse n'a été recue, les instructions n'ont pas été exécutées")
+						if(self.MODE%2 == 0):
+							if(vitesse_gauche != default):
+								vitesse_gauche += 128
+							if(vitesse_droite != default):
+								vitesse_droite += 128
+						result_droite = self.verif_commande_SETSPEED(vitesse_droite)
+						result_gauche = self.verif_commande_SETSPEED(vitesse_gauche)
+						#Si tout est bon, on envoie à la liaison série
+						if(result_mode & result_droite & result_gauche):
+							self.serie.input.appendleft((self.MODE,vitesse_gauche,vitesse_droite))
+						#sinon, on informe le serveur
 					else:
 						self.serveur.input.appendleft("Un des paramètres recu n'est pas bon, les instructions n'ont pas été exécutées")
 				else:
@@ -101,7 +104,7 @@ class Algorithmique(threading.Thread):
 		return (parameter >= 1) & (parameter <= 10)
 
 	def verif_commande_SETMODE(self,parameter):
-		return (parameter >= 0) & (parameter <= 3)
+		return ((parameter >= 0) & (parameter <= 3)) | (parameter == 8)
 
 	def stop(self):
 		self.stoprequest.set()
