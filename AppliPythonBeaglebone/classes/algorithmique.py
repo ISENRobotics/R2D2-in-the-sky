@@ -54,7 +54,7 @@ class Algorithmique(threading.Thread):
 				if(result_mode):
 					self.MODE = int(msg_recu_json['mode']);
 					if(self.MODE == 8):
-						self.serie.input.appendleft(("0","0128","0128"))
+						self.serie.input.appendleft((0,128,128))
 					else:
 						#on commence par assigner des vitesses telles que les moteurs ne bougent pas
 						if(self.MODE %2 == 0):
