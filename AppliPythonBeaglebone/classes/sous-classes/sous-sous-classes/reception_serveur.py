@@ -31,6 +31,7 @@ class Reception_Serveur(threading.Thread):
 
 		#Une connexion maximale possible au socket, comme ca pas de problème avec plusieurs applications, un seul téléphone peut communiquer avec l'appli
 		self.socket_serveur.listen(1)
+		self.socket_serveur.settimeout(0.05)
 
 		#On accepte la connexion
 		#Attention, la méthode accept bloque le programme tant qu'aucun client ne s'est présenté
@@ -40,8 +41,15 @@ class Reception_Serveur(threading.Thread):
 
 	def run(self):
 		sleep(1)
+		attente = False
+		compteur_attente = 0
 		#Tant que le controleur ne demande pas au thread de s'arreter
 		while not self.stoprequest.isSet():
+			if(compteur_attente > 10000):
+				attente = True
+				self.connexion_avec_client.close()
+			if(attente):
+				self.connexion_avec_client, self.infos_connexion = self.socket_serveur.accept()
 			try:
 				#On attend les informations du smartphone
 				#La connexion Android envoie deux caractères au début de la connexion
@@ -60,7 +68,9 @@ class Reception_Serveur(threading.Thread):
 						chaine += msg
 				print("Dans la classe Reception serveur : "+chaine)
 				self.output.appendleft((chaine))
-			except IndexError:
+				compteur_attente = 0
+			except socket.timeout:
+				compteur_attente += 1
 				continue
 
 	def stop(self):
