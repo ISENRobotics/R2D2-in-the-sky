@@ -3,6 +3,7 @@
 import socket
 import threading
 import Queue
+from time import sleep
 
 class Emission_Serveur(threading.Thread):
 	"""
@@ -29,15 +30,18 @@ class Emission_Serveur(threading.Thread):
 
 		#On connecte le socket sur l'adresse et le port désiré
 		#Idée : attribuer une IP fixe grâce au routeur au téléphone Android, voir réseau en 255.255.255.252
-		self.socket_client.connect(('192.168.0.3', 12800))
+		#self.socket_client.connect(('192.168.0.3', 12800))
 
 	def run(self):
+		sleep(1)
 		while not self.stoprequest.isSet():
 			try:
-				infos = self.input.get(True)
+				infos = self.input.pop()
 				print("Dans la classe Emission serveur : "+str(infos))
-				self.socket_client.send(infos)
+				#self.socket_client.send(infos)
 				continue
-			except Queue.Empty:
+			except IndexError:
 				continue
 
+	def stop(self):
+		self.stoprequest.set()

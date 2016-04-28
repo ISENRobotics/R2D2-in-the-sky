@@ -8,9 +8,10 @@ import threading
 import Queue
 import constants
 
+from time import sleep
 ###   Préparation du programme
 
-class Emission_serie(threading.Thread):
+class Emission_Serie(threading.Thread):
 	"""
 	Classe regroupant l'émission par liaison série avec les moteurs
 		Prend en entrée:
@@ -36,6 +37,7 @@ class Emission_serie(threading.Thread):
 		self.ser.close()
 
 	def run(self):
+		sleep(1)
 		#Tant que le controleur ne demande pas au thread de s'arreter
 		while not self.stoprequest.isSet():
 			try:
@@ -45,13 +47,13 @@ class Emission_serie(threading.Thread):
 				#	infos[1] : valeur de la vitesse 1 demandée
 				#	infos[2] : valeur de la vitesse 2 demandée
 				#	infos[3] : valeur de l'acceleration demandée
-				infos = self.input.get(True)
+				infos = self.input.pop()
 				print("Dans la classe Emission serie : "+str(infos))
 				self.resultM = self.ordre_moteurs(constants.SET_MODE,infos[0])
 				self.resultG = self.ordre_moteurs(constants.SET_SPEED_1,infos[1])
 				self.resultD = self.ordre_moteurs(constants.SET_SPEED_2,infos[2])
 				#self.resultA = self.ordre_moteurs(constants.SET_ACCELERATION,int(infos[3]))
-			except Queue.Empty:
+			except IndexError:
 				continue
 
 	#Fonction chargée d'effectuer l'envoi sur la liaison série des commandes moteurs
@@ -63,3 +65,6 @@ class Emission_serie(threading.Thread):
 			#Si la liaison série n'est pas ouverte, on renvoie l'erreur 1000
 			return 1000
 		self.ser.close()
+
+	def stop(self):
+		self.stoprequest.set()

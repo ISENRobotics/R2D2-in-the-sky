@@ -4,6 +4,15 @@ import socket
 import json
 import threading
 import Queue
+from collections import deque
+
+from time import sleep
+
+import sys
+sys.path.insert(0, '/root/R2D2/classes/sous-classes/sous-sous-classes')
+
+from emission_serveur import Emission_Serveur
+from reception_serveur import Reception_Serveur
 
 class Serveur(threading.Thread):
 	"""
@@ -22,28 +31,36 @@ class Serveur(threading.Thread):
 		self.input = queue_input
 		self.output = queue_output
 
-		queue_input_reception = Queue.Queue()
-		queue_output_emission = Queue.Queue()
+		self.queue_input_reception = deque()
+		self.queue_output_emission = deque()
 
 		#variable écoutant l'arrêt du thread par le controleur
 		self.stoprequest = threading.Event()
-		self.thread_emission_serveur = Emission_serveur(queue_output_emission)
-		self.thread_reception_serveur = Reception_serveur(queue_input_reception)
-		thread_emission_serveur.start()
-		thread_reception_serveur.start()
+		self.thread_emission_serveur = Emission_Serveur(self.queue_output_emission)
+		self.thread_reception_serveur = Reception_Serveur(self.queue_input_reception)
+		self.thread_emission_serveur.start()
+		self.thread_reception_serveur.start()
 		
 
 	def run(self):
+		sleep(1)
 		#Tant que le controleur ne demande pas au thread de s'arreter
 		while not self.stoprequest.isSet():
 			try:
 				#On regarde si on a recu des informations, si oui, on les transmet à l'algorithmique
-				infos = self.queue_input_reception.get(True,0.005)
-				self.output.put(infos)
-			except Queue.Empty:
+				infos = self.queue_input_reception.pop()
+				print("Dans la classe Serveur, coté réception : "+str(infos))
+				self.output.appendleft(infos)
+				print("On met dans la pile "+str(infos))
+			except IndexError:
 				try:
 					#Si on n'a pas recu d'informations dans le temps imparti, on regarde si un message à envoyer est arrivé
-					infos = self.input.get(True,0.005)
-					self.queue_output_emission.put(infos)
-				except Queue.Empty:
+					infos = self.input.pop()
+					print("Dans la classe Serveur, coté émission : "+str(infos))
+					self.queue_output_emission.appendleft(infos)
+					print("On met dans la pile "+str(infos))
+				except IndexError:
 					continue
+
+	def stop(self):
+		self.stoprequest.set()

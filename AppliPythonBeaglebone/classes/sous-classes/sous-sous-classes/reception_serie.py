@@ -3,6 +3,7 @@
 import Adafruit_BBIO.UART as UART
 import serial
 import curses
+from time import sleep
 
 import threading
 
@@ -39,8 +40,10 @@ class Reception_Serie(threading.Thread):
 
 	def run(self):
 		#Tant que le controleur ne demande pas au thread de s'arreter
+		sleep(1)
 		while not self.stoprequest.isSet():
 			try:
+				self.ser.open()
 				infos = self.ser.read()
 				print("Dans la classe Reception serie : "+str(infos))
 				#On regarde si un nouveau jeu d'instructions a été mis en queue
@@ -49,8 +52,11 @@ class Reception_Serie(threading.Thread):
 				#	infos[1] : valeur de la vitesse 1 demandée
 				#	infos[2] : valeur de la vitesse 2 demandée
 				#	infos[3] : valeur de l'acceleration demandée
-				self.input.put(infos)
-			except Queue.Empty:
+				self.input.appendleft(infos)
+				self.ser.close()
+			except IndexError:
 				continue
 
 	
+	def stop(self):
+		self.stoprequest.set()

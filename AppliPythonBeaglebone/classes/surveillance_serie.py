@@ -4,18 +4,33 @@ import logging
 from datetime import datetime
 from time import sleep
 import Queue
+from collections import deque
+
+import sys
+sys.path.insert(0, '/root/R2D2/classes/sous-classes')
 
 import serie
 
+
 class Surveillance_serie(threading.Thread):
 	def __init__(self,controleur,filename="surveillance_serie.log"):
+		threading.Thread.__init__(self)
 		self.pere   =controleur
-		self.queue_input_reception = Queue.Queue()
-		self.queue_output_emission = Queue.Queue()
+		self.queue_input_reception = deque()
+		self.queue_output_emission = deque()
 		self.serie=serie.Serie(self.queue_input_reception,self.queue_output_emission)
 		self.stoprequest = threading.Event()
-		logging.basicConfig(filename=filename,level=logging.DEBUG)
-		logging.debug("Démarrage du thread de Surveillance_serie")
+		logger1 = logging.getLogger('R2D2.surveillance_serie')
+		formatter = logging.Formatter('%(asctime)s : %(message)s')
+		fileHandler = logging.FileHandler(filename, mode='w')
+		fileHandler.setFormatter(formatter)
+		streamHandler = logging.StreamHandler()
+		streamHandler.setFormatter(formatter)
+
+		logger1.setLevel(logging.DEBUG)
+		logger1.addHandler(fileHandler)
+		logger1.addHandler(streamHandler)
+		logger1.debug("Démarrage du thread de Surveillance_serie")
 		self.serie.start()
 
 	def kill(self):
@@ -24,7 +39,9 @@ class Surveillance_serie(threading.Thread):
 		self.pere.mise_a_jour_serie(self.serie)
 
 	def run(self):
+		logger1.debug("Surveillance_serie running")
 		sleep(0.01)
+		logger1.debug("Serie initialized, commencing surveillance")
 		#Messages servant à logger l'activité de la liaison série
 		message_input = ""
 		message_output = ""
@@ -39,10 +56,13 @@ class Surveillance_serie(threading.Thread):
 				if(not serie_vivante):
 					statut_serie = "mort"
 					kill()
-					logging.critical("Le thread Serie ne répondait plus, il a été tué et réinstancié")
+					logger1.critical("Le thread Serie ne répondait plus, il a été tué et réinstancié")
 				else:
 					statut_serie = "vivant"
 				maintenant = datetime.now()
-				logging.debug("Le "+maintenant.day+"/"+maintenant.month+"/"+maintenant.year+" à "+maintenant.hour+":"+maintenant.minute+":"+maintenant.second+", le thread serie est "+statut_serie+" et les messages suivants sont en attente de traitement : Emission série:"+str(message_input)+"///// Réception série:"+str(message_output))
-			except Queue.Empty:
+				logger1.debug("Le "+maintenant.day+"/"+maintenant.month+"/"+maintenant.year+" à "+maintenant.hour+":"+maintenant.minute+":"+maintenant.second+", le thread serie est "+statut_serie+" et les messages suivants sont en attente de traitement : Emission série:"+str(message_input)+"///// Réception série:"+str(message_output))
+			except IndexError:
 				continue
+
+	def stop(self):
+		self.stoprequest.set()

@@ -42,7 +42,7 @@ class Controleur(object):
 		self.surveillance_serveur = surveillance_serveur.Surveillance_serveur(self)
 		self.surveillance_serie   = surveillance_serie.Surveillance_serie(self)
 		self.algorithmique        = algorithmique.Algorithmique(self)
-
+		self.continuer = True
 
 
 	def fonctionnement(self):
@@ -64,9 +64,12 @@ class Controleur(object):
 			#curses.endwin()
 			try:
 				os.remove("daemon_python")
-				self.surveillance_serveur.join(timeout=0)
-				self.surveillance_serie.join(timeout=0)
-				self.algorithmique.join(timeout=0)
+				self.surveillance_serveur.stop()
+				self.surveillance_serveur.join()
+				self.surveillance_serie.stop()
+				self.surveillance_serie.join()
+				self.algorithmique.stop()
+				self.algorithmique.join()
 				#os.unlink("daemon_python") est équivalent selon la documentation python, version liens Unix
 			except OSError as e:  ## si l'opération échoue, on affiche l'erreur rencontrée (voir au niveau des permissions)
 				print ("Error: %s - %s." % (e.filename,e.strerror))
@@ -79,9 +82,12 @@ class Controleur(object):
 			#curses.endwin()
 			try:
 				os.remove("daemon_python")
-				self.surveillance_serveur.join(timeout=0)
-				self.surveillance_serie.join(timeout=0)
-				self.algorithmique.join(timeout=0)
+				self.surveillance_serveur.stop()
+				self.surveillance_serveur.join()
+				self.surveillance_serie.stop()
+				self.surveillance_serie.join()
+				self.algorithmique.stop()
+				self.algorithmique.join()
 				#os.unlink("daemon_python") est équivalent selon la documentation python, version liens Unix
 			except OSError as e:  ## si l'opération échoue, on affiche l'erreur rencontrée (voir au niveau des permissions)
 				print ("Error: %s - %s." % (e.filename,e.strerror))
@@ -91,11 +97,16 @@ class Controleur(object):
 			#stdscr.keypad(0)
 			#curses.echo()
 			#curses.endwin()
+			while self.continuer:
+				continue
 			try:
 				os.remove("daemon_python")
-				self.surveillance_serveur.join(timeout=0)
-				self.surveillance_serie.join(timeout=0)
-				self.algorithmique.join(timeout=0)
+				self.surveillance_serveur.stop()
+				self.surveillance_serveur.join()
+				self.surveillance_serie.stop()
+				self.surveillance_serie.join()
+				self.algorithmique.stop()
+				self.algorithmique.join()
 				#os.unlink("daemon_python") est équivalent selon la documentation python, version liens Unix
 			except OSError as e:  ## si l'opération échoue, on affiche l'erreur rencontrée (voir au niveau des permissions)
 				print ("Error: %s - %s." % (e.filename,e.strerror))
