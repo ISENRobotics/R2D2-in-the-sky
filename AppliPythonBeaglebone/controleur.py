@@ -18,6 +18,8 @@ import thread
 import surveillance_serveur
 import surveillance_serie
 import algorithmique
+#import template
+#import template_surveillance
 
 
 class Controleur(object):
@@ -42,6 +44,11 @@ class Controleur(object):
 		self.surveillance_serveur = surveillance_serveur.Surveillance_serveur(self)
 		self.surveillance_serie   = surveillance_serie.Surveillance_serie(self)
 		self.algorithmique        = algorithmique.Algorithmique(self)
+		####################################
+		#	Partie Template
+		####################################
+		#self.template			  = template.Template(self)
+		#self.template_surveillance	= template_surveillance.Template_surveillance(self)
 		self.continuer = True
 
 
@@ -50,11 +57,25 @@ class Controleur(object):
 			self.surveillance_serveur.start()
 			self.surveillance_serie.start()
 			self.algorithmique.start()
+			
+			####################################
+			#	Partie Template
+			####################################
+			#La partie surveillance doit être lancée avant la partie traitement
+			#self.template_surveillance.start()
+			#self.template.start()	
+
 				
+
+
 			self.surveillance_serveur.join()
 			self.surveillance_serie.join()
 			self.algorithmique.join()
-			
+
+			#self.template_surveillance.join()
+			#self.template.join()	
+
+				
 		#On récupère toutes exceptions génantes (Ctrl-C de l'utilisateur, arrêt brutal du système)
 		except KeyboardInterrupt as key:
 			print("User-generated interrupt, exiting....")
@@ -70,6 +91,17 @@ class Controleur(object):
 				self.surveillance_serie.join()
 				self.algorithmique.stop()
 				self.algorithmique.join()
+
+
+				####################################
+				#	Partie Template
+				####################################
+				#self.template_surveillance.stop()
+				#self.template_surveillance.join()
+				#self.template.stop()	
+				#self.template.join()	
+
+				
 				#os.unlink("daemon_python") est équivalent selon la documentation python, version liens Unix
 			except OSError as e:  ## si l'opération échoue, on affiche l'erreur rencontrée (voir au niveau des permissions)
 				print ("Error: %s - %s." % (e.filename,e.strerror))
@@ -88,6 +120,16 @@ class Controleur(object):
 				self.surveillance_serie.join()
 				self.algorithmique.stop()
 				self.algorithmique.join()
+
+				####################################
+				#	Partie Template
+				####################################
+				#self.template_surveillance.stop()
+				#self.template_surveillance.join()
+				#self.template.stop()	
+				#self.template.join()	
+
+
 				#os.unlink("daemon_python") est équivalent selon la documentation python, version liens Unix
 			except OSError as e:  ## si l'opération échoue, on affiche l'erreur rencontrée (voir au niveau des permissions)
 				print ("Error: %s - %s." % (e.filename,e.strerror))
@@ -107,6 +149,14 @@ class Controleur(object):
 				self.surveillance_serie.join()
 				self.algorithmique.stop()
 				self.algorithmique.join()
+				####################################
+				#	Partie Template
+				####################################
+				#self.template_surveillance.stop()
+				#self.template_surveillance.join()
+				#self.template.stop()	
+				#self.template.join()	
+
 				#os.unlink("daemon_python") est équivalent selon la documentation python, version liens Unix
 			except OSError as e:  ## si l'opération échoue, on affiche l'erreur rencontrée (voir au niveau des permissions)
 				print ("Error: %s - %s." % (e.filename,e.strerror))
@@ -117,6 +167,10 @@ class Controleur(object):
 		self.algorithmique.serveur=serveur
 	def mise_a_jour_serie(self,serie):
 		self.algorithmique.serie=serie
+
+	#def mise_a_jour(self,template_partage):
+	#	self.template.template_partage=template_partage
+
 
 c=Controleur()
 c.fonctionnement()
