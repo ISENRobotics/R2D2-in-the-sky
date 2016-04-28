@@ -32,11 +32,7 @@ class Surveillance_serie(threading.Thread):
 		logger1.addHandler(streamHandler)
 		logger1.debug("Démarrage du thread de Surveillance_serie")
 		self.serie.start()
-
-	def kill(self):
-		del self.serie
-		self.serie=Serie()
-		self.pere.mise_a_jour_serie(self.serie)
+		logger1.debug("Thread série démarré")
 
 	def run(self):
 		logger1.debug("Surveillance_serie running")
@@ -55,7 +51,7 @@ class Surveillance_serie(threading.Thread):
 				serie_vivante = self.serie.is_alive()
 				if(not serie_vivante):
 					statut_serie = "mort"
-					kill()
+					self.kill()
 					logger1.critical("Le thread Serie ne répondait plus, il a été tué et réinstancié")
 				else:
 					statut_serie = "vivant"
@@ -66,3 +62,9 @@ class Surveillance_serie(threading.Thread):
 
 	def stop(self):
 		self.stoprequest.set()
+
+
+	def kill(self):
+		del self.serie
+		self.serie=Serie()
+		self.pere.mise_a_jour_serie(self.serie)

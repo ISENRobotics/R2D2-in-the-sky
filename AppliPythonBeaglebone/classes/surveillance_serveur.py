@@ -32,11 +32,7 @@ class Surveillance_serveur(threading.Thread):
 		logger2.debug("Démarrage du thread de Surveillance_serveur")
 
 		self.serveur.start()
-
-	def kill(self):
-		del self.serveur
-		self.serveur=Serveur()
-		self.pere.mise_a_jour_serveur(self.serveur)
+		logger2.debug("Thread serveur démarré")
 
 	def run(self):
 		logger2.debug("Surveillance_serveur running")
@@ -55,7 +51,7 @@ class Surveillance_serveur(threading.Thread):
 				serveur_vivant = self.serveur.is_alive()
 				if(not serveur_vivant):
 					statut_serveur = "mort"
-					kill()
+					self.kill()
 					logger2.critical("Le thread Serie ne répondait plus, il a été tué et réinstancié")
 				else:
 					statut_serveur = "vivant"
@@ -66,3 +62,9 @@ class Surveillance_serveur(threading.Thread):
 
 	def stop(self):
 		self.stoprequest.set()
+
+
+	def kill(self):
+		del self.serveur
+		self.serveur=Serveur()
+		self.pere.mise_a_jour_serveur(self.serveur)

@@ -30,7 +30,7 @@ class Emission_Serveur(threading.Thread):
 
 		#On connecte le socket sur l'adresse et le port désiré
 		#Idée : attribuer une IP fixe grâce au routeur au téléphone Android, voir réseau en 255.255.255.252
-		#self.socket_client.connect(('192.168.0.3', 12800))
+		#self.socket_client.connect(('192.168.0.5', 12800))
 
 	def run(self):
 		sleep(1)
