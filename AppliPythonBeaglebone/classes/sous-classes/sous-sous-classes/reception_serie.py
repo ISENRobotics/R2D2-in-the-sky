@@ -42,6 +42,7 @@ class Reception_Serie(threading.Thread):
 		while not self.stoprequest.isSet():
 			try:
 				infos = self.ser.read()
+				print("Dans la classe Reception serie : "+str(infos))
 				#On regarde si un nouveau jeu d'instructions a été mis en queue
 				#Les jeux d'instructions se décomposent de la manière suivante : 
 				#	infos[0] : valeur du mode de fonctionnement demandé

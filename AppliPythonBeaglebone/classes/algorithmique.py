@@ -17,14 +17,17 @@ class Algorithmique(threading.Thread):
 	def run(self):
 		while not self.stoprequest.isSet():
 			try:
-				#On regarde si on a recu des informations, si oui, on les transmet à l'algorithmique
-				infos = self.input.get(True,0.005)
-				self.queue_output_emission.put(infos)
+				infos = self.serveur.output.get(True,0.005)
+				#Traitement des infos
+
+				self.serie.output.put(infos)
 			except Queue.Empty:
 				try:
 					#Si on n'a pas recu d'informations dans le temps imparti, on regarde si un message à envoyer est arrivé
-					infos = self.queue_input_reception.get(True,0.005)
-					self.output.put(infos)
+					infos = self.serie.output.get(True,0.005)
+					#Traitement des infos
+
+					self.serveur.intput.put(infos)
 				except Queue.Empty:
 					continue
 

@@ -46,6 +46,7 @@ class Emission_serie(threading.Thread):
 				#	infos[2] : valeur de la vitesse 2 demandée
 				#	infos[3] : valeur de l'acceleration demandée
 				infos = self.input.get(True)
+				print("Dans la classe Emission serie : "+str(infos))
 				self.resultM = self.ordre_moteurs(constants.SET_MODE,infos[0])
 				self.resultG = self.ordre_moteurs(constants.SET_SPEED_1,infos[1])
 				self.resultD = self.ordre_moteurs(constants.SET_SPEED_2,infos[2])

@@ -46,8 +46,10 @@ class Reception_Serveur(threading.Thread):
 				#La connexion Android envoie deux caractères au début de la connexion
 				#Il faut donc les réceptionner afin qu'ils ne perturbent pas le reste des messages
 				msg_useless = self.connexion_avec_client.recv(2)
-				print("J'attends les informations du smartphone")
+				print("Dans la classe Reception serveur : "+msg_useless)
+				print("Dans la classe Reception serveur : J'attends les informations du smartphone")
 				msg_recu = self.connexion_avec_client.recv(49)
+				print("Dans la classe Reception serveur : "+msg_recu)
 				self.output.put((msg_recu))
 			except Queue.Empty:
 				continue

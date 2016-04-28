@@ -35,7 +35,7 @@ class Emission_Serveur(threading.Thread):
 		while not self.stoprequest.isSet():
 			try:
 				infos = self.input.get(True)
-				print("Les informations que le serveur a recu valent :"+str(infos))
+				print("Dans la classe Emission serveur : "+str(infos))
 				self.socket_client.send(infos)
 				continue
 			except Queue.Empty:
