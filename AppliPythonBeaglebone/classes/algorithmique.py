@@ -43,6 +43,7 @@ class Algorithmique(threading.Thread):
 		return self.ser.name
 
 	def verif_trame_recu(self,trame):
+		sens_des_moteurs_moteur_1_a_gauche_moteur_2_a_droite = True;
 		try:
 			msg_recu_json = json.loads(trame)
 			result_mode = 0
@@ -81,7 +82,10 @@ class Algorithmique(threading.Thread):
 						result_gauche = self.verif_commande_SETSPEED(vitesse_gauche)
 						#Si tout est bon, on envoie à la liaison série
 						if(result_mode & result_droite & result_gauche):
-							self.serie.input.appendleft((self.MODE,vitesse_gauche,vitesse_droite))
+							if(sens_des_moteurs_moteur_1_a_gauche_moteur_2_a_droite):
+								self.serie.input.appendleft((self.MODE,vitesse_gauche,vitesse_droite))
+							else:
+								self.serie.input.appendleft((self.MODE,vitesse_droite,vitesse_gauche))
 						#sinon, on informe le serveur
 				else:
 					self.serveur.input.appendleft("Le mode recu n'est pas bon, aucune instruction n'a été exécuté")
