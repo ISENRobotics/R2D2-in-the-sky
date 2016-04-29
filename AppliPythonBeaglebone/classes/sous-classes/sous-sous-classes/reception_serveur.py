@@ -19,7 +19,7 @@ class Reception_Serveur(threading.Thread):
 	def __init__(self,serveur, queue_output):
 		threading.Thread.__init__(self)
 		self.output = queue_output
-
+		self.serveur = serveur
 		#variable écoutant l'arrêt du thread par le controleur
 		self.stoprequest = threading.Event()
 		
@@ -36,7 +36,7 @@ class Reception_Serveur(threading.Thread):
 		#Attention, la méthode accept bloque le programme tant qu'aucun client ne s'est présenté
 		self.connexion_avec_client, self.infos_connexion = self.socket_serveur.accept()
 		print(self.infos_connexion)
-		serveur.infos_connexion = self.infos_connexion
+		self.serveur.infos_connexion = self.infos_connexion
 		
 
 	def run(self):
@@ -52,6 +52,7 @@ class Reception_Serveur(threading.Thread):
 				self.connexion_avec_client.close()
 			if(attente):
 				self.connexion_avec_client, self.infos_connexion = self.socket_serveur.accept()
+				self.serveur.infos_connexion = self.infos_connexion
 				print(self.infos_connexion)
 				attente = False
 			try:

@@ -19,44 +19,44 @@ class Surveillance_serveur(threading.Thread):
 		self.queue_output_emission = deque()
 		self.serveur=serveur.Serveur(self.queue_input_reception,self.queue_output_emission)
 		self.stoprequest = threading.Event()
-		logger2 = logging.getLogger('R2D2.surveillance_serveur')
-		formatter = logging.Formatter('%(asctime)s : %(message)s')
-		fileHandler = logging.FileHandler(filename, mode='w')
-		fileHandler.setFormatter(formatter)
-		streamHandler = logging.StreamHandler()
-		streamHandler.setFormatter(formatter)
+		self.logger2 = logging.getLogger('R2D2.surveillance_serveur')
+		self.formatter = logging.Formatter('%(asctime)s : %(message)s')
+		self.fileHandler = logging.FileHandler(filename, mode='w')
+		self.fileHandler.setFormatter(formatter)
+		self.streamHandler = logging.StreamHandler()
+		self.streamHandler.setFormatter(formatter)
 
-		logger2.setLevel(logging.DEBUG)
-		logger2.addHandler(fileHandler)
-		logger2.addHandler(streamHandler)
-		logger2.debug("Démarrage du thread de Surveillance_serveur")
+		self.logger2.setLevel(logging.DEBUG)
+		self.logger2.addHandler(fileHandler)
+		self.logger2.addHandler(streamHandler)
+		self.logger2.debug("Démarrage du thread de Surveillance_serveur")
 
 		self.serveur.start()
-		logger2.debug("Thread serveur démarré")
+		self.logger2.debug("Thread serveur démarré")
 
 	def run(self):
-		logger2.debug("Surveillance_serveur running")
+		self.logger2.debug("Surveillance_serveur running")
 		sleep(0.01)
-		logger2.debug("Serveur initialized, commencing surveillance")
+		self.logger2.debug("Serveur initialized, commencing surveillance")
 		#Messages servant à logger l'activité du serveur
-		message_input = ""
-		message_output = ""
+		self.message_input = ""
+		self.message_output = ""
 		while not self.stoprequest.isSet():
 			try:
 				#Routine de logging d'activité du serveur
-				if(message_input != self.serveur.input[0]):
-					message_input = self.serveur.input[0]
-				if(message_output != self.serveur.output[0]):
-					message_output = self.serveur.output[0]
-				serveur_vivant = self.serveur.is_alive()
-				if(not serveur_vivant):
-					statut_serveur = "mort"
+				if(self.message_input != self.serveur.input[0]):
+					self.message_input = self.serveur.input[0]
+				if(self.message_output != self.serveur.output[0]):
+					self.message_output = self.serveur.output[0]
+				self.serveur_vivant = self.serveur.is_alive()
+				if(not self.serveur_vivant):
+					self.statut_serveur = "mort"
 					self.kill()
-					logger2.critical("Le thread Serie ne répondait plus, il a été tué et réinstancié")
+					self.logger2.critical("Le thread Serie ne répondait plus, il a été tué et réinstancié")
 				else:
-					statut_serveur = "vivant"
-				maintenant = datetime.now()
-				logger2.debug("Le "+maintenant.day+"/"+maintenant.month+"/"+maintenant.year+" à "+maintenant.hour+":"+maintenant.minute+":"+maintenant.second+", le thread serie est "+statut_serveur+" et les messages suivants sont en attente de traitement : Emission série:"+message_input+"///// Réception série:"+message_output)
+					self.statut_serveur = "vivant"
+				self.maintenant = datetime.now()
+				logger2.debug("Le "+self.maintenant.day+"/"+self.maintenant.month+"/"+self.maintenant.year+" à "+self.maintenant.hour+":"+self.maintenant.minute+":"+self.maintenant.second+", le thread serie est "+self.statut_serveur+" et les messages suivants sont en attente de traitement : Emission série:"+self.message_input+"///// Réception série:"+self.message_output)
 			except IndexError:
 				continue
 

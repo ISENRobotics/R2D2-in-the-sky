@@ -20,43 +20,43 @@ class Surveillance_serie(threading.Thread):
 		self.queue_output_emission = deque()
 		self.serie=serie.Serie(self.queue_input_reception,self.queue_output_emission)
 		self.stoprequest = threading.Event()
-		logger1 = logging.getLogger('R2D2.surveillance_serie')
-		formatter = logging.Formatter('%(asctime)s : %(message)s')
-		fileHandler = logging.FileHandler(filename, mode='w')
-		fileHandler.setFormatter(formatter)
-		streamHandler = logging.StreamHandler()
-		streamHandler.setFormatter(formatter)
+		self.logger1 = logging.getLogger('R2D2.surveillance_serie')
+		self.formatter = logging.Formatter('%(asctime)s : %(message)s')
+		self.fileHandler = logging.FileHandler(filename, mode='w')
+		self.fileHandler.setFormatter(formatter)
+		self.streamHandler = logging.StreamHandler()
+		self.streamHandler.setFormatter(formatter)
 
-		logger1.setLevel(logging.DEBUG)
-		logger1.addHandler(fileHandler)
-		logger1.addHandler(streamHandler)
-		logger1.debug("Démarrage du thread de Surveillance_serie")
+		self.logger1.setLevel(logging.DEBUG)
+		self.logger1.addHandler(fileHandler)
+		self.logger1.addHandler(streamHandler)
+		self.logger1.debug("Démarrage du thread de Surveillance_serie")
 		self.serie.start()
-		logger1.debug("Thread série démarré")
+		self.logger1.debug("Thread série démarré")
 
 	def run(self):
-		logger1.debug("Surveillance_serie running")
+		self.logger1.debug("Surveillance_serie running")
 		sleep(0.01)
-		logger1.debug("Serie initialized, commencing surveillance")
+		self.logger1.debug("Serie initialized, commencing surveillance")
 		#Messages servant à logger l'activité de la liaison série
-		message_input = ""
-		message_output = ""
+		self.message_input = ""
+		self.message_output = ""
 		while not self.stoprequest.isSet():
 			try:
 				#Routine de logging d'activité de la liaison série
-				if(message_input != self.serie.input[0]):
-					message_input = self.serie.input[0]
-				if(message_output != self.serie.output[0]):
-					message_output = self.serie.output[0]
-				serie_vivante = self.serie.is_alive()
-				if(not serie_vivante):
-					statut_serie = "mort"
+				if(self.message_input != self.serie.input[0]):
+					self.message_input = self.serie.input[0]
+				if(self.message_output != self.serie.output[0]):
+					self.message_output = self.serie.output[0]
+				self.serie_vivante = self.serie.is_alive()
+				if(not self.serie_vivante):
+					self.statut_serie = "mort"
 					self.kill()
-					logger1.critical("Le thread Serie ne répondait plus, il a été tué et réinstancié")
+					self.logger1.critical("Le thread Serie ne répondait plus, il a été tué et réinstancié")
 				else:
-					statut_serie = "vivant"
-				maintenant = datetime.now()
-				logger1.debug("Le "+maintenant.day+"/"+maintenant.month+"/"+maintenant.year+" à "+maintenant.hour+":"+maintenant.minute+":"+maintenant.second+", le thread serie est "+statut_serie+" et les messages suivants sont en attente de traitement : Emission série:"+str(message_input)+"///// Réception série:"+str(message_output))
+					self.statut_serie = "vivant"
+				self.maintenant = datetime.now()
+				logger1.debug("Le "+self.maintenant.day+"/"+self.maintenant.month+"/"+self.maintenant.year+" à "+self.maintenant.hour+":"+self.maintenant.minute+":"+self.maintenant.second+", le thread serie est "+self.statut_serie+" et les messages suivants sont en attente de traitement : Emission série:"+str(self.message_input)+"///// Réception série:"+str(self.message_output))
 			except IndexError:
 				continue
 
