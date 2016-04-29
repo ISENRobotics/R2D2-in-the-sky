@@ -12,6 +12,8 @@ import Queue
 
 import thread
 
+import time
+
 """
 	On importe les classes personnalisées python
 """
@@ -44,6 +46,11 @@ class Controleur(object):
 		self.surveillance_serveur = surveillance_serveur.Surveillance_serveur(self)
 		self.surveillance_serie   = surveillance_serie.Surveillance_serie(self)
 		self.algorithmique        = algorithmique.Algorithmique(self)
+
+		#On met les threads en mode daemon, quand le controleur est tué, on tue tous les threads
+		self.surveillance_serveur.daemon = True
+		self.surveillance_serie.daemon   = True
+		self.algorithmique.daemon        = True
 		####################################
 		#	Partie Template
 		####################################
@@ -64,16 +71,8 @@ class Controleur(object):
 			#La partie surveillance doit être lancée avant la partie traitement
 			#self.template_surveillance.start()
 			#self.template.start()	
-
-				
-
-
-			self.surveillance_serveur.join()
-			self.surveillance_serie.join()
-			self.algorithmique.join()
-
-			#self.template_surveillance.join()
-			#self.template.join()	
+			while True:
+				time.sleep(1)
 
 				
 		#On récupère toutes exceptions génantes (Ctrl-C de l'utilisateur, arrêt brutal du système)

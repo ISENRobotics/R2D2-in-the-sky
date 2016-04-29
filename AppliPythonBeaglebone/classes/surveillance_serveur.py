@@ -31,6 +31,7 @@ class Surveillance_serveur(threading.Thread):
 		self.logger2.addHandler(self.streamHandler)
 		self.logger2.debug("Démarrage du thread de Surveillance_serveur")
 
+		self.serveur.daemon=True
 		self.serveur.start()
 		self.logger2.debug("Thread serveur démarré")
 
@@ -52,11 +53,11 @@ class Surveillance_serveur(threading.Thread):
 				if(not self.serveur_vivant):
 					self.statut_serveur = "mort"
 					self.kill()
-					self.logger2.critical("Le thread Serie ne répondait plus, il a été tué et réinstancié")
+					self.logger2.critical("Le thread Serveur ne répondait plus, il a été tué et réinstancié")
 				else:
 					self.statut_serveur = "vivant"
-				self.maintenant = datetime.now()
-				logger2.debug("Le "+self.maintenant.day+"/"+self.maintenant.month+"/"+self.maintenant.year+" à "+self.maintenant.hour+":"+self.maintenant.minute+":"+self.maintenant.second+", le thread serie est "+self.statut_serveur+" et les messages suivants sont en attente de traitement : Emission série:"+self.message_input+"///// Réception série:"+self.message_output)
+				self.logger2.debug("Le thread serveur est "+self.statut_serveur+" et les messages suivants sont en attente de traitement : Emission serveur:"+str(self.message_input)+"///// Réception serveur:"+str(self.message_output))
+				sleep(0.1)
 			except IndexError:
 				continue
 
@@ -67,4 +68,6 @@ class Surveillance_serveur(threading.Thread):
 	def kill(self):
 		del self.serveur
 		self.serveur=Serveur()
+		self.serveur.daemon = True
+		self.serveur.start()
 		self.pere.mise_a_jour_serveur(self.serveur)

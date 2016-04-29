@@ -42,7 +42,9 @@ class Serie(threading.Thread):
 		#variable écoutant l'arrêt du thread par le controleur
 		self.stoprequest = threading.Event()
 		self.thread_emission_serie = Emission_Serie(self.queue_output_emission)
+		self.thread_emission_serie.daemon = True
 		self.thread_reception_serie = Reception_Serie(self.queue_input_reception)
+		self.thread_reception_serie.daemon = True
 		self.thread_emission_serie.start()
 		self.thread_reception_serie.start()
 		

@@ -31,6 +31,7 @@ class Surveillance_serie(threading.Thread):
 		self.logger1.addHandler(self.fileHandler)
 		self.logger1.addHandler(self.streamHandler)
 		self.logger1.debug("Démarrage du thread de Surveillance_serie")
+		self.serie.daemon = True
 		self.serie.start()
 		self.logger1.debug("Thread série démarré")
 
@@ -55,8 +56,8 @@ class Surveillance_serie(threading.Thread):
 					self.logger1.critical("Le thread Serie ne répondait plus, il a été tué et réinstancié")
 				else:
 					self.statut_serie = "vivant"
-				self.maintenant = datetime.now()
-				logger1.debug("Le "+self.maintenant.day+"/"+self.maintenant.month+"/"+self.maintenant.year+" à "+self.maintenant.hour+":"+self.maintenant.minute+":"+self.maintenant.second+", le thread serie est "+self.statut_serie+" et les messages suivants sont en attente de traitement : Emission série:"+str(self.message_input)+"///// Réception série:"+str(self.message_output))
+				self.logger1.debug("Le thread serie est "+self.statut_serie+" et les messages suivants sont en attente de traitement : Emission série:"+str(self.message_input)+"///// Réception série:"+str(self.message_output))
+				sleep(0.1)
 			except IndexError:
 				continue
 
@@ -67,4 +68,6 @@ class Surveillance_serie(threading.Thread):
 	def kill(self):
 		del self.serie
 		self.serie=Serie()
+		self.serie.daemon = True
+		self.serie.start()
 		self.pere.mise_a_jour_serie(self.serie)
