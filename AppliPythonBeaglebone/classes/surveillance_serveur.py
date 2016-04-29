@@ -42,24 +42,28 @@ class Surveillance_serveur(threading.Thread):
 		#Messages servant à logger l'activité du serveur
 		self.message_input = ""
 		self.message_output = ""
+		self.statut_serveur = "vivant"
 		while not self.stoprequest.isSet():
 			try:
 				#Routine de logging d'activité du serveur
 				if(self.message_input != self.serveur.input[0]):
 					self.message_input = self.serveur.input[0]
+			except IndexError:
+				self.message_input = "pas d'input"
+			try:
 				if(self.message_output != self.serveur.output[0]):
 					self.message_output = self.serveur.output[0]
-				self.serveur_vivant = self.serveur.is_alive()
-				if(not self.serveur_vivant):
-					self.statut_serveur = "mort"
-					self.kill()
-					self.logger2.critical("Le thread Serveur ne répondait plus, il a été tué et réinstancié")
-				else:
-					self.statut_serveur = "vivant"
-				self.logger2.debug("Le thread serveur est "+self.statut_serveur+" et les messages suivants sont en attente de traitement : Emission serveur:"+str(self.message_input)+"///// Réception serveur:"+str(self.message_output))
-				sleep(0.1)
 			except IndexError:
-				continue
+				self.message_output = "pas d'output"
+			self.serveur_vivant = self.serveur.is_alive()
+			if(not self.serveur_vivant):
+				self.statut_serveur = "mort"
+				self.kill()
+				self.logger2.critical("Le thread Serveur ne répondait plus, il a été tué et réinstancié")
+			else:
+				self.statut_serveur = "vivant"
+			self.logger2.debug("Le thread serveur est "+self.statut_serveur+" et les messages suivants sont en attente de traitement : Emission serveur:"+str(self.message_input)+"///// Réception serveur:"+str(self.message_output))
+			sleep(0.1)
 
 	def stop(self):
 		self.stoprequest.set()

@@ -65,14 +65,16 @@ class Controleur(object):
 			self.surveillance_serie.start()
 			self.algorithmique.start()
 			
+
+			self.surveillance_serie.join()
+			self.surveillance_serveur.join()
+			self.algorithmique.join()
 			####################################
 			#	Partie Template
 			####################################
 			#La partie surveillance doit être lancée avant la partie traitement
 			#self.template_surveillance.start()
 			#self.template.start()	
-			while True:
-				time.sleep(1)
 
 				
 		#On récupère toutes exceptions génantes (Ctrl-C de l'utilisateur, arrêt brutal du système)

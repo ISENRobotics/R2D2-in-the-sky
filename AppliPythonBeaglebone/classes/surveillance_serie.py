@@ -42,24 +42,28 @@ class Surveillance_serie(threading.Thread):
 		#Messages servant à logger l'activité de la liaison série
 		self.message_input = ""
 		self.message_output = ""
+		self.statut_serveur = "vivant"
 		while not self.stoprequest.isSet():
 			try:
 				#Routine de logging d'activité de la liaison série
 				if(self.message_input != self.serie.input[0]):
 					self.message_input = self.serie.input[0]
+			except IndexError:
+				self.message_input = "pas d'input"
+			try:
 				if(self.message_output != self.serie.output[0]):
 					self.message_output = self.serie.output[0]
-				self.serie_vivante = self.serie.is_alive()
-				if(not self.serie_vivante):
-					self.statut_serie = "mort"
-					self.kill()
-					self.logger1.critical("Le thread Serie ne répondait plus, il a été tué et réinstancié")
-				else:
-					self.statut_serie = "vivant"
-				self.logger1.debug("Le thread serie est "+self.statut_serie+" et les messages suivants sont en attente de traitement : Emission série:"+str(self.message_input)+"///// Réception série:"+str(self.message_output))
-				sleep(0.1)
 			except IndexError:
-				continue
+				self.message_input = "pas d'output"
+			self.serie_vivante = self.serie.is_alive()
+			if(not self.serie_vivante):
+				self.statut_serie = "mort"
+				self.kill()
+				self.logger1.critical("Le thread Serie ne répondait plus, il a été tué et réinstancié")
+			else:
+				self.statut_serie = "vivant"
+			self.logger1.debug("Le thread serie est "+self.statut_serie+" et les messages suivants sont en attente de traitement : Emission série:"+str(self.message_input)+"///// Réception série:"+str(self.message_output))
+			sleep(0.1)
 
 	def stop(self):
 		self.stoprequest.set()
