@@ -54,7 +54,7 @@ class Surveillance_serie(threading.Thread):
 				if(self.message_output != self.serie.output[0]):
 					self.message_output = self.serie.output[0]
 			except IndexError:
-				self.message_input = "pas d'output"
+				self.message_output = "pas d'output"
 			self.serie_vivante = self.serie.is_alive()
 			if(not self.serie_vivante):
 				self.statut_serie = "mort"
@@ -63,7 +63,6 @@ class Surveillance_serie(threading.Thread):
 			else:
 				self.statut_serie = "vivant"
 			self.logger1.debug("Le thread serie est "+self.statut_serie+" et les messages suivants sont en attente de traitement : Emission série:"+str(self.message_input)+"///// Réception série:"+str(self.message_output))
-			sleep(0.1)
 
 	def stop(self):
 		self.stoprequest.set()

@@ -7,7 +7,7 @@ import curses
 
 import os
 import sys
-sys.path.append("classes/")
+sys.path.append("./classes/")
 import Queue
 
 import thread

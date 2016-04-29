@@ -63,7 +63,6 @@ class Surveillance_serveur(threading.Thread):
 			else:
 				self.statut_serveur = "vivant"
 			self.logger2.debug("Le thread serveur est "+self.statut_serveur+" et les messages suivants sont en attente de traitement : Emission serveur:"+str(self.message_input)+"///// Réception serveur:"+str(self.message_output))
-			sleep(0.1)
 
 	def stop(self):
 		self.stoprequest.set()
