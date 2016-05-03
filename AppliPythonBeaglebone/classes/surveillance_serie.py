@@ -44,10 +44,10 @@ class Surveillance_serie(threading.Thread):
 			self.message_input = ""
 			self.message_output = ""
 			self.statut_serveur = "vivant"
-			self.log1 = False
-			self.log2 = False
 			while not self.stoprequest.isSet():
 				try:
+					self.log1 = False
+					self.log2 = False
 					#Routine de logging d'activité de la liaison série
 					if(self.message_input != self.serie.input[0]):
 						self.message_input = self.serie.input[0]
@@ -67,7 +67,7 @@ class Surveillance_serie(threading.Thread):
 					self.logger1.critical("Le thread Serie ne répondait plus, il a été tué et réinstancié")
 				else:
 					self.statut_serie = "vivant"
-				if(self.lo1 & self.log2):
+				if(self.log1 | self.log2):
 					self.logger1.debug("Le thread serie est "+self.statut_serie+" et les messages suivants sont en attente de traitement : Emission série:"+str(self.message_input)+"///// Réception série:"+str(self.message_output))
 				self.log1 = False
 				self.log2 = False
