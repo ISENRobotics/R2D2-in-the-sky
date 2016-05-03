@@ -17,12 +17,12 @@ class Emission_Serveur(threading.Thread):
 			queue_output : Une queue d'items output, les informations que le serveur transmet au controleur : les commandes demandées par smartphone
 			
 	"""
-	def __init__(self, serveur,queue_input):
+	def __init__(self, serveur,queue_input,stopevent):
 		threading.Thread.__init__(self)
 		self.input = queue_input
 		self.serveur = serveur
 		#variable écoutant l'arrêt du thread par le controleur
-		self.stoprequest = threading.Event()
+		self.stoprequest = stopevent
 		
 		### Socket client
 		#On crée le socket de connexion
@@ -35,22 +35,25 @@ class Emission_Serveur(threading.Thread):
 	def run(self):
 		sleep(1)
 		connecte = False
-		while not self.stoprequest.isSet():
-			try:
-				if (not connecte):
-					self.socket_client.connect((self.infos_connexion[0], self.infos_connexion[1]))
-					connecte = True
-				else:
-					infos = self.input.pop()
-					print("Dans la classe Emission serveur : "+str(infos))
-					self.socket_client.send(infos)
+		try:
+			while not self.stoprequest.isSet():
+				try:
+					if (not connecte):
+						self.socket_client.connect((self.infos_connexion[0], self.infos_connexion[1]))
+						connecte = True
+					else:
+						infos = self.input.pop()
+						print("Dans la classe Emission serveur : "+str(infos))
+						self.socket_client.send(infos)
+						continue
+				except socket.socket_error as serr:
+					if serr.errno != errno.ECONNREFUSED:
+						# Not the error we are looking for, re-raise
+						raise serr
+					sleep(1)
 					continue
-			except socket.socket_error as serr:
-				if serr.errno != errno.ECONNREFUSED:
-					# Not the error we are looking for, re-raise
-					raise serr
-				sleep(1)
-				continue
+		except KeyboardInterrupt as key:
+			self.stoprequest.set()
 
 	def stop(self):
 		self.stoprequest.set()

@@ -12,13 +12,13 @@ sys.path.insert(0, '/root/R2D2/classes/sous-classes')
 import serveur
 
 class Surveillance_serveur(threading.Thread):
-	def __init__(self,controleur,filename="surveillance_serveur.log"):
+	def __init__(self,controleur,stopevent,filename="surveillance_serveur.log"):
 		threading.Thread.__init__(self)
 		self.pere   =controleur
 		self.queue_input_reception = deque()
 		self.queue_output_emission = deque()
-		self.serveur=serveur.Serveur(self.queue_input_reception,self.queue_output_emission)
-		self.stoprequest = threading.Event()
+		self.serveur=serveur.Serveur(self.queue_input_reception,self.queue_output_emission,stopevent)
+		self.stoprequest = stopevent
 		self.logger2 = logging.getLogger('R2D2.surveillance_serveur')
 		self.formatter = logging.Formatter('%(asctime)s : %(message)s')
 		self.fileHandler = logging.FileHandler(filename, mode='w')
@@ -36,41 +36,51 @@ class Surveillance_serveur(threading.Thread):
 		self.logger2.debug("Thread serveur démarré")
 
 	def run(self):
-		self.logger2.debug("Surveillance_serveur running")
-		sleep(0.01)
-		self.logger2.debug("Serveur initialized, commencing surveillance")
-		#Messages servant à logger l'activité du serveur
-		self.message_input = ""
-		self.message_output = ""
-		self.statut_serveur = "vivant"
-		while not self.stoprequest.isSet():
-			try:
-				#Routine de logging d'activité du serveur
-				if(self.message_input != self.serveur.input[0]):
-					self.message_input = self.serveur.input[0]
-			except IndexError:
-				self.message_input = "pas d'input"
-			try:
-				if(self.message_output != self.serveur.output[0]):
-					self.message_output = self.serveur.output[0]
-			except IndexError:
-				self.message_output = "pas d'output"
-			self.serveur_vivant = self.serveur.is_alive()
-			if(not self.serveur_vivant):
-				self.statut_serveur = "mort"
-				self.kill()
-				self.logger2.critical("Le thread Serveur ne répondait plus, il a été tué et réinstancié")
-			else:
-				self.statut_serveur = "vivant"
-			self.logger2.debug("Le thread serveur est "+self.statut_serveur+" et les messages suivants sont en attente de traitement : Emission serveur:"+str(self.message_input)+"///// Réception serveur:"+str(self.message_output))
-
+		try:
+			self.logger2.debug("Surveillance_serveur running")
+			sleep(0.01)
+			self.logger2.debug("Serveur initialized, commencing surveillance")
+			#Messages servant à logger l'activité du serveur
+			self.message_input = ""
+			self.message_output = ""
+			self.statut_serveur = "vivant"
+			self.log1 = False
+			self.log2 = False
+			while not self.stoprequest.isSet():
+				try:
+					#Routine de logging d'activité du serveur
+					if(self.message_input != self.serveur.input[0]):
+						self.message_input = self.serveur.input[0]
+						self.log1 = True
+				except IndexError:
+					self.i = 1
+				try:
+					if(self.message_output != self.serveur.output[0]):
+						self.message_output = self.serveur.output[0]
+						self.log2 = True
+				except IndexError:
+					self.i = 1
+				self.serveur_vivant = self.serveur.is_alive()
+				if(not self.serveur_vivant):
+					self.statut_serveur = "mort"
+					self.kill()
+					self.logger2.critical("Le thread Serveur ne répondait plus, il a été tué et réinstancié")
+				else:
+					self.statut_serveur = "vivant"
+				if(self.lo1 & self.log2):
+					self.logger2.debug("Le thread serveur est "+self.statut_serveur+" et les messages suivants sont en attente de traitement : Emission serveur:"+str(self.message_input)+"///// Réception serveur:"+str(self.message_output))
+				self.log1 = False
+				self.log2 = False
+				sleep(0.00002)
+		except KeyboardInterrupt as key:
+			self.stoprequest.set()
 	def stop(self):
 		self.stoprequest.set()
 
 
 	def kill(self):
 		del self.serveur
-		self.serveur=Serveur()
+		self.serveur=Serveur(self.queue_input_reception,self.queue_output_emission,self.stoprequest)
 		self.serveur.daemon = True
 		self.serveur.start()
 		self.pere.mise_a_jour_serveur(self.serveur)

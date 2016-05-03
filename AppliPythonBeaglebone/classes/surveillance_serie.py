@@ -13,13 +13,13 @@ import serie
 
 
 class Surveillance_serie(threading.Thread):
-	def __init__(self,controleur,filename="surveillance_serie.log"):
+	def __init__(self,controleur,stopevent,filename="surveillance_serie.log"):
 		threading.Thread.__init__(self)
 		self.pere   =controleur
 		self.queue_input_reception = deque()
 		self.queue_output_emission = deque()
-		self.serie=serie.Serie(self.queue_input_reception,self.queue_output_emission)
-		self.stoprequest = threading.Event()
+		self.serie=serie.Serie(self.queue_input_reception,self.queue_output_emission,stopevent)
+		self.stoprequest = stopevent
 		self.logger1 = logging.getLogger('R2D2.surveillance_serie')
 		self.formatter = logging.Formatter('%(asctime)s : %(message)s')
 		self.fileHandler = logging.FileHandler(filename, mode='w')
@@ -36,33 +36,44 @@ class Surveillance_serie(threading.Thread):
 		self.logger1.debug("Thread série démarré")
 
 	def run(self):
-		self.logger1.debug("Surveillance_serie running")
-		sleep(0.01)
-		self.logger1.debug("Serie initialized, commencing surveillance")
-		#Messages servant à logger l'activité de la liaison série
-		self.message_input = ""
-		self.message_output = ""
-		self.statut_serveur = "vivant"
-		while not self.stoprequest.isSet():
-			try:
-				#Routine de logging d'activité de la liaison série
-				if(self.message_input != self.serie.input[0]):
-					self.message_input = self.serie.input[0]
-			except IndexError:
-				self.message_input = "pas d'input"
-			try:
-				if(self.message_output != self.serie.output[0]):
-					self.message_output = self.serie.output[0]
-			except IndexError:
-				self.message_output = "pas d'output"
-			self.serie_vivante = self.serie.is_alive()
-			if(not self.serie_vivante):
-				self.statut_serie = "mort"
-				self.kill()
-				self.logger1.critical("Le thread Serie ne répondait plus, il a été tué et réinstancié")
-			else:
-				self.statut_serie = "vivant"
-			self.logger1.debug("Le thread serie est "+self.statut_serie+" et les messages suivants sont en attente de traitement : Emission série:"+str(self.message_input)+"///// Réception série:"+str(self.message_output))
+		try:
+			self.logger1.debug("Surveillance_serie running")
+			sleep(0.01)
+			self.logger1.debug("Serie initialized, commencing surveillance")
+			#Messages servant à logger l'activité de la liaison série
+			self.message_input = ""
+			self.message_output = ""
+			self.statut_serveur = "vivant"
+			self.log1 = False
+			self.log2 = False
+			while not self.stoprequest.isSet():
+				try:
+					#Routine de logging d'activité de la liaison série
+					if(self.message_input != self.serie.input[0]):
+						self.message_input = self.serie.input[0]
+						self.log1 = True
+				except IndexError:
+					self.i = 1
+				try:
+					if(self.message_output != self.serie.output[0]):
+						self.message_output = self.serie.output[0]
+						self.log2 = True
+				except IndexError:
+					self.i = 1
+				self.serie_vivante = self.serie.is_alive()
+				if(not self.serie_vivante):
+					self.statut_serie = "mort"
+					self.kill()
+					self.logger1.critical("Le thread Serie ne répondait plus, il a été tué et réinstancié")
+				else:
+					self.statut_serie = "vivant"
+				if(self.lo1 & self.log2):
+					self.logger1.debug("Le thread serie est "+self.statut_serie+" et les messages suivants sont en attente de traitement : Emission série:"+str(self.message_input)+"///// Réception série:"+str(self.message_output))
+				self.log1 = False
+				self.log2 = False
+				sleep(0.00002)
+		except KeyboardInterrupt as key:
+			self.stoprequest.set()
 
 	def stop(self):
 		self.stoprequest.set()
@@ -70,7 +81,7 @@ class Surveillance_serie(threading.Thread):
 
 	def kill(self):
 		del self.serie
-		self.serie=Serie()
+		self.serie=Serie(self.queue_input_reception,self.queue_output_emission,self.stoprequest)
 		self.serie.daemon = True
 		self.serie.start()
 		self.pere.mise_a_jour_serie(self.serie)

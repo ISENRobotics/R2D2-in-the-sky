@@ -16,12 +16,12 @@ class Reception_Serveur(threading.Thread):
 			queue_output : Une queue d'items output, les informations que le serveur transmet au controleur : les commandes demandées par smartphone
 			
 	"""
-	def __init__(self,serveur, queue_output):
+	def __init__(self,serveur, queue_output, stopevent):
 		threading.Thread.__init__(self)
 		self.output = queue_output
 		self.serveur = serveur
 		#variable écoutant l'arrêt du thread par le controleur
-		self.stoprequest = threading.Event()
+		self.stoprequest = stopevent
 		
 		### Socket serveur
 		self.socket_serveur = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -45,38 +45,41 @@ class Reception_Serveur(threading.Thread):
 		attente = False
 		compteur_attente = 0
 		#Tant que le controleur ne demande pas au thread de s'arreter
-		while not self.stoprequest.isSet():
-			print("Le compteur_attente vaut : "+str(compteur_attente))
-			if(compteur_attente > 10000):
-				attente = True
-				self.connexion_avec_client.close()
-			if(attente):
-				self.connexion_avec_client, self.infos_connexion = self.socket_serveur.accept()
-				self.serveur.infos_connexion = self.infos_connexion
-				print(self.infos_connexion)
-				attente = False
-			try:
-				#On attend les informations du smartphone
-				#La connexion Android envoie deux caractères au début de la connexion
-				#Il faut donc les réceptionner afin qu'ils ne perturbent pas le reste des messages
-				print("Dans la classe Reception serveur : J'attends les informations du smartphone")
-				chaine = ""
-				continuer = True
-				enregistrer = False
-				while continuer:
-					msg = self.connexion_avec_client.recv(1)
-					if(msg == "{"):
-						enregistrer = True
-					elif(msg == "}"):
-						continuer = False
-					if(enregistrer):
-						chaine += msg
-				print("Dans la classe Reception serveur : "+chaine)
-				self.output.appendleft((chaine))
-				compteur_attente = 0
-			except socket.timeout:
-				compteur_attente += 1
-				continue
+		try:
+			while not self.stoprequest.isSet():
+				print("Le compteur_attente vaut : "+str(compteur_attente))
+				if(compteur_attente > 10000):
+					attente = True
+					self.connexion_avec_client.close()
+				if(attente):
+					self.connexion_avec_client, self.infos_connexion = self.socket_serveur.accept()
+					self.serveur.infos_connexion = self.infos_connexion
+					print(self.infos_connexion)
+					attente = False
+				try:
+					#On attend les informations du smartphone
+					#La connexion Android envoie deux caractères au début de la connexion
+					#Il faut donc les réceptionner afin qu'ils ne perturbent pas le reste des messages
+					print("Dans la classe Reception serveur : J'attends les informations du smartphone")
+					chaine = ""
+					continuer = True
+					enregistrer = False
+					while continuer:
+						msg = self.connexion_avec_client.recv(1)
+						if(msg == "{"):
+							enregistrer = True
+						elif(msg == "}"):
+							continuer = False
+						if(enregistrer):
+							chaine += msg
+					print("Dans la classe Reception serveur : "+chaine)
+					self.output.appendleft((chaine))
+					compteur_attente = 0
+				except socket.timeout:
+					compteur_attente += 1
+					continue
+		except KeyboardInterrupt as key:
+			self.stoprequest.set()
 
 	def stop(self):
 		self.stoprequest.set()
