@@ -2,7 +2,7 @@
 # -*-coding:Utf-8 -*
 import socket
 import threading
-import Queue
+
 from time import sleep
 
 class Emission_Serveur(threading.Thread):
@@ -17,31 +17,43 @@ class Emission_Serveur(threading.Thread):
 			queue_output : Une queue d'items output, les informations que le serveur transmet au controleur : les commandes demandées par smartphone
 			
 	"""
-	def __init__(self, serveur,queue_input):
+	def __init__(self, serveur,queue_input,stopevent):
 		threading.Thread.__init__(self)
 		self.input = queue_input
-
+		self.serveur = serveur
 		#variable écoutant l'arrêt du thread par le controleur
-		self.stoprequest = threading.Event()
+		self.stoprequest = stopevent
 		
 		### Socket client
 		#On crée le socket de connexion
 		self.socket_client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
+		self.infos_connexion = self.serveur.infos_connexion
 		#On connecte le socket sur l'adresse et le port désiré
 		#Idée : attribuer une IP fixe grâce au routeur au téléphone Android, voir réseau en 255.255.255.252
-		self.socket_client.connect((serveur.infos_connexion[0], serveur.infos_connexion[1]))
+		
 
 	def run(self):
 		sleep(1)
-		while not self.stoprequest.isSet():
-			try:
-				infos = self.input.pop()
-				print("Dans la classe Emission serveur : "+str(infos))
-				#self.socket_client.send(infos)
-				continue
-			except IndexError:
-				continue
+		connecte = False
+		try:
+			while not self.stoprequest.isSet():
+				try:
+					if (not connecte):
+						self.socket_client.connect((self.infos_connexion[0], self.infos_connexion[1]))
+						connecte = True
+					else:
+						infos = self.input.pop()
+						print("Dans la classe Emission serveur : "+str(infos))
+						self.socket_client.send(infos)
+						continue
+				except socket.socket_error as serr:
+					if serr.errno != errno.ECONNREFUSED:
+						# Not the error we are looking for, re-raise
+						raise serr
+					sleep(1)
+					continue
+		except KeyboardInterrupt as key:
+			self.stoprequest.set()
 
 	def stop(self):
 		self.stoprequest.set()

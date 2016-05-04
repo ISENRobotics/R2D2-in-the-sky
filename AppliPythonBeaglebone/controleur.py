@@ -7,10 +7,12 @@ import curses
 
 import os
 import sys
-sys.path.append("classes/")
+sys.path.append("./classes/")
 import Queue
 
-import thread
+import threading
+
+import time
 
 """
 	On importe les classes personnalisées python
@@ -18,6 +20,7 @@ import thread
 import surveillance_serveur
 import surveillance_serie
 import algorithmique
+import video
 #import template
 #import template_surveillance
 
@@ -41,9 +44,17 @@ class Controleur(object):
 			message = "I/O error("+str(e.errno)+"): "+str(e.strerror)
 			print(message)
 	   #On effectue le vrai travail ici
-		self.surveillance_serveur = surveillance_serveur.Surveillance_serveur(self)
-		self.surveillance_serie   = surveillance_serie.Surveillance_serie(self)
-		self.algorithmique        = algorithmique.Algorithmique(self)
+	   	stop_event = threading.Event()
+		self.surveillance_serveur = surveillance_serveur.Surveillance_serveur(self,stop_event)
+		self.surveillance_serie   = surveillance_serie.Surveillance_serie(self,stop_event)
+		self.algorithmique        = algorithmique.Algorithmique(self,stop_event)
+		#self.video        		  = video.Video(self,stop_event)
+
+		#On met les threads en mode daemon, quand le controleur est tué, on tue tous les threads
+		self.surveillance_serveur.daemon = True
+		self.surveillance_serie.daemon   = True
+		self.algorithmique.daemon        = True
+		#self.video.daemon        = True
 		####################################
 		#	Partie Template
 		####################################
@@ -57,23 +68,19 @@ class Controleur(object):
 			self.surveillance_serveur.start()
 			self.surveillance_serie.start()
 			self.algorithmique.start()
+			#self.video.start()
 			
+
+			self.surveillance_serie.join()
+			self.surveillance_serveur.join()
+			self.algorithmique.join()
+			#self.video.join()
 			####################################
 			#	Partie Template
 			####################################
 			#La partie surveillance doit être lancée avant la partie traitement
 			#self.template_surveillance.start()
 			#self.template.start()	
-
-				
-
-
-			self.surveillance_serveur.join()
-			self.surveillance_serie.join()
-			self.algorithmique.join()
-
-			#self.template_surveillance.join()
-			#self.template.join()	
 
 				
 		#On récupère toutes exceptions génantes (Ctrl-C de l'utilisateur, arrêt brutal du système)
@@ -84,6 +91,7 @@ class Controleur(object):
 			#curses.echo()
 			#curses.endwin()
 			try:
+				stop_event.set()
 				os.remove("daemon_python")
 				self.surveillance_serveur.stop()
 				self.surveillance_serveur.join()
@@ -91,6 +99,8 @@ class Controleur(object):
 				self.surveillance_serie.join()
 				self.algorithmique.stop()
 				self.algorithmique.join()
+				#self.video.stop()
+				#self.video.join()
 
 
 				####################################
@@ -120,6 +130,8 @@ class Controleur(object):
 				self.surveillance_serie.join()
 				self.algorithmique.stop()
 				self.algorithmique.join()
+				#self.video.stop()
+				#self.video.join()
 
 				####################################
 				#	Partie Template
@@ -149,6 +161,8 @@ class Controleur(object):
 				self.surveillance_serie.join()
 				self.algorithmique.stop()
 				self.algorithmique.join()
+				#self.video.stop()
+				#self.video.join()
 				####################################
 				#	Partie Template
 				####################################
@@ -165,6 +179,7 @@ class Controleur(object):
 	
 	def mise_a_jour_serveur(self,serveur):
 		self.algorithmique.serveur=serveur
+		#self.video.serveur=serveur
 	def mise_a_jour_serie(self,serie):
 		self.algorithmique.serie=serie
 
