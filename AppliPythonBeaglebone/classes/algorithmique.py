@@ -42,6 +42,7 @@ class Algorithmique(threading.Thread):
 
 	def verif_trame_recu(self,trame):
 		sens_des_moteurs_moteur_1_a_gauche_moteur_2_a_droite = True
+		inversion_vitesse_moteur = True
 		try:
 			msg_recu_json = json.loads(trame)
 			result_mode = 0
@@ -74,6 +75,9 @@ class Algorithmique(threading.Thread):
 									vitesse_droite = int(msg_recu_json['vitesseD'])
 								else:
 									self.serveur.input.appendleft("Aucune vitesse n'a été recue, les instructions n'ont pas été exécutées")
+								if(inversion_vitesse_moteur):
+									vitesse_gauche *= -1
+									vitesse_droite *= -1
 								#Si on est en mode 0 ou 2, on ramène les vitesses entre 0 et 255
 								if(self.MODE%2 == 0):
 									if(vitesse_gauche != default):
