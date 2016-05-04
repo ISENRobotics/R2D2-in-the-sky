@@ -41,7 +41,10 @@ class Algorithmique(threading.Thread):
 			self.stoprequest.set()
 
 	def verif_trame_recu(self,trame):
+		#variable décidant quel moteur est à gauche et quel moteur est à droite
 		sens_des_moteurs_moteur_1_a_gauche_moteur_2_a_droite = True
+		#variable inversant les vitesses moteurs recues (full forward devient full reverse)
+		#sert à rétablir le sens du robot (moteurs montées dans le mauvais sens)
 		inversion_vitesse_moteur = True
 		try:
 			msg_recu_json = json.loads(trame)
