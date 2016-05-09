@@ -19,9 +19,9 @@ class Algorithmique(threading.Thread):
 		self.stoprequest = stopevent
 		
 	def run(self):
+		self.serie.input.appendleft((0,128,128,2))
 		try:
 			while not self.stoprequest.isSet():
-				print("ON RENTRE DANS LA CLASSE ALGO BITCH !")
 				try:
 					infos = self.serveur.output.pop()
 					#Traitement des infos
@@ -37,12 +37,19 @@ class Algorithmique(threading.Thread):
 						self.serveur.input.appendleft(infos)
 					except IndexError:
 						continue
+					except KeyboardInterrupt as key:
+						self.stoprequest.set()
+				except KeyboardInterrupt as key:
+					self.stoprequest.set()
 		except KeyboardInterrupt as key:
 			self.stoprequest.set()
+		finally:
+			self.serveur.stop()
+			self.serie.stop()
 
 	def verif_trame_recu(self,trame):
 		#variable décidant quel moteur est à gauche et quel moteur est à droite
-		sens_des_moteurs_moteur_1_a_gauche_moteur_2_a_droite = True
+		sens_des_moteurs_moteur_1_a_gauche_moteur_2_a_droite = False
 		#variable inversant les vitesses moteurs recues (full forward devient full reverse)
 		#sert à rétablir le sens du robot (moteurs montées dans le mauvais sens)
 		inversion_vitesse_moteur = True
@@ -53,14 +60,14 @@ class Algorithmique(threading.Thread):
 			result_gauche = 0
 			if('temps' in msg_recu_json):
 				temps = int(round(time.time() * 1000))
-				print("ALGORITHMIQUE : VOILA CE QUE VAUT LA SOUSTRACTION DU TEMPS ACTUEL AU TEMPS ENVOYEEEEEEEEEEEEEEEEEEEEEEEE : "+str(temps - int(msg_recu_json['temps'])))
 				if(temps - int(msg_recu_json['temps']) < 2000):
 					if('mode' in msg_recu_json):
 						result_mode = self.verif_commande_SETMODE(int(msg_recu_json['mode']))
 						if(result_mode):
 							self.MODE = int(msg_recu_json['mode']);
 							if(self.MODE == 8):
-								self.serie.input.appendleft((0,128,128))
+								print("ALGORITHMIQUE DEBUT")
+								self.serie.input.appendleft((0,128,128,2))
 							else:
 								#on commence par assigner des vitesses telles que les moteurs ne bougent pas
 								if(self.MODE %2 == 0):
@@ -92,9 +99,11 @@ class Algorithmique(threading.Thread):
 								#Si tout est bon, on envoie à la liaison série
 								if(result_mode & result_droite & result_gauche):
 									if(sens_des_moteurs_moteur_1_a_gauche_moteur_2_a_droite):
-										self.serie.input.appendleft((self.MODE,vitesse_gauche,vitesse_droite))
+										print("ALGORITHMIQUE on envoie")
+										self.serie.input.appendleft((self.MODE,vitesse_gauche,vitesse_droite,2))
 									else:
-										self.serie.input.appendleft((self.MODE,vitesse_droite,vitesse_gauche))
+										print("ALGORITHMIQUE on envoie")
+										self.serie.input.appendleft((self.MODE,vitesse_droite,vitesse_gauche,2))
 								#sinon, on informe le serveur
 						else:
 							self.serveur.input.appendleft("{'probleme':'Le mode recu n'est pas bon, aucune instruction n'a été exécuté'}")

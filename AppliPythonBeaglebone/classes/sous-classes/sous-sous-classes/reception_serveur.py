@@ -32,14 +32,14 @@ class Reception_Serveur(threading.Thread):
 		#Une connexion maximale possible au socket, comme ca pas de problème avec plusieurs applications, un seul téléphone peut communiquer avec l'appli
 		self.socket_serveur.listen(1)
 
+		
+
+	def run(self):
 		#On accepte la connexion
 		#Attention, la méthode accept bloque le programme tant qu'aucun client ne s'est présenté
 		self.connexion_avec_client, self.infos_connexion = self.socket_serveur.accept()
 		print(self.infos_connexion)
 		self.serveur.infos_connexion = self.infos_connexion
-		
-
-	def run(self):
 		sleep(1)
 		self.socket_serveur.settimeout(0.05)
 		attente = False
@@ -73,13 +73,20 @@ class Reception_Serveur(threading.Thread):
 						if(enregistrer):
 							chaine += msg
 					print("Dans la classe Reception serveur : "+chaine)
-					self.output.appendleft((chaine))
+					if(chaine != ""):
+						self.output.appendleft((chaine))
 					compteur_attente = 0
 				except socket.timeout:
 					compteur_attente += 1
 					continue
+				except KeyboardInterrupt as key:
+					print("Catched a keyboard interruption in Reception_Serveur, exiting")
+					self.socket_serveur.close()
+					self.stoprequest.set()
 		except KeyboardInterrupt as key:
 			self.stoprequest.set()
-
+		finally:
+			self.socket_serveur.close()
+			
 	def stop(self):
 		self.stoprequest.set()

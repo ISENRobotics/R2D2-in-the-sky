@@ -50,14 +50,24 @@ class Emission_Serie(threading.Thread):
 					#	infos[3] : valeur de l'acceleration demandée
 					infos = self.input.pop()
 					print("Dans la classe Emission serie : "+str(infos))
-					self.resultM = self.ordre_moteurs(constants.SET_MODE,infos[0])
-					self.resultG = self.ordre_moteurs(constants.SET_SPEED_1,infos[1])
-					self.resultD = self.ordre_moteurs(constants.SET_SPEED_2,infos[2])
-					#self.resultA = self.ordre_moteurs(constants.SET_ACCELERATION,int(infos[3]))
+					longueur = len(infos)
+					if(longueur == 4):
+						self.resultM = self.ordre_moteurs(constants.SET_MODE,infos[0])
+						self.resultG = self.ordre_moteurs(constants.SET_SPEED_1,infos[1])
+						self.resultD = self.ordre_moteurs(constants.SET_SPEED_2,infos[2])
+						self.resultA = self.ordre_moteurs(constants.SET_ACCELERATION,infos[3])
+					elif(longueur == 1):
+						self.result = self.ordre_moteurs(infos[0],0)
 				except IndexError:
 					continue
+				except KeyboardInterrupt as key:
+					print("Catched a keyboard interruption in Emission_Serie, exiting")
+					self.ser.close()
+					self.stoprequest.set()
 		except KeyboardInterrupt as key:
 			self.stoprequest.set()
+		finally:
+			self.ser.close()
 
 	#Fonction chargée d'effectuer l'envoi sur la liaison série des commandes moteurs
 	def ordre_moteurs(self,commande,parameter):

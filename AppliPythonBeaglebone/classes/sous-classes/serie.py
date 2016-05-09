@@ -56,16 +56,25 @@ class Serie(threading.Thread):
 				try:
 					#On regarde si on a recu des informations, si oui, on les transmet à l'algorithmique
 					infos = self.input.pop()
+					print("Dans la classe Série: "+str(infos))
 					self.queue_output_emission.appendleft(infos)
 				except IndexError:
 					try:
 						#Si on n'a pas recu d'informations dans le temps imparti, on regarde si un message à envoyer est arrivé
 						infos = self.queue_input_reception.pop()
+						print("Dans la classe Série: "+str(infos))
 						self.output.appendleft(infos)
 					except IndexError:
 						continue
+					except KeyboardInterrupt as key:
+						self.stoprequest.set()
+				except KeyboardInterrupt as key:
+					self.stoprequest.set()
 		except KeyboardInterrupt as key:
 			self.stoprequest.set()
+		finally:
+			self.thread_emission_serie.stop()
+			self.thread_reception_serie.stop()
 
 	def stop(self):
 		self.stoprequest.set()

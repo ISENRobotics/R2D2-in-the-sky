@@ -46,8 +46,8 @@ class Surveillance_serveur(threading.Thread):
 			self.statut_serveur = "vivant"
 			while not self.stoprequest.isSet():
 				try:
-				self.log1 = False
-				self.log2 = False
+					self.log1 = False
+					self.log2 = False
 					#Routine de logging d'activité du serveur
 					if(self.message_input != self.serveur.input[0]):
 						self.message_input = self.serveur.input[0]
@@ -69,8 +69,6 @@ class Surveillance_serveur(threading.Thread):
 					self.statut_serveur = "vivant"
 				if(self.log1 | self.log2):
 					self.logger2.debug("Le thread serveur est "+self.statut_serveur+" et les messages suivants sont en attente de traitement : Emission serveur:"+str(self.message_input)+"///// Réception serveur:"+str(self.message_output))
-				self.log1 = False
-				self.log2 = False
 				sleep(0.00002)
 		except KeyboardInterrupt as key:
 			self.stoprequest.set()

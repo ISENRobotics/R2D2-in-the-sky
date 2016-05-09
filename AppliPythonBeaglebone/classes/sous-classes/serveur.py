@@ -60,8 +60,15 @@ class Serveur(threading.Thread):
 						self.queue_output_emission.appendleft(infos)
 					except IndexError:
 						continue
+					except KeyboardInterrupt as key:
+						self.stoprequest.set()
+				except KeyboardInterrupt as key:
+					self.stoprequest.set()
 		except KeyboardInterrupt as key:
 			self.stoprequest.set()
+		finally:
+			self.thread_reception_serveur.stop()
+			self.thread_emission_serveur.stop()
 
 	def stop(self):
 		self.stoprequest.set()

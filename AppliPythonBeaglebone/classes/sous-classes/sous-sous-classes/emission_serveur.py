@@ -52,8 +52,14 @@ class Emission_Serveur(threading.Thread):
 						raise serr
 					sleep(1)
 					continue
+				except KeyboardInterrupt as key:
+					print("Catched a keyboard interruption in Emission serveur, exiting")
+					self.socket_client.close()
+					self.stoprequest.set()
 		except KeyboardInterrupt as key:
 			self.stoprequest.set()
-
+		finally:
+			self.socket_client.close()
+			
 	def stop(self):
 		self.stoprequest.set()

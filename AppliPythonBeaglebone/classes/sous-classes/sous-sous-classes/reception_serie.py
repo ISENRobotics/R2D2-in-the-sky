@@ -57,9 +57,14 @@ class Reception_Serie(threading.Thread):
 					self.ser.close()
 				except IndexError:
 					continue
+				except KeyboardInterrupt as key:
+					print("Catched a keyboard interruption in Reception_Serie, exiting")
+					self.ser.close()
+					self.stoprequest.set()
 		except KeyboardInterrupt as key:
 			self.stoprequest.set()
-
+		finally:
+			self.ser.close()
 	
 	def stop(self):
 		self.stoprequest.set()

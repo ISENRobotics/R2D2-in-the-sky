@@ -20,7 +20,8 @@ import time
 import surveillance_serveur
 import surveillance_serie
 import algorithmique
-import video
+#import video
+import LED
 #import template
 #import template_surveillance
 
@@ -49,12 +50,14 @@ class Controleur(object):
 		self.surveillance_serie   = surveillance_serie.Surveillance_serie(self,stop_event)
 		self.algorithmique        = algorithmique.Algorithmique(self,stop_event)
 		#self.video        		  = video.Video(self,stop_event)
+		#self.led 				  = LED.LED(self,stop_event)
 
 		#On met les threads en mode daemon, quand le controleur est tué, on tue tous les threads
 		self.surveillance_serveur.daemon = True
 		self.surveillance_serie.daemon   = True
 		self.algorithmique.daemon        = True
 		#self.video.daemon        = True
+		#self.led.daemon        = True
 		####################################
 		#	Partie Template
 		####################################
@@ -69,12 +72,14 @@ class Controleur(object):
 			self.surveillance_serie.start()
 			self.algorithmique.start()
 			#self.video.start()
+			#self.led.start()
 			
 
 			self.surveillance_serie.join()
 			self.surveillance_serveur.join()
 			self.algorithmique.join()
 			#self.video.join()
+			#self.led.join()
 			####################################
 			#	Partie Template
 			####################################
@@ -101,7 +106,8 @@ class Controleur(object):
 				self.algorithmique.join()
 				#self.video.stop()
 				#self.video.join()
-
+				#self.led.stop()
+				#self.led.join()
 
 				####################################
 				#	Partie Template
@@ -132,7 +138,8 @@ class Controleur(object):
 				self.algorithmique.join()
 				#self.video.stop()
 				#self.video.join()
-
+				#self.led.stop()
+				#self.led.join()
 				####################################
 				#	Partie Template
 				####################################
@@ -163,6 +170,8 @@ class Controleur(object):
 				self.algorithmique.join()
 				#self.video.stop()
 				#self.video.join()
+				#self.led.stop()
+				#self.led.join()
 				####################################
 				#	Partie Template
 				####################################
