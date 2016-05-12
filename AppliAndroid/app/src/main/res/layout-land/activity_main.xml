@@ -8,8 +8,7 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="fr.pierreyvesmingam.robotr2d2.MainActivity"
-    android:id="@+id/ee"
-    android:onClick="connexion">
+    android:id="@+id/ee">
 
     
 
@@ -92,9 +91,9 @@
         android:layout_alignStart="@+id/linearLayout1">
 
         <RelativeLayout
-            android:id="@+id/layout_joystick3"
-            android:layout_width="25dp"
-            android:layout_height="25dp"
+
+            android:layout_width="35dp"
+            android:layout_height="35dp"
             android:background="@drawable/rouge"
             android:layout_centerVertical="true"
             android:layout_centerHorizontal="true">
@@ -136,8 +135,8 @@
         android:layout_toEndOf="@+id/button4">
 
         <RelativeLayout
-            android:layout_width="25dp"
-            android:layout_height="25dp"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
             android:background="@drawable/rouge"
             android:layout_centerVertical="true"
             android:layout_centerHorizontal="true" />
