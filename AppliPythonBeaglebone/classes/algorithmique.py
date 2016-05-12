@@ -25,24 +25,18 @@ class Algorithmique(threading.Thread):
 				try:
 					infos = self.serveur.output.pop()
 					#Traitement des infos
-					print("Dans la classe Algorithmique : "+str(infos))
+					#print("Dans la classe Algorithmique : "+str(infos))
 					self.verif_trame_recu(infos)
 					
 				except IndexError:
 					try:
 						#Si on n'a pas recu d'informations dans le temps imparti, on regarde si un message à envoyer est arrivé
 						infos = self.serie.output.pop()
-						print("Dans la classe Algorithmique : "+str(infos))
+						#print("Dans la classe Algorithmique : "+str(infos))
 						#Traitement des infos
 						self.serveur.input.appendleft(infos)
 					except IndexError:
 						continue
-					except KeyboardInterrupt as key:
-						self.stoprequest.set()
-				except KeyboardInterrupt as key:
-					self.stoprequest.set()
-		except KeyboardInterrupt as key:
-			self.stoprequest.set()
 		finally:
 			self.serveur.stop()
 			self.serie.stop()
@@ -66,7 +60,7 @@ class Algorithmique(threading.Thread):
 						if(result_mode):
 							self.MODE = int(msg_recu_json['mode']);
 							if(self.MODE == 8):
-								print("ALGORITHMIQUE DEBUT")
+								#print("ALGORITHMIQUE DEBUT")
 								self.serie.input.appendleft((0,128,128,2))
 							else:
 								#on commence par assigner des vitesses telles que les moteurs ne bougent pas
@@ -99,10 +93,10 @@ class Algorithmique(threading.Thread):
 								#Si tout est bon, on envoie à la liaison série
 								if(result_mode & result_droite & result_gauche):
 									if(sens_des_moteurs_moteur_1_a_gauche_moteur_2_a_droite):
-										print("ALGORITHMIQUE on envoie")
+										#print("ALGORITHMIQUE on envoie")
 										self.serie.input.appendleft((self.MODE,vitesse_gauche,vitesse_droite,2))
 									else:
-										print("ALGORITHMIQUE on envoie")
+										#print("ALGORITHMIQUE on envoie")
 										self.serie.input.appendleft((self.MODE,vitesse_droite,vitesse_gauche,2))
 								#sinon, on informe le serveur
 						else:

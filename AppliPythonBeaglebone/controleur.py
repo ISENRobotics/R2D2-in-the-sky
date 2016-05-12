@@ -21,7 +21,7 @@ import surveillance_serveur
 import surveillance_serie
 import algorithmique
 #import video
-import LED
+#import LED
 #import template
 #import template_surveillance
 
@@ -44,27 +44,28 @@ class Controleur(object):
 		except IOError as e:
 			message = "I/O error("+str(e.errno)+"): "+str(e.strerror)
 			print(message)
-	   #On effectue le vrai travail ici
-	   	stop_event = threading.Event()
-		self.surveillance_serveur = surveillance_serveur.Surveillance_serveur(self,stop_event)
-		self.surveillance_serie   = surveillance_serie.Surveillance_serie(self,stop_event)
-		self.algorithmique        = algorithmique.Algorithmique(self,stop_event)
-		#self.video        		  = video.Video(self,stop_event)
-		#self.led 				  = LED.LED(self,stop_event)
+		#On effectue le vrai travail ici
+		self.stop_event = threading.Event()
+		self.surveillance_serveur = surveillance_serveur.Surveillance_serveur(self,self.stop_event)
+		self.surveillance_serie   = surveillance_serie.Surveillance_serie(self,self.stop_event)
+		self.algorithmique        = algorithmique.Algorithmique(self,self.stop_event)
+		#self.video        		  = video.Video(self,self.stop_event)
+		#self.led 				  = LED.LED(self.stop_event)
 
 		#On met les threads en mode daemon, quand le controleur est tué, on tue tous les threads
 		self.surveillance_serveur.daemon = True
 		self.surveillance_serie.daemon   = True
 		self.algorithmique.daemon        = True
-		#self.video.daemon        = True
-		#self.led.daemon        = True
+		#self.video.daemon        		 = True
+		#self.led.daemon        			 = True
 		####################################
 		#	Partie Template
 		####################################
 		#self.template			  = template.Template(self)
 		#self.template_surveillance	= template_surveillance.Template_surveillance(self)
-		self.continuer = True
 
+		#self.template.daemon			  = True
+		#self.template_surveillance.daemon	= True
 
 	def fonctionnement(self):
 		try:
@@ -74,12 +75,9 @@ class Controleur(object):
 			#self.video.start()
 			#self.led.start()
 			
+			while not self.stop_event.isSet():
+				continue
 
-			self.surveillance_serie.join()
-			self.surveillance_serveur.join()
-			self.algorithmique.join()
-			#self.video.join()
-			#self.led.join()
 			####################################
 			#	Partie Template
 			####################################
@@ -91,96 +89,58 @@ class Controleur(object):
 		#On récupère toutes exceptions génantes (Ctrl-C de l'utilisateur, arrêt brutal du système)
 		except KeyboardInterrupt as key:
 			print("User-generated interrupt, exiting....")
-			#curses.nocbreak()
-			#stdscr.keypad(0)
-			#curses.echo()
-			#curses.endwin()
 			try:
-				stop_event.set()
-				os.remove("daemon_python")
+				self.stop_event.set()
 				self.surveillance_serveur.stop()
-				self.surveillance_serveur.join()
 				self.surveillance_serie.stop()
-				self.surveillance_serie.join()
 				self.algorithmique.stop()
-				self.algorithmique.join()
 				#self.video.stop()
-				#self.video.join()
+				print("On essaie de tuer la LED....")
 				#self.led.stop()
-				#self.led.join()
-
+				
 				####################################
 				#	Partie Template
 				####################################
 				#self.template_surveillance.stop()
-				#self.template_surveillance.join()
 				#self.template.stop()	
-				#self.template.join()	
-
 				
-				#os.unlink("daemon_python") est équivalent selon la documentation python, version liens Unix
+				
 			except OSError as e:  ## si l'opération échoue, on affiche l'erreur rencontrée (voir au niveau des permissions)
 				print ("Error: %s - %s." % (e.filename,e.strerror))
 
 		except SystemExit as exit_sys:
 			print("An exception forcing the interpreter to stop has been detected, shutting down....")
-			#curses.nocbreak()
-			#stdscr.keypad(0)
-			#curses.echo()
-			#curses.endwin()
 			try:
-				os.remove("daemon_python")
 				self.surveillance_serveur.stop()
-				self.surveillance_serveur.join()
 				self.surveillance_serie.stop()
-				self.surveillance_serie.join()
 				self.algorithmique.stop()
-				self.algorithmique.join()
 				#self.video.stop()
-				#self.video.join()
 				#self.led.stop()
-				#self.led.join()
 				####################################
 				#	Partie Template
 				####################################
 				#self.template_surveillance.stop()
-				#self.template_surveillance.join()
 				#self.template.stop()	
-				#self.template.join()	
+				
 
-
-				#os.unlink("daemon_python") est équivalent selon la documentation python, version liens Unix
 			except OSError as e:  ## si l'opération échoue, on affiche l'erreur rencontrée (voir au niveau des permissions)
 				print ("Error: %s - %s." % (e.filename,e.strerror))
 		#Quand on a fini toute l'application (si celle-ci a une fin), on efface le fichier disant que l'application est lancée (et on restaure le terminal initial)
 		finally:
-			#curses.nocbreak()
-			#stdscr.keypad(0)
-			#curses.echo()
-			#curses.endwin()
-			while self.continuer:
-				continue
 			try:
 				os.remove("daemon_python")
 				self.surveillance_serveur.stop()
-				self.surveillance_serveur.join()
 				self.surveillance_serie.stop()
-				self.surveillance_serie.join()
 				self.algorithmique.stop()
-				self.algorithmique.join()
 				#self.video.stop()
-				#self.video.join()
+				print("On essaie de tuer la LED avant fermeture définitive....")
 				#self.led.stop()
-				#self.led.join()
 				####################################
 				#	Partie Template
 				####################################
 				#self.template_surveillance.stop()
-				#self.template_surveillance.join()
 				#self.template.stop()	
-				#self.template.join()	
-
-				#os.unlink("daemon_python") est équivalent selon la documentation python, version liens Unix
+			
 			except OSError as e:  ## si l'opération échoue, on affiche l'erreur rencontrée (voir au niveau des permissions)
 				print ("Error: %s - %s." % (e.filename,e.strerror))
 

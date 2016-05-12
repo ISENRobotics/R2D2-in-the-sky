@@ -60,12 +60,6 @@ class Emission_Serie(threading.Thread):
 						self.result = self.ordre_moteurs(infos[0],0)
 				except IndexError:
 					continue
-				except KeyboardInterrupt as key:
-					print("Catched a keyboard interruption in Emission_Serie, exiting")
-					self.ser.close()
-					self.stoprequest.set()
-		except KeyboardInterrupt as key:
-			self.stoprequest.set()
 		finally:
 			self.ser.close()
 

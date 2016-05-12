@@ -40,10 +40,10 @@ class Serie(threading.Thread):
 		self.queue_output_emission = deque()
 
 		#variable écoutant l'arrêt du thread par le controleur
-		self.stoprequest = stopevent
-		self.thread_emission_serie = Emission_Serie(self.queue_output_emission,stopevent)
+		self.stoprequest = threading.Event()
+		self.thread_emission_serie = Emission_Serie(self.queue_output_emission,stopevent,2)
 		self.thread_emission_serie.daemon = True
-		self.thread_reception_serie = Reception_Serie(self.queue_input_reception,stopevent)
+		self.thread_reception_serie = Reception_Serie(self.queue_input_reception,stopevent,2)
 		self.thread_reception_serie.daemon = True
 		self.thread_emission_serie.start()
 		self.thread_reception_serie.start()
@@ -56,22 +56,16 @@ class Serie(threading.Thread):
 				try:
 					#On regarde si on a recu des informations, si oui, on les transmet à l'algorithmique
 					infos = self.input.pop()
-					print("Dans la classe Série: "+str(infos))
+					#print("Dans la classe Série: "+str(infos))
 					self.queue_output_emission.appendleft(infos)
 				except IndexError:
 					try:
 						#Si on n'a pas recu d'informations dans le temps imparti, on regarde si un message à envoyer est arrivé
 						infos = self.queue_input_reception.pop()
-						print("Dans la classe Série: "+str(infos))
+						#print("Dans la classe Série: "+str(infos))
 						self.output.appendleft(infos)
 					except IndexError:
 						continue
-					except KeyboardInterrupt as key:
-						self.stoprequest.set()
-				except KeyboardInterrupt as key:
-					self.stoprequest.set()
-		except KeyboardInterrupt as key:
-			self.stoprequest.set()
 		finally:
 			self.thread_emission_serie.stop()
 			self.thread_reception_serie.stop()

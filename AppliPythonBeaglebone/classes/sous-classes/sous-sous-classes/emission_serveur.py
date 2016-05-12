@@ -1,6 +1,6 @@
 #/usr/bin/env python
 # -*-coding:Utf-8 -*
-import socket
+import socket, errno
 import threading
 
 from time import sleep
@@ -24,42 +24,46 @@ class Emission_Serveur(threading.Thread):
 		#variable écoutant l'arrêt du thread par le controleur
 		self.stoprequest = stopevent
 		
-		### Socket client
-		#On crée le socket de connexion
-		self.socket_client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-		self.infos_connexion = self.serveur.infos_connexion
-		#On connecte le socket sur l'adresse et le port désiré
-		#Idée : attribuer une IP fixe grâce au routeur au téléphone Android, voir réseau en 255.255.255.252
 		
-
 	def run(self):
 		sleep(1)
-		connecte = False
+		self.connecte = False
+		while (self.serveur.infos_connexion[0] == '') & (self.serveur.infos_connexion[1] == ''):
+			continue
+		self.socket_client = self.serveur.thread_reception_serveur.connexion_avec_client
+		print(self.socket_client)
 		try:
 			while not self.stoprequest.isSet():
+				### Socket client
+				#On crée le socket de connexion
+				self.socket_client = self.serveur.thread_reception_serveur.connexion_avec_client
+				self.infos_connexion = self.serveur.infos_connexion
+				
+				print("Dans la classe Émission serveur, les infos de connexion valent :"+str(self.infos_connexion))
 				try:
-					if (not connecte):
-						self.socket_client.connect((self.infos_connexion[0], self.infos_connexion[1]))
-						connecte = True
-					else:
-						infos = self.input.pop()
-						print("Dans la classe Emission serveur : "+str(infos))
-						self.socket_client.send(infos)
-						continue
-				except socket.socket_error as serr:
+					'''if (not self.connecte):
+						if((self.infos_connexion[0] != '') & (self.infos_connexion[1] != '')):
+							self.connecte = True
+						else:
+							continue
+					else:'''
+					#infos = self.input.pop().encode("UTF-8")
+					infos = "{test:success}\n".encode("UTF-8")
+					print("Dans la classe Emission serveur : "+str(infos))
+					self.socket_client.send(infos)
+					print("Dans la classe Emission serveur : apres envoi")
+					continue
+				except socket.error as serr:
 					if serr.errno != errno.ECONNREFUSED:
 						# Not the error we are looking for, re-raise
 						raise serr
+					print(str(serr))
 					sleep(1)
 					continue
-				except KeyboardInterrupt as key:
-					print("Catched a keyboard interruption in Emission serveur, exiting")
-					self.socket_client.close()
-					self.stoprequest.set()
-		except KeyboardInterrupt as key:
-			self.stoprequest.set()
+				except IndexError:
+					continue
 		finally:
 			self.socket_client.close()
-			
+
 	def stop(self):
 		self.stoprequest.set()

@@ -46,7 +46,7 @@ class Reception_Serie(threading.Thread):
 				try:
 					self.ser.open()
 					infos = self.ser.read()
-					print("Dans la classe Reception serie : "+str(infos))
+					#print("Dans la classe Reception serie : "+str(infos))
 					#On regarde si un nouveau jeu d'instructions a été mis en queue
 					#Les jeux d'instructions se décomposent de la manière suivante : 
 					#	infos[0] : valeur du mode de fonctionnement demandé
@@ -57,12 +57,6 @@ class Reception_Serie(threading.Thread):
 					self.ser.close()
 				except IndexError:
 					continue
-				except KeyboardInterrupt as key:
-					print("Catched a keyboard interruption in Reception_Serie, exiting")
-					self.ser.close()
-					self.stoprequest.set()
-		except KeyboardInterrupt as key:
-			self.stoprequest.set()
 		finally:
 			self.ser.close()
 	

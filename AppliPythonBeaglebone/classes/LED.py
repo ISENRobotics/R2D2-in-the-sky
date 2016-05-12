@@ -33,29 +33,29 @@ class LED(threading.Thread):
 		rgb_led = ChainableLED(CLK_PIN, DATA_PIN, NUMBER_OF_LEDS)
 		ecran=LCD(DisplayText, DisplayRGB)
 		ecran.setRGB(255,255,255)
-		son=Speaker("P9_22")
+		son=Speaker("P9_14")
  
 		while not self.stoprequest.isSet():
 			try:
 				rgb_led.setColorRGB(0, 255, 0, 0)
 				rgb_led.setColorRGB(1, 255, 0, 0)
-				ecran.setText("Du cote obscur ne pas sombrer il faut")
-				son.marche_imperiale("P9_22")
-				time.sleep(2)
+				#ecran.setText("Du cote obscur ne pas sombrer il faut")
+				son.marche_imperiale("P9_14")
+				#time.sleep(0.5)
 				ecran.setText("	 #ISEN")
-				time.sleep(2)
+				#time.sleep(0.5)
 				ecran.setText("   Yes I code")
-				time.sleep(2)
+				#time.sleep(0.5)
 				ecran.setText("	  ISEN \n  est mon pere")
 				rgb_led.setColorRGB(0, 0, 0, 255)
 				rgb_led.setColorRGB(1, 0, 0, 255)
-				time.sleep(5)
+				#time.sleep(1)
 			except KeyboardInterrupt as key:
 				self.stoprequest.set()
-				continue
+				
 	def stop(self):
 		self.stoprequest.set()
-
+		
 
 class ChainableLED():
 	def __init__(self, clk_pin, data_pin, number_of_leds):
@@ -269,10 +269,10 @@ class Speaker():
 		self.jouer_note(sol,50)
 		PWM.set_duty_cycle(pin, 0)
 
-	def jouer_note(note, duty):
-		PWM.set_frequency("P9_22", note)
-		PWM.set_duty_cycle("P9_22", duty)
+	def jouer_note(self,note, duty):
+		PWM.set_frequency("P9_14", note)
+		PWM.set_duty_cycle("P9_14", duty)
 		time.sleep(0.5)
-		PWM.set_duty_cycle("P9_22", 0)
+		PWM.set_duty_cycle("P9_14", 0)
 		time.sleep(0.3)
-		PWM.set_duty_cycle("P9_22", duty)
+		PWM.set_duty_cycle("P9_14", duty)

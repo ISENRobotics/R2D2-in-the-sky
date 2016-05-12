@@ -30,12 +30,13 @@ class Serveur(threading.Thread):
 		threading.Thread.__init__(self)
 		self.input = queue_input
 		self.output = queue_output
+		self.infos_connexion = (('',''))
 
 		self.queue_input_reception = deque()
 		self.queue_output_emission = deque()
 
 		#variable écoutant l'arrêt du thread par le controleur
-		self.stoprequest = stopevent
+		self.stoprequest = threading.Event()
 		self.thread_reception_serveur = Reception_Serveur(self,self.queue_input_reception,stopevent)
 		self.thread_reception_serveur.daemon = True
 		self.thread_emission_serveur = Emission_Serveur(self,self.queue_output_emission,stopevent)
@@ -60,12 +61,6 @@ class Serveur(threading.Thread):
 						self.queue_output_emission.appendleft(infos)
 					except IndexError:
 						continue
-					except KeyboardInterrupt as key:
-						self.stoprequest.set()
-				except KeyboardInterrupt as key:
-					self.stoprequest.set()
-		except KeyboardInterrupt as key:
-			self.stoprequest.set()
 		finally:
 			self.thread_reception_serveur.stop()
 			self.thread_emission_serveur.stop()

@@ -38,7 +38,6 @@ class Reception_Serveur(threading.Thread):
 		#On accepte la connexion
 		#Attention, la méthode accept bloque le programme tant qu'aucun client ne s'est présenté
 		self.connexion_avec_client, self.infos_connexion = self.socket_serveur.accept()
-		print(self.infos_connexion)
 		self.serveur.infos_connexion = self.infos_connexion
 		sleep(1)
 		self.socket_serveur.settimeout(0.05)
@@ -47,7 +46,8 @@ class Reception_Serveur(threading.Thread):
 		#Tant que le controleur ne demande pas au thread de s'arreter
 		try:
 			while not self.stoprequest.isSet():
-				print("Le compteur_attente vaut : "+str(compteur_attente))
+				print("Dans la classe réception serveur, les infos de connexion valent :"+str(self.infos_connexion))
+				#print("Le compteur_attente vaut : "+str(compteur_attente))
 				if(compteur_attente > 10000):
 					attente = True
 					self.connexion_avec_client.close()
@@ -60,7 +60,7 @@ class Reception_Serveur(threading.Thread):
 					#On attend les informations du smartphone
 					#La connexion Android envoie deux caractères au début de la connexion
 					#Il faut donc les réceptionner afin qu'ils ne perturbent pas le reste des messages
-					print("Dans la classe Reception serveur : J'attends les informations du smartphone")
+					#print("Dans la classe Reception serveur : J'attends les informations du smartphone")
 					chaine = ""
 					continuer = True
 					enregistrer = False
@@ -72,21 +72,15 @@ class Reception_Serveur(threading.Thread):
 							continuer = False
 						if(enregistrer):
 							chaine += msg
-					print("Dans la classe Reception serveur : "+chaine)
+					#print("Dans la classe Reception serveur : "+chaine)
 					if(chaine != ""):
 						self.output.appendleft((chaine))
 					compteur_attente = 0
 				except socket.timeout:
 					compteur_attente += 1
 					continue
-				except KeyboardInterrupt as key:
-					print("Catched a keyboard interruption in Reception_Serveur, exiting")
-					self.socket_serveur.close()
-					self.stoprequest.set()
-		except KeyboardInterrupt as key:
-			self.stoprequest.set()
 		finally:
 			self.socket_serveur.close()
-			
+
 	def stop(self):
 		self.stoprequest.set()

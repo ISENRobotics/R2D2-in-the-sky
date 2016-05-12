@@ -68,12 +68,12 @@ class Surveillance_serie(threading.Thread):
 				else:
 					self.statut_serie = "vivant"
 				if(self.log1 | self.log2):
-					self.logger1.debug("Le thread serie est "+self.statut_serie+" et les messages suivants sont en attente de traitement : Emission série:"+str(self.message_input)+"///// Réception série:"+str(self.message_output))
+					self.logger1.info("Le thread serie est "+self.statut_serie+" et les messages suivants sont en attente de traitement : Emission série:"+str(self.message_input)+"///// Réception série:"+str(self.message_output))
 				self.log1 = False
 				self.log2 = False
 				sleep(0.00002)
-		except KeyboardInterrupt as key:
-			self.stoprequest.set()
+		finally:
+			self.serie.stop()
 
 	def stop(self):
 		self.stoprequest.set()
