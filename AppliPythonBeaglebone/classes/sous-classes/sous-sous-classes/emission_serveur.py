@@ -33,6 +33,7 @@ class Emission_Serveur(threading.Thread):
 		self.socket_client = self.serveur.thread_reception_serveur.connexion_avec_client
 		print(self.socket_client)
 		try:
+			self.i = 0
 			while not self.stoprequest.isSet():
 				### Socket client
 				#On crée le socket de connexion
@@ -48,7 +49,7 @@ class Emission_Serveur(threading.Thread):
 							continue
 					else:'''
 					infos = self.input.pop()
-					#infos = "{test:success}\n".encode("UTF-8")
+					#infos = "{test:"+str(self.i)+"}\n".encode("UTF-8")
 					#print("Dans la classe Emission serveur : "+str(infos))
 					self.socket_client.send(infos)
 					#print("Dans la classe Emission serveur : apres envoi")

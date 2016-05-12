@@ -5,7 +5,6 @@ import numpy as np
 import sys
 import time
 import os
-from PIL import Image
 
 import cv2
 import string
@@ -58,7 +57,7 @@ class Video(threading.Thread):
 				#cv2.waitKey(40)
 			'''
 			while(self.error != 0):
-				os.system('avconv -f video4linux2 -s 640x360 -r 10 -b 350k -i /dev/video0 -f flv tcp://172.17.0.2:12801')
+				os.system('avconv -f video4linux2 -s 640x360 -r 10 -b 350k -i /dev/video0 tcp://172.17.0.2:12801')
 				time.sleep(1)
 		finally:
 			#self.video.release()
