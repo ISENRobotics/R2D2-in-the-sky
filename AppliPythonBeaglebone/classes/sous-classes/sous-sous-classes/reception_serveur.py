@@ -46,7 +46,7 @@ class Reception_Serveur(threading.Thread):
 		#Tant que le controleur ne demande pas au thread de s'arreter
 		try:
 			while not self.stoprequest.isSet():
-				print("Dans la classe réception serveur, les infos de connexion valent :"+str(self.infos_connexion))
+				#print("Dans la classe réception serveur, les infos de connexion valent :"+str(self.infos_connexion))
 				#print("Le compteur_attente vaut : "+str(compteur_attente))
 				if(compteur_attente > 10000):
 					attente = True

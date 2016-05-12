@@ -20,8 +20,8 @@ import time
 import surveillance_serveur
 import surveillance_serie
 import algorithmique
-#import video
-#import LED
+import video
+import LED
 #import template
 #import template_surveillance
 
@@ -49,15 +49,15 @@ class Controleur(object):
 		self.surveillance_serveur = surveillance_serveur.Surveillance_serveur(self,self.stop_event)
 		self.surveillance_serie   = surveillance_serie.Surveillance_serie(self,self.stop_event)
 		self.algorithmique        = algorithmique.Algorithmique(self,self.stop_event)
-		#self.video        		  = video.Video(self,self.stop_event)
-		#self.led 				  = LED.LED(self.stop_event)
+		self.video        		  = video.Video(self,self.stop_event)
+		self.led 				  = LED.LED(self.stop_event)
 
 		#On met les threads en mode daemon, quand le controleur est tué, on tue tous les threads
 		self.surveillance_serveur.daemon = True
 		self.surveillance_serie.daemon   = True
 		self.algorithmique.daemon        = True
-		#self.video.daemon        		 = True
-		#self.led.daemon        			 = True
+		self.video.daemon        		 = True
+		self.led.daemon        			 = True
 		####################################
 		#	Partie Template
 		####################################
@@ -72,8 +72,8 @@ class Controleur(object):
 			self.surveillance_serveur.start()
 			self.surveillance_serie.start()
 			self.algorithmique.start()
-			#self.video.start()
-			#self.led.start()
+			self.video.start()
+			self.led.start()
 			
 			while not self.stop_event.isSet():
 				continue
@@ -94,9 +94,9 @@ class Controleur(object):
 				self.surveillance_serveur.stop()
 				self.surveillance_serie.stop()
 				self.algorithmique.stop()
-				#self.video.stop()
+				self.video.stop()
 				print("On essaie de tuer la LED....")
-				#self.led.stop()
+				self.led.stop()
 				
 				####################################
 				#	Partie Template
@@ -114,8 +114,8 @@ class Controleur(object):
 				self.surveillance_serveur.stop()
 				self.surveillance_serie.stop()
 				self.algorithmique.stop()
-				#self.video.stop()
-				#self.led.stop()
+				self.video.stop()
+				self.led.stop()
 				####################################
 				#	Partie Template
 				####################################
@@ -132,9 +132,9 @@ class Controleur(object):
 				self.surveillance_serveur.stop()
 				self.surveillance_serie.stop()
 				self.algorithmique.stop()
-				#self.video.stop()
+				self.video.stop()
 				print("On essaie de tuer la LED avant fermeture définitive....")
-				#self.led.stop()
+				self.led.stop()
 				####################################
 				#	Partie Template
 				####################################
@@ -148,7 +148,7 @@ class Controleur(object):
 	
 	def mise_a_jour_serveur(self,serveur):
 		self.algorithmique.serveur=serveur
-		#self.video.serveur=serveur
+		self.video.serveur=serveur
 	def mise_a_jour_serie(self,serie):
 		self.algorithmique.serie=serie
 

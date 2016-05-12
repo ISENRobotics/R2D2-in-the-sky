@@ -21,13 +21,14 @@ class Surveillance_serie(threading.Thread):
 		self.serie=serie.Serie(self.queue_input_reception,self.queue_output_emission,stopevent)
 		self.stoprequest = stopevent
 		self.logger1 = logging.getLogger('R2D2.surveillance_serie')
+		self.logger1.setLevel(logging.DEBUG)
 		self.formatter = logging.Formatter('%(asctime)s : %(message)s')
 		self.fileHandler = logging.FileHandler(filename, mode='w')
 		self.fileHandler.setFormatter(self.formatter)
 		self.streamHandler = logging.StreamHandler()
 		self.streamHandler.setFormatter(self.formatter)
+		self.streamHandler.setLevel(logging.ERROR)
 
-		self.logger1.setLevel(logging.DEBUG)
 		self.logger1.addHandler(self.fileHandler)
 		self.logger1.addHandler(self.streamHandler)
 		self.logger1.debug("Démarrage du thread de Surveillance_serie")

@@ -22,6 +22,7 @@ class Algorithmique(threading.Thread):
 		self.serie.input.appendleft((0,128,128,2))
 		try:
 			while not self.stoprequest.isSet():
+				#self.serveur.input.appendleft("On a reussi à decoder le JSON que tu m'as envoye\n")
 				try:
 					infos = self.serveur.output.pop()
 					#Traitement des infos
