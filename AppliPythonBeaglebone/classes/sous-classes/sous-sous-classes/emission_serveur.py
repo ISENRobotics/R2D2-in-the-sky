@@ -38,21 +38,9 @@ class Emission_Serveur(threading.Thread):
 				### Socket client
 				#On crée le socket de connexion
 				self.socket_client = self.serveur.thread_reception_serveur.connexion_avec_client
-				self.infos_connexion = self.serveur.infos_connexion
-				
-				#print("Dans la classe Émission serveur, les infos de connexion valent :"+str(self.infos_connexion))
 				try:
-					'''if (not self.connecte):
-						if((self.infos_connexion[0] != '') & (self.infos_connexion[1] != '')):
-							self.connecte = True
-						else:
-							continue
-					else:'''
 					infos = self.input.pop()
-					#infos = "{test:"+str(self.i)+"}\n".encode("UTF-8")
-					#print("Dans la classe Emission serveur : "+str(infos))
 					self.socket_client.send(infos)
-					#print("Dans la classe Emission serveur : apres envoi")
 					continue
 				except socket.error as serr:
 					if serr.errno != errno.ECONNREFUSED:

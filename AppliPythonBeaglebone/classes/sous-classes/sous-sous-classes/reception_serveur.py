@@ -35,26 +35,18 @@ class Reception_Serveur(threading.Thread):
 		
 
 	def run(self):
-		#On accepte la connexion
-		#Attention, la méthode accept bloque le programme tant qu'aucun client ne s'est présenté
-		self.connexion_avec_client, self.infos_connexion = self.socket_serveur.accept()
-		self.serveur.infos_connexion = self.infos_connexion
 		sleep(1)
-		self.socket_serveur.settimeout(0.05)
-		attente = False
-		compteur_attente = 0
+		attente = True
 		#Tant que le controleur ne demande pas au thread de s'arreter
 		try:
 			while not self.stoprequest.isSet():
 				#print("Dans la classe réception serveur, les infos de connexion valent :"+str(self.infos_connexion))
 				#print("Le compteur_attente vaut : "+str(compteur_attente))
-				if(compteur_attente > 10000):
-					attente = True
-					self.connexion_avec_client.close()
 				if(attente):
+					#On attend une connexion et on l'accepte
 					self.connexion_avec_client, self.infos_connexion = self.socket_serveur.accept()
 					self.serveur.infos_connexion = self.infos_connexion
-					print(self.infos_connexion)
+					self.socket_serveur.settimeout(0.05)
 					attente = False
 				try:
 					#On attend les informations du smartphone
@@ -75,10 +67,9 @@ class Reception_Serveur(threading.Thread):
 					#print("Dans la classe Reception serveur : "+chaine)
 					if(chaine != ""):
 						self.output.appendleft((chaine))
-					compteur_attente = 0
-				except socket.timeout:
-					compteur_attente += 1
-					continue
+				except socket.error as msg:
+					self.socket_serveur.close()
+					attente = True
 		finally:
 			self.socket_serveur.close()
 

@@ -114,10 +114,8 @@ class Algorithmique(threading.Thread):
 								#Si tout est bon, on envoie à la liaison série
 								if(result_mode & result_droite & result_gauche):
 									if(sens_des_moteurs_moteur_1_a_gauche_moteur_2_a_droite):
-										#print("ALGORITHMIQUE on envoie")
 										self.serie.input.appendleft((self.MODE,vitesse_gauche,vitesse_droite,2))
 									else:
-										#print("ALGORITHMIQUE on envoie")
 										self.serie.input.appendleft((self.MODE,vitesse_droite,vitesse_gauche,2))
 								#sinon, on informe le serveur
 						else:
