@@ -18,24 +18,29 @@ class Reception_Serie(threading.Thread):
 	"""
 	Classe regroupant la communication par liaison série avec les moteurs
 		Prend en entrée:
-			queue_input : Une queue d'items input, les informations que le controleur envoie à la classe Série : les paramètres des commandes
-			queue_output : Une queue d'items output, les informations que la liaison série envoie au controleur : les retours des commandes effectuées
+			queue_input : Une queue d'items input, les informations que la liaison Série va faire remonter au controleur : les retours des commandes s'il y en a 
+			stopevent : Une variable provoquant l'arrêt du thread, passée depuis le thread parent, qui permet l'arrêt en cascade
 			sel_uart : variable sélectionnant la liaison série à ouvrir, valant 1 par défaut (UART1)
 	"""
 
-	def __init__(self, queue_input, stopevent,sel_uart =1):
-		if(sel_uart not in [1,2,4,5]):
+	def __init__(self, queue_input, stopevent,sel_uart =2):
+		#Les liaisons valides sont les liaisons 1,2,4
+		if(sel_uart not in [1,2,4]):
 				return "Erreur : la liaison série spécifiée n'est pas valide"
+		#Initialisation du thread lui-même		
 		threading.Thread.__init__(self)
+		#Les informations recues sur la liaison série seront empilées ici
 		self.input = queue_input
 		#variable écoutant l'arrêt du thread par le controleur
 		self.stoprequest = stopevent
 		### Liaison série
-		#On choisit la liaison série 1 par défaut, la liaison série spécifiée sinon
+		#On choisit la liaison série spécifiée, sinon la liaison série 1 par défaut
 		UART.setup("UART"+str(sel_uart))
 
 		#Ouverture de la liaison série
+		#le parametre stopbits DOIT etre égal à 1, le mettre à deux entraine une incompréhension par le controleur des moteurs des ordres à envoyer
 		self.ser = serial.Serial(port = "/dev/ttyO"+str(sel_uart), baudrate=38400,bytesize=8, stopbits=1,timeout=0.005)
+		#On ferme la liaison série instanciée, afin de ne pas occuper constamment le canal
 		self.ser.close()
 
 	def run(self):
@@ -46,14 +51,10 @@ class Reception_Serie(threading.Thread):
 				try:
 					self.ser.open()
 					infos = self.ser.read()
-					#print("Dans la classe Reception serie : "+str(infos))
-					#On regarde si un nouveau jeu d'instructions a été mis en queue
-					#Les jeux d'instructions se décomposent de la manière suivante : 
-					#	infos[0] : valeur du mode de fonctionnement demandé
-					#	infos[1] : valeur de la vitesse 1 demandée
-					#	infos[2] : valeur de la vitesse 2 demandée
-					#	infos[3] : valeur de l'acceleration demandée
-					self.input.appendleft(infos)
+					#On regarde si des informations nous parviennent de la liaison série
+					#S'il y a quelque chose, on le transmet au controleur
+					if(infos != ''):
+						self.input.appendleft(infos)
 					self.ser.close()
 				except IndexError:
 					continue

@@ -45,11 +45,12 @@ class Controleur(object):
 			message = "I/O error("+str(e.errno)+"): "+str(e.strerror)
 			print(message)
 		#On effectue le vrai travail ici
+		#On instancie les classes principales
 		self.stop_event = threading.Event()
 		self.surveillance_serveur = surveillance_serveur.Surveillance_serveur(self,self.stop_event)
 		self.surveillance_serie   = surveillance_serie.Surveillance_serie(self,self.stop_event)
 		self.algorithmique        = algorithmique.Algorithmique(self,self.stop_event)
-		self.video        		  = video.Video(self,self.stop_event)
+		self.video        		  = video.Video(self.stop_event)
 		self.led 				  = LED.LED(self.stop_event)
 
 		#On met les threads en mode daemon, quand le controleur est tué, on tue tous les threads
@@ -69,12 +70,15 @@ class Controleur(object):
 
 	def fonctionnement(self):
 		try:
+			#on démarre les threads
 			self.surveillance_serveur.start()
 			self.surveillance_serie.start()
 			self.algorithmique.start()
 			self.video.start()
 			self.led.start()
 			
+			#Tant que l'arrêt du programme n'a pas été détecté (ctrl+c au clavier ou évènement système important)
+			#On boucle indéfiniment juste pour rester vivant
 			while not self.stop_event.isSet():
 				continue
 
@@ -95,7 +99,6 @@ class Controleur(object):
 				self.surveillance_serie.stop()
 				self.algorithmique.stop()
 				self.video.stop()
-				print("On essaie de tuer la LED....")
 				self.led.stop()
 				
 				####################################
@@ -133,7 +136,6 @@ class Controleur(object):
 				self.surveillance_serie.stop()
 				self.algorithmique.stop()
 				self.video.stop()
-				print("On essaie de tuer la LED avant fermeture définitive....")
 				self.led.stop()
 				####################################
 				#	Partie Template
@@ -145,10 +147,10 @@ class Controleur(object):
 				print ("Error: %s - %s." % (e.filename,e.strerror))
 
 
-	
+	#Fonction chargée de mettre à jour le serveur de la classe Algorithmique si la classe de surveillance serveur a été obligé de redémarrer le thread
 	def mise_a_jour_serveur(self,serveur):
 		self.algorithmique.serveur=serveur
-		self.video.serveur=serveur
+	#Fonction chargée de mettre à jour la liaison série de la classe Algorithmique si la classe de surveillance série a été obligé de redémarrer le thread
 	def mise_a_jour_serie(self,serie):
 		self.algorithmique.serie=serie
 

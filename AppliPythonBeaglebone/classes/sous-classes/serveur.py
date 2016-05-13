@@ -16,7 +16,7 @@ from reception_serveur import Reception_Serveur
 
 class Serveur(threading.Thread):
 	"""
-	Classe englobant le socket serveur permettant la transmission d'infos du robot au smartphone, et inversement
+	Classe englobant le socket serveur
 		Contient:
 			Socket serveur réceptionnant les informations du smartphone
 			Socket client transmettant les informations vers le smartphone
@@ -24,9 +24,10 @@ class Serveur(threading.Thread):
 		Prend en entrée:
 			queue_input : Une queue d'items input, les informations que le controleur envoie à la classe Serveur : le retour des commandes de la liaison série
 			queue_output : Une queue d'items output, les informations que le serveur transmet au controleur : les commandes demandées par smartphone
-			
+			stopevent : Une variable provoquant l'arrêt du thread, passée depuis le thread parent, qui permet l'arrêt en cascade
 	"""
 	def __init__(self, queue_input, queue_output,stopevent):
+		#Initialisation du thread lui-même		
 		threading.Thread.__init__(self)
 		self.input = queue_input
 		self.output = queue_output
