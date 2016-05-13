@@ -35,17 +35,15 @@ class Reception_Serveur(threading.Thread):
 
 	def run(self):
 		sleep(1)
+		compteur_attente = 0
 		attente = True
 		#Tant que le controleur ne demande pas au thread de s'arreter
 		try:
 			while not self.stoprequest.isSet():
-				#print("Dans la classe réception serveur, les infos de connexion valent :"+str(self.infos_connexion))
-				#print("Le compteur_attente vaut : "+str(compteur_attente))
 				if(attente):
 					#On attend une connexion et on l'accepte
 					self.connexion_avec_client, self.infos_connexion = self.socket_serveur.accept()
 					self.serveur.infos_connexion = self.infos_connexion
-					#self.socket_serveur.settimeout(0.05)
 					print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAconnexion acceptée")
 					attente = False
 				try:
@@ -53,6 +51,7 @@ class Reception_Serveur(threading.Thread):
 					#La connexion Android envoie deux caractères au début de la connexion
 					#Il faut donc les réceptionner afin qu'ils ne perturbent pas le reste des messages
 					#print("Dans la classe Reception serveur : J'attends les informations du smartphone")
+					self.socket_serveur.settimeout(0.05)
 					chaine = ""
 					continuer = True
 					enregistrer = False
@@ -66,16 +65,22 @@ class Reception_Serveur(threading.Thread):
 							chaine += msg
 					#print("Dans la classe Reception serveur : "+chaine)
 					print(chaine)
-					if(chaine =='{"connexion":"false"}'):
+					self.socket_serveur.settimeout(None)
+					if((compteur_attente > 1000) | (chaine =='{"connexion":"false"}')):
 						self.socket_serveur.shutdown(socket.SHUT_WR)
 						print("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB Socket fermé")
 						attente = True
+						compteur_attente = 0
 					elif(chaine != ""):
 						self.output.appendleft((chaine))
+				except socket.timeout:
+					compteur_attente += 1
+					continue
 				except socket.error as msg:
 					self.socket_serveur.shutdown()
 					print("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB Socket fermé")
 					attente = True
+					continue
 		finally:
 			self.socket_serveur.close()
 
