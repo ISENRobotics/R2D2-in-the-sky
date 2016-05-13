@@ -25,14 +25,13 @@ class Reception_Serveur(threading.Thread):
 		
 		### Socket serveur
 		self.socket_serveur = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
+		self.socket_serveur.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 		#Adresse et Port à définir suivant les possibilités de l'application Android, ici port 12800
 		self.socket_serveur.bind(('', 12800))
-
 		#Une connexion maximale possible au socket, comme ca pas de problème avec plusieurs applications, un seul téléphone peut communiquer avec l'appli
-		self.socket_serveur.listen(1)
-
-		
+		self.socket_serveur.listen(9999)
+					
+					
 
 	def run(self):
 		sleep(1)
@@ -46,7 +45,8 @@ class Reception_Serveur(threading.Thread):
 					#On attend une connexion et on l'accepte
 					self.connexion_avec_client, self.infos_connexion = self.socket_serveur.accept()
 					self.serveur.infos_connexion = self.infos_connexion
-					self.socket_serveur.settimeout(0.05)
+					#self.socket_serveur.settimeout(0.05)
+					print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAconnexion acceptée")
 					attente = False
 				try:
 					#On attend les informations du smartphone
@@ -65,10 +65,16 @@ class Reception_Serveur(threading.Thread):
 						if(enregistrer):
 							chaine += msg
 					#print("Dans la classe Reception serveur : "+chaine)
-					if(chaine != ""):
+					print(chaine)
+					if(chaine =='{"connexion":"false"}'):
+						self.socket_serveur.shutdown(socket.SHUT_WR)
+						print("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB Socket fermé")
+						attente = True
+					elif(chaine != ""):
 						self.output.appendleft((chaine))
 				except socket.error as msg:
-					self.socket_serveur.close()
+					self.socket_serveur.shutdown()
+					print("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB Socket fermé")
 					attente = True
 		finally:
 			self.socket_serveur.close()
