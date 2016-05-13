@@ -22,7 +22,6 @@ class Algorithmique(threading.Thread):
 		self.serie.input.appendleft((0,128,128,2))
 		try:
 			while not self.stoprequest.isSet():
-				#self.serveur.input.appendleft("On a reussi à decoder le JSON que tu m'as envoye\n")
 				try:
 					infos = self.serveur.output.pop()
 					#Traitement des infos
@@ -61,9 +60,30 @@ class Algorithmique(threading.Thread):
 						if(result_mode):
 							self.MODE = int(msg_recu_json['mode']);
 							if(self.MODE == 8):
-								#print("ALGORITHMIQUE DEBUT")
+								#Mode arrêt
 								self.serie.input.appendleft((0,128,128,2))
+							elif (self.MODE == 2):
+								#mode portrait
+								default = 0
+								if(('vitesse' in msg_recu_json) & ('angle' in msg_recu_json)):
+									vitesse = int(msg_recu_json['vitesse'])
+									turn = float(msg_recu_json['angle'])
+								elif('vitesse' in msg_recu_json):
+									vitesse = int(msg_recu_json['vitesse'])
+									turn = float(default)
+								elif('angle' in msg_recu_json):
+									vitesse = default
+									turn = float(msg_recu_json['angle'])
+								else:
+									self.serveur.input.appendleft("La vitesse et l'angle n'ont pas été recues, les instructions n'ont pas été exécutées")
+								#if(vitesse != default):
+								#	vitesse += 128
+								result_vitesse = self.verif_commande_SETSPEED(vitesse)
+								turn = self.conversion_TURN_MODE_2(turn)
+								if(result_vitesse):
+									self.serie.input.appendleft((3,vitesse,int(turn),2))
 							else:
+								#Mode paysage
 								#on commence par assigner des vitesses telles que les moteurs ne bougent pas
 								if(self.MODE %2 == 0):
 									default = 128
@@ -123,6 +143,16 @@ class Algorithmique(threading.Thread):
 
 	def verif_commande_SETMODE(self,parameter):
 		return ((parameter >= 0) & (parameter <= 3)) | (parameter == 8)
+
+	def conversion_TURN_MODE_2(self,turn_value):
+		if(turn_value <=90.0):
+			return int((127-(turn_value/90.0)*127.0)/2.0)
+		elif((turn_value>90.0) & (turn_value<=180.0)):
+			return int((((turn_value/90.0)-1)*(-127))/2.0)
+		elif((turn_value>180.0) & (turn_value<=270.0)):
+			return int((127.0 - ((turn_value/90.0)-2)*127.0)/2.0)
+		else:
+			return int((((turn_value/90.0)-3)*(-127))/2.0)
 
 	def stop(self):
 		self.stoprequest.set()

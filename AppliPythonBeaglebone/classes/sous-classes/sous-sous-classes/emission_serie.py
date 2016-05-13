@@ -67,7 +67,20 @@ class Emission_Serie(threading.Thread):
 	def ordre_moteurs(self,commande,parameter):
 		self.ser.open()
 		if self.ser.isOpen():
-			self.ser.write(bytearray.fromhex(constants.CMD+commande+format(parameter, '#04x')[2:]))
+			if(parameter >= 0):
+				param = format(parameter, '#04x')[2:]
+				#Un chiffre hexadécimal comprend nécessairement au minimum DEUX lettres.
+				#Donc si le paramètre est compris entre 0 et 9, on lui ajoute un 0 devant.
+				#9 devient 09 
+				if(len(param) == 1):
+					param = "0"+param
+				self.ser.write(bytearray.fromhex(constants.CMD+commande+param))
+			else:
+				parameter += 128
+				param = format(parameter, '#04x')[3:]
+				if(len(param) == 1):
+					param = "0"+param
+				self.ser.write(bytearray.fromhex(constants.CMD+commande+param))
 		else:
 			#Si la liaison série n'est pas ouverte, on renvoie l'erreur 1000
 			return 1000
