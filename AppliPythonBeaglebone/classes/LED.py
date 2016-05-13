@@ -33,8 +33,7 @@ class LED(threading.Thread):
 		rgb_led = ChainableLED(CLK_PIN, DATA_PIN, NUMBER_OF_LEDS)
 		ecran=LCD(DisplayText, DisplayRGB)
 		ecran.setRGB(255,255,255)
-		son=Speaker("P9_14")
- 
+		son=Speaker("P9_14") 
 		while not self.stoprequest.isSet():
 			try:
 				rgb_led.setColorRGB(0, 255, 0, 0)
@@ -56,7 +55,6 @@ class LED(threading.Thread):
 	def stop(self):
 		self.stoprequest.set()
 		
-
 class ChainableLED():
 	def __init__(self, clk_pin, data_pin, number_of_leds):
 		self.__clk_pin = clk_pin
