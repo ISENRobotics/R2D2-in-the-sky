@@ -7,7 +7,7 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="fr.pierreyvesmingam.robotr2d2.LuncherActivity">
+    tools:context=".LauncherActivity">
 
     <ImageView
         android:layout_width="wrap_content"
@@ -42,7 +42,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="Robot R2D2 V1.0"
+        android:text="Robot R2D2 V2.0"
         android:id="@+id/textView7"
         android:layout_above="@+id/textView6"
         android:layout_alignParentLeft="true"
