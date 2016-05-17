@@ -81,5 +81,5 @@ Python application :
 
 Android Application:
   1. You can find the .apk in the release.
-  2. After install the .apk on your device
+  2. After, install the .apk on your device
   3. You can control R2D2 !
