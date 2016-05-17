@@ -1,3 +1,4 @@
+# coding: utf8
 import threading
 import time
 import numpy as np
@@ -34,10 +35,15 @@ class LED(threading.Thread):
 		ecran=LCD(DisplayText, DisplayRGB)
 		ecran.setRGB(255,255,255)
 		son=Speaker("P9_14")
-		fichier = open('texte_lcd.txt','r')
+		fichier = open('/root/R2D2/classes/texte_lcd.txt','r')
 		contenu = fichier.read()
-		tableau_contenu = contenu.split('\t')
+		#On remplace les formatages de chaine étranges
+		contenu.replace('\r\n','\n')
+		contenu.replace('\\\n','\n')
+		tableau_contenu = contenu.split('^^^^')
 		i = 0
+		#On ote le premier élément, toujours vide
+		del(tableau_contenu[0])
 		maximum = len(tableau_contenu)
 		while not self.stoprequest.isSet():
 			try:

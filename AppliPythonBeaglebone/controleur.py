@@ -1,18 +1,8 @@
-#/usr/bin/env python
-# -*-coding:Utf-8 -*
-import Adafruit_BBIO.UART as UART
-import serial
-import socket
-import curses
-
+# coding: utf8
 import os
 import sys
 sys.path.append("./classes/")
-import Queue
-
 import threading
-
-import time
 
 """
 	On importe les classes personnalisées python

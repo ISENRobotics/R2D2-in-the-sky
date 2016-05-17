@@ -1,8 +1,6 @@
-#/usr/bin/env python
-# -*-coding:Utf-8 -*
+# coding: utf8
 import socket
 import threading
-import Queue
 from time import sleep
 class Reception_Serveur(threading.Thread):
 	"""
