@@ -1,9 +1,7 @@
 # coding: utf8
 import threading
 import logging
-from datetime import datetime
 from time import sleep
-import Queue
 from collections import deque
 
 import sys

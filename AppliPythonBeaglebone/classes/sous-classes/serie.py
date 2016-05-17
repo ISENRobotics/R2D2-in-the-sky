@@ -1,14 +1,10 @@
-#/usr/bin/env python
-# -*-coding:Utf-8 -*
+# coding: utf8
 import Adafruit_BBIO.UART as UART
 import serial
-import curses
 
 import threading
 
-import os
 import sys
-import Queue
 from collections import deque
 
 from time import sleep

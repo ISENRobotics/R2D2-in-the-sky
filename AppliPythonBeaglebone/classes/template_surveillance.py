@@ -1,3 +1,4 @@
+# coding: utf8
 import threading
 from collections import deque
 

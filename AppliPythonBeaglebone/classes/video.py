@@ -1,12 +1,7 @@
 # coding: utf8
 import threading
-from collections import deque
-import numpy as np
-import sys
 import time
 import os
-
-import string
 
 class Video(threading.Thread):
 	"""

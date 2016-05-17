@@ -1,8 +1,6 @@
 # coding: utf8
 import threading
-import logging
 import json
-from datetime import datetime
 import time
 
 import sys
@@ -59,6 +57,11 @@ class Algorithmique(threading.Thread):
 		#variable inversant les vitesses moteurs recues (full forward devient full reverse)
 		#sert à rétablir le sens du robot (moteurs montées dans le mauvais sens)
 		inversion_vitesse_moteur = True
+
+		#Bridage moteur, afin de diminuer la vitesse maximale
+		bridage = True
+		#Par combien la vitesse sera divisée
+		taux_de_bridage = 2.0
 		try:
 			#On essaie de décoder le JSON recu
 			msg_recu_json = json.loads(trame)
@@ -122,6 +125,9 @@ class Algorithmique(threading.Thread):
 									vitesse_droite = int(msg_recu_json['vitesseD'])
 								else:
 									self.serveur.input.appendleft("Aucune vitesse n'a été recue, les instructions n'ont pas été exécutées")
+								if(bridage):
+									vitesse_gauche = (int)((float)vitesse_gauche/taux_de_bridage)
+									vitesse_droite = (int)((float)vitesse_droite/taux_de_bridage)
 								#Si les valeurs transmises sont inversées par rapport à la réalité, on les réajustent
 								if(inversion_vitesse_moteur):
 									vitesse_gauche *= -1

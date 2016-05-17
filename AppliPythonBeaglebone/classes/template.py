@@ -1,3 +1,4 @@
+# coding: utf8
 import threading
 
 class Template(threading.Thread):
