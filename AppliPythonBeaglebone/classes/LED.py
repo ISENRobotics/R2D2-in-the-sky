@@ -33,22 +33,22 @@ class LED(threading.Thread):
 		rgb_led = ChainableLED(CLK_PIN, DATA_PIN, NUMBER_OF_LEDS)
 		ecran=LCD(DisplayText, DisplayRGB)
 		ecran.setRGB(255,255,255)
-		son=Speaker("P9_14") 
+		son=Speaker("P9_14")
+		fichier = open('texte_lcd.txt','r')
+		contenu = fichier.read()
+		tableau_contenu = contenu.split('\t')
+		i = 0
+		maximum = len(tableau_contenu)
 		while not self.stoprequest.isSet():
 			try:
 				rgb_led.setColorRGB(0, 255, 0, 0)
 				rgb_led.setColorRGB(1, 255, 0, 0)
-				#ecran.setText("Du cote obscur ne pas sombrer il faut")
 				son.marche_imperiale("P9_14")
-				#time.sleep(0.5)
-				ecran.setText("	 #ISEN")
-				#time.sleep(0.5)
-				ecran.setText("   Yes I code")
-				#time.sleep(0.5)
-				ecran.setText("	  ISEN \n  est mon pere")
+				j = i%maximum
+				ecran.setText(tableau_contenu[j])
 				rgb_led.setColorRGB(0, 0, 0, 255)
 				rgb_led.setColorRGB(1, 0, 0, 255)
-				#time.sleep(1)
+				i += 1
 			except KeyboardInterrupt as key:
 				self.stoprequest.set()
 				
