@@ -83,6 +83,7 @@ class Emission_Serie(threading.Thread):
 								print("L'envoi occupe la liaison série")
 								self.ordre_moteurs(infos[0],infos[1])
 								self.occupe = False
+								print("L'envoi n'occupe plus la liaison série")
 								self.infos_envoyees = True
 							else:
 								continue

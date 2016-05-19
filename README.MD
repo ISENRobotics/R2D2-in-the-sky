@@ -15,9 +15,9 @@ This application stream video to the smartphone using the software avconv. If it
 ####Serial
 To use this application, you need to enable your serial lines on your beaglebone. It can be done very easily by typing :
 	
-	echo BB-UART1 > /sys/devices/bone_capemgr.*/slots
+	echo BB-UART2 > /sys/devices/bone_capemgr.*/slots
 
-This line actually enable the Serial 1. Change BB-UART1 by BB-UART2 to open the Serial 2, and so on.
+This line actually enable the Serial 2. Change BB-UART1 by BB-UART1 to open the Serial 1, and so on. The Serial used in the python application to communicate with the motors is the Serial 2.
 
 This application needs a working implementation of Adafruit_BBIO and of pyserial in your python path. Without it, no communication over Serial lines, and no point in the application.
 
