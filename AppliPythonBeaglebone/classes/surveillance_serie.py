@@ -6,8 +6,10 @@ from collections import deque
 
 import sys
 sys.path.insert(0, '/root/R2D2/classes/sous-classes')
+sys.path.insert(0, '/root/R2D2/classes/sous-classes/sous-sous-classes')
 
 import serie
+import constants
 
 
 class Surveillance_serie(threading.Thread):
@@ -93,6 +95,11 @@ class Surveillance_serie(threading.Thread):
 				#Si on a quelque chose à logger
 				if(self.log1 | self.log2):
 					self.logger1.info("Le thread serie est "+self.statut_serie+" et les messages suivants sont en attente de traitement : Emission série:"+str(self.message_input)+"///// Réception série:"+str(self.message_output))
+				self.infos_volts = informations(constants.GET_VOLTS)
+				self.infos_current1 = informations(constants.GET_CURRENT_1)
+				self.infos_current2 = informations(constants.GET_CURRENT_2)
+				self.infos_version = informations(constants.GET_VERSION)
+				self.logger1.info("Informations à propos des moteurs : Voltage recu : "+self.infos_volts+" //Intensité du courant du moteur 1 : "+self.infos_current1+" //Intensité du courant du moteur 2 : "+self.infos_current2+"///Version du software logiciel : "+self.infos_version)
 				#On dort 20 ms
 				sleep(0.00002)
 		finally:
@@ -111,3 +118,9 @@ class Surveillance_serie(threading.Thread):
 		self.serie.daemon = True
 		self.serie.start()
 		self.pere.mise_a_jour_serie(self.serie)
+
+	def informations(commande):
+		self.serie.input.appendleft((commande))
+		while(self.serie.output[0] == ''):
+			continue
+		return self.serie.output[0]

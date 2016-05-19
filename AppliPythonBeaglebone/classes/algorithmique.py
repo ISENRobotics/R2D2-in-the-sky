@@ -59,9 +59,9 @@ class Algorithmique(threading.Thread):
 		inversion_vitesse_moteur = True
 
 		#Bridage moteur, afin de diminuer la vitesse maximale
-		bridage = True
+		bridage = False
 		#Par combien la vitesse sera divisée
-		taux_de_bridage = 2.0
+		taux_de_bridage = 1.5
 		try:
 			#On essaie de décoder le JSON recu
 			msg_recu_json = json.loads(trame)
@@ -126,8 +126,8 @@ class Algorithmique(threading.Thread):
 								else:
 									self.serveur.input.appendleft("Aucune vitesse n'a été recue, les instructions n'ont pas été exécutées")
 								if(bridage):
-									vitesse_gauche = (int)((float)vitesse_gauche/taux_de_bridage)
-									vitesse_droite = (int)((float)vitesse_droite/taux_de_bridage)
+									vitesse_gauche = (int)((float)(vitesse_gauche)/taux_de_bridage)
+									vitesse_droite = (int)((float)(vitesse_droite)/taux_de_bridage)
 								#Si les valeurs transmises sont inversées par rapport à la réalité, on les réajustent
 								if(inversion_vitesse_moteur):
 									vitesse_gauche *= -1
