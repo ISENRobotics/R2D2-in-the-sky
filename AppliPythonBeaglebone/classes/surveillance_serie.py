@@ -95,11 +95,15 @@ class Surveillance_serie(threading.Thread):
 				#Si on a quelque chose à logger
 				if(self.log1 | self.log2):
 					self.logger1.info("Le thread serie est "+self.statut_serie+" et les messages suivants sont en attente de traitement : Emission série:"+str(self.message_input)+"///// Réception série:"+str(self.message_output))
-				self.infos_volts = informations(constants.GET_VOLTS)
-				self.infos_current1 = informations(constants.GET_CURRENT_1)
-				self.infos_current2 = informations(constants.GET_CURRENT_2)
-				self.infos_version = informations(constants.GET_VERSION)
-				self.logger1.info("Informations à propos des moteurs : Voltage recu : "+self.infos_volts+" //Intensité du courant du moteur 1 : "+self.infos_current1+" //Intensité du courant du moteur 2 : "+self.infos_current2+"///Version du software logiciel : "+self.infos_version)
+				self.infos_volts = self.informations(constants.GET_VOLTS)
+				print("Classe surveillance série : on récupère le voltage :"+str(ord(self.infos_volts)))
+				self.infos_current1 = self.informations(constants.GET_CURRENT_1)
+				print("Classe surveillance série : on récupère le courant 1 :"+str(ord(self.infos_current1)))
+				self.infos_current2 = self.informations(constants.GET_CURRENT_2)
+				print("Classe surveillance série : on récupère le courant 2 :"+str(ord(self.infos_current2)))
+				self.infos_version = self.informations(constants.GET_VERSION)
+				print("Classe surveillance série : on récupère la version :"+str(ord(self.infos_version)))
+				self.logger1.info("Informations à propos des moteurs : Voltage recu : "+str((float)(ord(self.infos_volts))/10.0)+" V //Intensité du courant du moteur 1 : "+str((float)(ord(self.infos_current1))/10.0)+" A //Intensité du courant du moteur 2 : "+str((float)(ord(self.infos_current2))/10.0)+" A ///Version du software logiciel : "+str((float)(ord(self.infos_version))))
 				#On dort 20 ms
 				sleep(0.00002)
 		finally:
@@ -119,8 +123,14 @@ class Surveillance_serie(threading.Thread):
 		self.serie.start()
 		self.pere.mise_a_jour_serie(self.serie)
 
-	def informations(commande):
-		self.serie.input.appendleft((commande))
-		while(self.serie.output[0] == ''):
-			continue
-		return self.serie.output[0]
+	def informations(self,commande):
+		#print("On envoie à la liaison Série depuis la surveillance série : "+str(commande))
+		self.serie.input.appendleft((commande,5000))
+		while(True):
+			try :
+				infos = self.serie.output.pop()
+				if(infos != ''):
+					break
+			except IndexError:
+				continue
+		return infos

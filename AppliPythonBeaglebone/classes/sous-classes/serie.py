@@ -39,12 +39,14 @@ class Serie(threading.Thread):
 		self.queue_input_reception = deque()
 		self.queue_output_emission = deque()
 
+		self.occupe = False
+
 		#variable écoutant l'arrêt du thread par le controleur
 		self.stoprequest = threading.Event()
-		self.thread_emission_serie = Emission_Serie(self.queue_output_emission,stopevent,sel_uart)
+		self.thread_emission_serie = Emission_Serie(self.queue_output_emission,stopevent,sel_uart,self.occupe)
 		#On lance les sous-threads en mode daemon, afin de permettre l'arrêt en cascade des threads
 		self.thread_emission_serie.daemon = True
-		self.thread_reception_serie = Reception_Serie(self.queue_input_reception,stopevent,sel_uart)
+		self.thread_reception_serie = Reception_Serie(self.queue_input_reception,stopevent,sel_uart,self.occupe)
 		self.thread_reception_serie.daemon = True
 		self.thread_emission_serie.start()
 		self.thread_reception_serie.start()
@@ -61,7 +63,9 @@ class Serie(threading.Thread):
 				except IndexError:
 					try:
 						#Si on n'a pas recu d'informations dans le temps imparti, on regarde si un message à envoyer est arrivé
+						#print("Classe série : On pop la réception")
 						infos = self.queue_input_reception.pop()
+						#print("Classe série : On met les infos dans la pile d'output")
 						self.output.appendleft(infos)
 					except IndexError:
 						continue

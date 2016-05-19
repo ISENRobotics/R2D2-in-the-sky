@@ -41,8 +41,9 @@ class Algorithmique(threading.Thread):
 				except IndexError:
 					try:
 						#Si on n'a pas recu d'informations dans le temps imparti, on regarde si un message à envoyer est arrivé
-						infos = self.serie.output.pop()
-						self.serveur.input.appendleft(infos)
+						#infos = self.serie.output.pop()
+						#self.serveur.input.appendleft(infos)
+						self.i = 10
 					except IndexError:
 						continue
 		finally:
@@ -59,7 +60,7 @@ class Algorithmique(threading.Thread):
 		inversion_vitesse_moteur = True
 
 		#Bridage moteur, afin de diminuer la vitesse maximale
-		bridage = False
+		bridage = True
 		#Par combien la vitesse sera divisée
 		taux_de_bridage = 1.5
 		try:

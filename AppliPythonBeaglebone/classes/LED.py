@@ -20,7 +20,7 @@ Fe=44100;
 
 CLK_PIN = "P9_26"
 DATA_PIN = "P9_24"
-NUMBER_OF_LEDS = 2
+NUMBER_OF_LEDS = 1
 
 DisplayRGB = Adafruit_I2C(0x62)
 DisplayText = Adafruit_I2C(0x3e)
@@ -46,14 +46,19 @@ class LED(threading.Thread):
 		del(tableau_contenu[0])
 		maximum = len(tableau_contenu)
 		while not self.stoprequest.isSet():
+			print("Classe LED en cours")
 			try:
+				print("On change la couleur de la LED")
 				rgb_led.setColorRGB(0, 255, 0, 0)
-				rgb_led.setColorRGB(1, 255, 0, 0)
+				#rgb_led.setColorRGB(1, 255, 0, 0)
+				print("couleur changée, buzzer")
 				son.marche_imperiale("P9_14")
 				j = i%maximum
+				print("On change le texte du LCD")
 				ecran.setText(tableau_contenu[j])
+				print("on rechange de couleur")
 				rgb_led.setColorRGB(0, 0, 0, 255)
-				rgb_led.setColorRGB(1, 0, 0, 255)
+				#rgb_led.setColorRGB(1, 0, 0, 255)
 				i += 1
 			except KeyboardInterrupt as key:
 				self.stoprequest.set()
@@ -66,7 +71,7 @@ class ChainableLED():
 		self.__clk_pin = clk_pin
 		self.__data_pin = data_pin
 		self.__number_of_leds = number_of_leds
- 
+
 		GPIO.setup(self.__clk_pin, GPIO.OUT)
 		GPIO.setup(self.__data_pin, GPIO.OUT)
 		
