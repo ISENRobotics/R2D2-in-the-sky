@@ -21,7 +21,7 @@ class Template_surveillance(threading.Thread):
 		logger1.addHandler(fileHandler)
 		logger1.addHandler(streamHandler)
 		logger1.debug("Démarrage du thread de Surveillance_serie")
-		self.serie.start()
+		self.template_partage.start()
 		logger1.debug("Thread série démarré")
 
 
@@ -49,8 +49,11 @@ class Template_surveillance(threading.Thread):
 
 
 	def kill(self):
+		#on efface la classe défectueuse
 		del self.template_partage
-		self.template_partage=template_partage()
+		#On en crée une nouvelle 
+		self.template_partage=template_partage(self.input_template_partage,self.output_template_partage)
+		#On prévient le controleur de mettre à jour la classe de traitement principal
 		self.pere.mise_a_jour_template_partage(self.template_partage)
 
 	def stop(self):
