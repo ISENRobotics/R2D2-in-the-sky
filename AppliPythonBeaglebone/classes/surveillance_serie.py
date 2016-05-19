@@ -105,7 +105,7 @@ class Surveillance_serie(threading.Thread):
 				print("Classe surveillance série : on récupère la version :"+str(ord(self.infos_version)))
 				self.logger1.info("Informations à propos des moteurs : Voltage recu : "+str((float)(ord(self.infos_volts))/10.0)+" V //Intensité du courant du moteur 1 : "+str((float)(ord(self.infos_current1))/10.0)+" A //Intensité du courant du moteur 2 : "+str((float)(ord(self.infos_current2))/10.0)+" A ///Version du software logiciel : "+str((float)(ord(self.infos_version))))
 				#On dort 20 ms
-				sleep(0.00002)
+				sleep(0.5)
 		finally:
 			self.serie.stop()
 

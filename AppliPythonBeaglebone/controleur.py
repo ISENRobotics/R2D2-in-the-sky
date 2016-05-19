@@ -144,7 +144,7 @@ class Controleur(object):
 	def mise_a_jour_serie(self,serie):
 		self.algorithmique.serie=serie
 
-	#def mise_a_jour(self,template_partage):
+	#def mise_a_jour_template_partage(self,template_partage):
 	#	self.template.template_partage=template_partage
 
 

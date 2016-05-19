@@ -64,6 +64,7 @@ class Reception_Serie(threading.Thread):
 								self.output.appendleft(infos)
 							self.ser.close()
 							self.occupe = False
+							print("La réception n'occupe plus la liaison série")
 							self.infos_recues = True
 						else:
 							continue

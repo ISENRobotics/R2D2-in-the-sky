@@ -43,6 +43,7 @@ class Algorithmique(threading.Thread):
 						#Si on n'a pas recu d'informations dans le temps imparti, on regarde si un message à envoyer est arrivé
 						#infos = self.serie.output.pop()
 						#self.serveur.input.appendleft(infos)
+						#Variable dummy, servant juste à faire quelque chose durant l'exception
 						self.i = 10
 					except IndexError:
 						continue
