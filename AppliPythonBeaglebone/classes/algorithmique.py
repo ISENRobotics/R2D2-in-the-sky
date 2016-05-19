@@ -41,8 +41,9 @@ class Algorithmique(threading.Thread):
 				except IndexError:
 					try:
 						#Si on n'a pas recu d'informations dans le temps imparti, on regarde si un message à envoyer est arrivé
-						infos = self.serie.output.pop()
-						self.serveur.input.appendleft(infos)
+						#infos = self.serie.output.pop()
+						#self.serveur.input.appendleft(infos)
+						self.i = 10
 					except IndexError:
 						continue
 		finally:
@@ -61,7 +62,7 @@ class Algorithmique(threading.Thread):
 		#Bridage moteur, afin de diminuer la vitesse maximale
 		bridage = True
 		#Par combien la vitesse sera divisée
-		taux_de_bridage = 2.0
+		taux_de_bridage = 1.5
 		try:
 			#On essaie de décoder le JSON recu
 			msg_recu_json = json.loads(trame)
@@ -126,8 +127,8 @@ class Algorithmique(threading.Thread):
 								else:
 									self.serveur.input.appendleft("Aucune vitesse n'a été recue, les instructions n'ont pas été exécutées")
 								if(bridage):
-									vitesse_gauche = (int)((float)vitesse_gauche/taux_de_bridage)
-									vitesse_droite = (int)((float)vitesse_droite/taux_de_bridage)
+									vitesse_gauche = (int)((float)(vitesse_gauche)/taux_de_bridage)
+									vitesse_droite = (int)((float)(vitesse_droite)/taux_de_bridage)
 								#Si les valeurs transmises sont inversées par rapport à la réalité, on les réajustent
 								if(inversion_vitesse_moteur):
 									vitesse_gauche *= -1

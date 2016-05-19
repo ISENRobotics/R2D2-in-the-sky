@@ -40,15 +40,15 @@ class Controleur(object):
 		self.surveillance_serveur = surveillance_serveur.Surveillance_serveur(self,self.stop_event)
 		self.surveillance_serie   = surveillance_serie.Surveillance_serie(self,self.stop_event)
 		self.algorithmique        = algorithmique.Algorithmique(self,self.stop_event)
-		self.video        		  = video.Video(self.stop_event)
-		self.led 				  = LED.LED(self.stop_event)
+		#self.video        		  = video.Video(self.stop_event)
+		#self.led 				  = LED.LED(self.stop_event)
 
 		#On met les threads en mode daemon, quand le controleur est tué, on tue tous les threads
 		self.surveillance_serveur.daemon = True
 		self.surveillance_serie.daemon   = True
 		self.algorithmique.daemon        = True
-		self.video.daemon        		 = True
-		self.led.daemon        			 = True
+		#self.video.daemon        		 = True
+		#self.led.daemon        			 = True
 		####################################
 		#	Partie Template
 		####################################
@@ -64,8 +64,8 @@ class Controleur(object):
 			self.surveillance_serveur.start()
 			self.surveillance_serie.start()
 			self.algorithmique.start()
-			self.video.start()
-			self.led.start()
+			#self.video.start()
+			#self.led.start()
 			
 			#Tant que l'arrêt du programme n'a pas été détecté (ctrl+c au clavier ou évènement système important)
 			#On boucle indéfiniment juste pour rester vivant
@@ -88,8 +88,8 @@ class Controleur(object):
 				self.surveillance_serveur.stop()
 				self.surveillance_serie.stop()
 				self.algorithmique.stop()
-				self.video.stop()
-				self.led.stop()
+				#self.video.stop()
+				#self.led.stop()
 				
 				####################################
 				#	Partie Template
@@ -107,8 +107,8 @@ class Controleur(object):
 				self.surveillance_serveur.stop()
 				self.surveillance_serie.stop()
 				self.algorithmique.stop()
-				self.video.stop()
-				self.led.stop()
+				#self.video.stop()
+				#self.led.stop()
 				####################################
 				#	Partie Template
 				####################################
@@ -125,8 +125,8 @@ class Controleur(object):
 				self.surveillance_serveur.stop()
 				self.surveillance_serie.stop()
 				self.algorithmique.stop()
-				self.video.stop()
-				self.led.stop()
+				#self.video.stop()
+				#self.led.stop()
 				####################################
 				#	Partie Template
 				####################################
