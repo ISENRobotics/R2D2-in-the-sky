@@ -75,7 +75,7 @@ class Algorithmique(threading.Thread):
 				#On calcule le temps actuel
 				temps = int(round(time.time() * 1000))
 				#Si les informations ont mises moins de 2 secondes à arriver, on continue
-				if(temps - int(msg_recu_json['temps']) < 999999999999999999999999999999999999999000):
+				if(temps - int(msg_recu_json['temps']) < 2000):
 					if('mode' in msg_recu_json):
 						#On vérifie si le mode recu est conforme aux valeurs autorisées
 						result_mode = self.verif_commande_SETMODE(int(msg_recu_json['mode']))
