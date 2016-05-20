@@ -49,7 +49,7 @@ class Serveur(threading.Thread):
 		try:
 			while not self.stoprequest.isSet():
 				try:
-					#On regarde si on a recu des informations, si oui, on les transmet à l'algorithmique
+					#On regarde si on a recu des informations, si oui, on les transmet à l'traitement
 					infos = self.queue_input_reception.pop()
 					self.output.appendleft(infos)
 				except IndexError:

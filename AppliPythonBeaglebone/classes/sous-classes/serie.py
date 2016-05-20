@@ -57,7 +57,7 @@ class Serie(threading.Thread):
 		try:
 			while not self.stoprequest.isSet():
 				try:
-					#On regarde si on a recu des informations, si oui, on les transmet à l'algorithmique
+					#On regarde si on a recu des informations, si oui, on les transmet à l'traitement
 					infos = self.input.pop()
 					self.queue_output_emission.appendleft(infos)
 				except IndexError:

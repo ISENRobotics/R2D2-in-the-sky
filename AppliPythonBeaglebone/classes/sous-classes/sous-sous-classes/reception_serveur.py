@@ -88,7 +88,6 @@ class Reception_Serveur(threading.Thread):
 				except socket.error as msg:
 					#Si une erreur se déclenche, on ferme le socket par prévention
 					self.socket_serveur.shutdown(socket.SHUT_WR)
-					print("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB Socket fermé")
 					attente = True
 					#On remet les informations de connexion du serveur à zéro, afin d'arreter l'émission
 					self.serveur.infos_connexion = (('',''))
