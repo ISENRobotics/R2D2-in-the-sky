@@ -2,7 +2,8 @@
 import threading
 import json
 import time
-
+import datetime
+import os
 import sys
 sys.path.insert(0, '/root/R2D2/classes/sous-classes')
 
@@ -27,7 +28,8 @@ class Algorithmique(threading.Thread):
 		self.serveur = controleur.surveillance_serveur.serveur 
 		self.serie   = controleur.surveillance_serie.serie;
 		self.stoprequest = stopevent
-		
+		self.heure_mise_a_jour = False
+
 	def run(self):
 		#On envoie un message d'arrêt aux moteurs pour être sur
 		self.serie.input.appendleft((0,128,128,2))
@@ -67,6 +69,7 @@ class Algorithmique(threading.Thread):
 		try:
 			#On essaie de décoder le JSON recu
 			msg_recu_json = json.loads(trame)
+			print(msg_recu_json)
 			#Variables testant si l'envoi des informations à la liaison série peut se faire, mises à False par défaut
 			result_mode = 0
 			result_droite = 0
@@ -74,6 +77,12 @@ class Algorithmique(threading.Thread):
 			#Si on a bien recu le timestamp de l'envoi du message
 			if('temps' in msg_recu_json):
 				#On calcule le temps actuel
+				if(not self.heure_mise_a_jour):
+					date = datetime.datetime.fromtimestamp(int(msg_recu_json['temps'])/1000).strftime('%m/%d/%Y')
+					heure = datetime.datetime.fromtimestamp(int(msg_recu_json['temps'])/1000).strftime('%H:%M:%S')
+					os.system("date -s "+str(date))
+					os.system("date -s "+str(heure))
+					self.heure_mise_a_jour = True
 				temps = int(round(time.time() * 1000))
 				#Si les informations ont mises moins de 2 secondes à arriver, on continue
 				if(temps - int(msg_recu_json['temps']) < 2000):

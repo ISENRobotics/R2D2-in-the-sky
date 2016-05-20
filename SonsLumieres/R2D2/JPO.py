@@ -251,14 +251,14 @@ class Speaker():
     
         
 if __name__ == "__main__":
-    rgb_led = ChainableLED(CLK_PIN, DATA_PIN, NUMBER_OF_LEDS)
+    #rgb_led = ChainableLED(CLK_PIN, DATA_PIN, NUMBER_OF_LEDS)
     ecran=LCD(DisplayText, DisplayRGB)
     ecran.setRGB(255,255,255)
     #son=Speaker("P9_22")
     
     ecran.setText("   Yes I ccannnnnnnnnnnnnnnn \n      #ISEN")
     
- 
+    '''
     while True:
         rgb_led.setColorRGB(0, 255,255,255)
         rgb_led.setColorRGB(1, 0, 0, 0)
@@ -326,3 +326,4 @@ if __name__ == "__main__":
         rgb_led.setColorRGB(0, 255, 255, 255)
         rgb_led.setColorRGB(1, 255, 255, 255)
         time.sleep(1)
+    '''
