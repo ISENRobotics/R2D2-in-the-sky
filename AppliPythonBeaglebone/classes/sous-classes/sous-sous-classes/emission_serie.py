@@ -57,16 +57,11 @@ class Emission_Serie(threading.Thread):
 					infos = ""
 					#print("Longueur de la pile d'entrée : "+str(len(self.input)))
 					infos = self.input.pop()
-					print("Longueur de la pile d'entrée après pop : "+str(len(self.input)))
 					longueur = len(infos)
-					print("Informations recues dans l'émission Série : "+str(infos))
-					print("Longueur de l'information série : "+str(longueur))
 					while(not self.infos_envoyees):
-						print("on tente l'envoi d'informations")
 						if(longueur == 4):
 							if(not self.occupe):
 								self.occupe = True
-								print("L'envoi occupe la liaison série")
 								self.ordre_moteurs(constants.SET_MODE,infos[0])
 								self.ordre_moteurs(constants.SET_SPEED_1,infos[1])
 								self.ordre_moteurs(constants.SET_SPEED_2,infos[2])
@@ -80,10 +75,8 @@ class Emission_Serie(threading.Thread):
 							#print("Une seule info détectée : "+str(infos[0])) 
 							if(not self.occupe):
 								self.occupe = True
-								print("L'envoi occupe la liaison série")
 								self.ordre_moteurs(infos[0],infos[1])
 								self.occupe = False
-								print("L'envoi n'occupe plus la liaison série")
 								self.infos_envoyees = True
 							else:
 								continue
@@ -102,7 +95,6 @@ class Emission_Serie(threading.Thread):
 			if(parameter >= 0):
 				if(parameter == 5000):
 					#Paramétre particulier envoyé par la surveillance série, dummy
-					print("Commande envoyée dans émission (surveillance série) : "+str(constants.CMD+commande))
 					self.ser.write(bytearray.fromhex(constants.CMD+commande))
 				else:
 					#Utilisation normale

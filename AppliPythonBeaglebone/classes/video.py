@@ -20,7 +20,8 @@ class Video(threading.Thread):
 		self.error = 1
 		try:
 			while(self.error != 0):
-				os.system('avconv -f video4linux2 -s 640x360 -r 10 -b 350k -i /dev/video0 -f mp4 tcp://172.17.0.2:12801')
+				os.system('avconv -f video4linux2 -s 640x360 -r 10 -b 350k -i /dev/video0 -g 52 -f webm tcp://172.17.0.2:12801')
+				#os.system('ffmpeg -re -f video4linux2 -s 640x360 -r 10 -b 350k -i /dev/video0 -g 52 -acodec libvo_aacenc -ab 64k -vcodec libx264 -vb 448k -f mp4 tcp://172.17.0.2:12801')
 				time.sleep(1)
 		finally:
 			print('stop')

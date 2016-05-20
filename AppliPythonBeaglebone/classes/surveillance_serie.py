@@ -23,7 +23,7 @@ class Surveillance_serie(threading.Thread):
 			stopevent : Une variable provoquant l'arrêt du thread, passée depuis le thread parent, qui permet l'arrêt en cascade
 			filename : le nom du fichier de logs créé, valeur par défaut : surveillance_serie.log
 	"""
-	def __init__(self,controleur,stopevent,filename="surveillance_serie.log"):
+	def __init__(self,controleur,stopevent,filename="/var/log/surveillance_serie.log"):
 		#Initialisation du thread lui-même
 		threading.Thread.__init__(self)
 		#On définit l'élément parent controleur
@@ -95,15 +95,36 @@ class Surveillance_serie(threading.Thread):
 				#Si on a quelque chose à logger
 				if(self.log1 | self.log2):
 					self.logger1.info("Le thread serie est "+self.statut_serie+" et les messages suivants sont en attente de traitement : Emission série:"+str(self.message_input)+"///// Réception série:"+str(self.message_output))
-				self.infos_volts = self.informations(constants.GET_VOLTS)
+				
+				#Valeurs particulières inatteignables
+				self.infos_volts = 9999
+				self.infos_current1 = 9999
+				self.infos_current2 = 9999
+				self.infos_version = 9999
+
+				while(self.infos_volts == 9999):
+					self.infos_volts = self.informations(constants.GET_VOLTS)
+					if(self.infos_volts == 9999):
+						sleep(0.05)
 				print("Classe surveillance série : on récupère le voltage :"+str(ord(self.infos_volts)))
-				self.infos_current1 = self.informations(constants.GET_CURRENT_1)
+				while(self.infos_current1 == 9999):
+					self.infos_current1 = self.informations(constants.GET_CURRENT_1)
+					if(self.infos_current1 == 9999):
+						sleep(0.05)
 				print("Classe surveillance série : on récupère le courant 1 :"+str(ord(self.infos_current1)))
-				self.infos_current2 = self.informations(constants.GET_CURRENT_2)
+				while(self.infos_current2 == 9999):
+					self.infos_current2 = self.informations(constants.GET_CURRENT_2)
+					if(self.infos_current2 == 9999):
+						sleep(0.05)
 				print("Classe surveillance série : on récupère le courant 2 :"+str(ord(self.infos_current2)))
-				self.infos_version = self.informations(constants.GET_VERSION)
+				while(self.infos_version == 9999):
+					self.infos_version = self.informations(constants.GET_VERSION)
+					if(self.infos_version == 9999):
+						sleep(0.05)
 				print("Classe surveillance série : on récupère la version :"+str(ord(self.infos_version)))
 				self.logger1.info("Informations à propos des moteurs : Voltage recu : "+str((float)(ord(self.infos_volts))/10.0)+" V //Intensité du courant du moteur 1 : "+str((float)(ord(self.infos_current1))/10.0)+" A //Intensité du courant du moteur 2 : "+str((float)(ord(self.infos_current2))/10.0)+" A ///Version du software logiciel : "+str((float)(ord(self.infos_version))))
+				self.pere.algorithmique.serveur.input.appendleft('Voltage : '+str((float)(ord(self.infos_volts))/10.0)+' V //Courant 1 : '+str((float)(ord(self.infos_current1))/10.0)+' A //Courant 2 : '+str((float)(ord(self.infos_current2))/10.0)+' A /// Version soft: '+str((float)(ord(self.infos_version)))+'\n')
+
 				#On dort 20 ms
 				sleep(0.5)
 		finally:

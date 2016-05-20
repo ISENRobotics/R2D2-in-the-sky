@@ -42,6 +42,7 @@ class Emission_Serveur(threading.Thread):
 				try:
 					#On récupére les infos à envoyer s'il y en a
 					infos = self.input.pop()
+					print("Envoi des informations suivantes au smartphone"+infos)
 					self.socket_client.send(infos)
 					continue
 				except socket.error as serr:

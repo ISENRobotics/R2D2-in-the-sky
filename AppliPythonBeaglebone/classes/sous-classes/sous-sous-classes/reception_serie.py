@@ -36,7 +36,7 @@ class Reception_Serie(threading.Thread):
 
 		#Ouverture de la liaison série
 		#le parametre stopbits DOIT etre égal à 1, le mettre à deux entraine une incompréhension par le controleur des moteurs des ordres à envoyer
-		self.ser = serial.Serial(port = "/dev/ttyO"+str(sel_uart), baudrate=38400,bytesize=8, stopbits=1,timeout=None)
+		self.ser = serial.Serial(port = "/dev/ttyO"+str(sel_uart), baudrate=38400,bytesize=8, stopbits=1,timeout=0.5)
 		#On ferme la liaison série instanciée, afin de ne pas occuper constamment le canal
 		self.ser.close()
 
@@ -48,23 +48,16 @@ class Reception_Serie(threading.Thread):
 				try:
 					self.infos_recues = False
 					while(not self.infos_recues):
-						print("on tente la réception d'informations")
 						if(not self.occupe):
-							print("La réception occupe la liaison série")
 							self.occupe = True
 							self.ser.open()
 							infos = self.ser.read()
 							#On regarde si des informations nous parviennent de la liaison série
 							#S'il y a quelque chose, on le transmet au controleur
 							if(infos != ''):
-								print("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
-								print("Informations détectée dans la réception Série  ! elles valent : ")
-								print(bin(ord(infos)))
-								print("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
 								self.output.appendleft(infos)
 							self.ser.close()
 							self.occupe = False
-							print("La réception n'occupe plus la liaison série")
 							self.infos_recues = True
 						else:
 							continue

@@ -9,7 +9,7 @@ sys.path.insert(0, '/root/R2D2/classes/sous-classes')
 import classe
 
 class Template_surveillance(threading.Thread):
-	def __init__(self,controleur,filename="surveillance_template_partage.log"):
+	def __init__(self,controleur,filename="/var/log/surveillance_template_partage.log"):
 		#Initialisation du thread lui-même
 		threading.Thread.__init__(self)
 		#On définit l'élément parent controleur

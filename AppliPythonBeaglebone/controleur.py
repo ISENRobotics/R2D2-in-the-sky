@@ -1,7 +1,7 @@
 # coding: utf8
 import os
 import sys
-sys.path.append("./classes/")
+sys.path.append("/root/R2D2/classes/")
 import threading
 
 """
@@ -21,34 +21,34 @@ class Controleur(object):
 
 	def __init__(self):
 		#On prépare un fichier temporaire tant que le script est lancé
-		pid = str(os.getpid())
-		pidfile = "/tmp/controleur.pid"
+		#pid = str(os.getpid())
+		#pidfile = "/tmp/controleur.pid"
 
-		try:
-			#On teste si le fichier existe déja
-			if os.path.isfile(pidfile):
-				os.link(pidfile,"daemon_python")
-			else:
-				file(pidfile, 'w').write(pid)
-				os.link(pidfile,"daemon_python")
-		except IOError as e:
-			message = "I/O error("+str(e.errno)+"): "+str(e.strerror)
-			print(message)
+		#try:
+		#	#On teste si le fichier existe déja
+		#	if os.path.isfile(pidfile):
+		#		os.link(pidfile,"daemon_python")
+		#	else:
+		#		file(pidfile, 'w').write(pid)
+		#		os.link(pidfile,"daemon_python")
+		#except IOError as e:
+		#	message = "I/O error("+str(e.errno)+"): "+str(e.strerror)
+		#	print(message)
 		#On effectue le vrai travail ici
 		#On instancie les classes principales
 		self.stop_event = threading.Event()
 		self.surveillance_serveur = surveillance_serveur.Surveillance_serveur(self,self.stop_event)
 		self.surveillance_serie   = surveillance_serie.Surveillance_serie(self,self.stop_event)
 		self.algorithmique        = algorithmique.Algorithmique(self,self.stop_event)
-		#self.video        		  = video.Video(self.stop_event)
-		#self.led 				  = LED.LED(self.stop_event)
+		self.video        		  = video.Video(self.stop_event)
+		self.led 				  = LED.LED(self.stop_event)
 
 		#On met les threads en mode daemon, quand le controleur est tué, on tue tous les threads
 		self.surveillance_serveur.daemon = True
 		self.surveillance_serie.daemon   = True
 		self.algorithmique.daemon        = True
-		#self.video.daemon        		 = True
-		#self.led.daemon        			 = True
+		self.video.daemon        		 = True
+		self.led.daemon        			 = True
 		####################################
 		#	Partie Template
 		####################################
@@ -64,8 +64,8 @@ class Controleur(object):
 			self.surveillance_serveur.start()
 			self.surveillance_serie.start()
 			self.algorithmique.start()
-			#self.video.start()
-			#self.led.start()
+			self.video.start()
+			self.led.start()
 			
 			#Tant que l'arrêt du programme n'a pas été détecté (ctrl+c au clavier ou évènement système important)
 			#On boucle indéfiniment juste pour rester vivant
@@ -88,8 +88,8 @@ class Controleur(object):
 				self.surveillance_serveur.stop()
 				self.surveillance_serie.stop()
 				self.algorithmique.stop()
-				#self.video.stop()
-				#self.led.stop()
+				self.video.stop()
+				self.led.stop()
 				
 				####################################
 				#	Partie Template
@@ -107,8 +107,8 @@ class Controleur(object):
 				self.surveillance_serveur.stop()
 				self.surveillance_serie.stop()
 				self.algorithmique.stop()
-				#self.video.stop()
-				#self.led.stop()
+				self.video.stop()
+				self.led.stop()
 				####################################
 				#	Partie Template
 				####################################
@@ -121,12 +121,12 @@ class Controleur(object):
 		#Quand on a fini toute l'application (si celle-ci a une fin), on efface le fichier disant que l'application est lancée (et on restaure le terminal initial)
 		finally:
 			try:
-				os.remove("daemon_python")
+				#os.remove("daemon_python")
 				self.surveillance_serveur.stop()
 				self.surveillance_serie.stop()
 				self.algorithmique.stop()
-				#self.video.stop()
-				#self.led.stop()
+				self.video.stop()
+				self.led.stop()
 				####################################
 				#	Partie Template
 				####################################
