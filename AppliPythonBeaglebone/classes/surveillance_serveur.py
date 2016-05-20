@@ -20,7 +20,7 @@ class Surveillance_serveur(threading.Thread):
 			stopevent : Une variable provoquant l'arrêt du thread, passée depuis le thread parent, qui permet l'arrêt en cascade
 			filename : le nom du fichier de logs créé, valeur par défaut : surveillance_serveur.log
 	"""
-	def __init__(self,controleur,stopevent,filename="/var/log/surveillance_serveur.log"):
+	def __init__(self,controleur,stopevent,filename="/var/log/R2D2_surveillance_serveur.log"):
 		#Initialisation du thread lui-même
 		threading.Thread.__init__(self)
 		#On définit l'élément parent controleur
