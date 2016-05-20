@@ -16,7 +16,7 @@ class Surveillance_serie(threading.Thread):
 	"""
 	Classe englobant la surveillance du Thread global de la liaison série
 		Contient:
-			Une classe Série, partagée avec la classe Algorithmique
+			Une classe Série, partagée avec la classe traitement
 
 		Prend en entrée:
 			controleur : le controleur général du programme, contenant toutes les classes principales
@@ -106,24 +106,20 @@ class Surveillance_serie(threading.Thread):
 					self.infos_volts = self.informations(constants.GET_VOLTS)
 					if(self.infos_volts == 9999):
 						sleep(0.05)
-				print("Classe surveillance série : on récupère le voltage :"+str(ord(self.infos_volts)))
 				while(self.infos_current1 == 9999):
 					self.infos_current1 = self.informations(constants.GET_CURRENT_1)
 					if(self.infos_current1 == 9999):
 						sleep(0.05)
-				print("Classe surveillance série : on récupère le courant 1 :"+str(ord(self.infos_current1)))
 				while(self.infos_current2 == 9999):
 					self.infos_current2 = self.informations(constants.GET_CURRENT_2)
 					if(self.infos_current2 == 9999):
 						sleep(0.05)
-				print("Classe surveillance série : on récupère le courant 2 :"+str(ord(self.infos_current2)))
 				while(self.infos_version == 9999):
 					self.infos_version = self.informations(constants.GET_VERSION)
 					if(self.infos_version == 9999):
 						sleep(0.05)
-				print("Classe surveillance série : on récupère la version :"+str(ord(self.infos_version)))
 				self.logger1.info("Informations à propos des moteurs : Voltage recu : "+str((float)(ord(self.infos_volts))/10.0)+" V //Intensité du courant du moteur 1 : "+str((float)(ord(self.infos_current1))/10.0)+" A //Intensité du courant du moteur 2 : "+str((float)(ord(self.infos_current2))/10.0)+" A ///Version du software logiciel : "+str((float)(ord(self.infos_version))))
-				self.pere.algorithmique.serveur.input.appendleft('Voltage : '+str((float)(ord(self.infos_volts))/10.0)+' V //Courant 1 : '+str((float)(ord(self.infos_current1))/10.0)+' A //Courant 2 : '+str((float)(ord(self.infos_current2))/10.0)+' A /// Version soft: '+str((float)(ord(self.infos_version)))+'\n')
+				self.pere.traitement.serveur.input.appendleft('Voltage : '+str((float)(ord(self.infos_volts))/10.0)+' V //Courant 1 : '+str((float)(ord(self.infos_current1))/10.0)+' A //Courant 2 : '+str((float)(ord(self.infos_current2))/10.0)+' A /// Version soft: '+str((float)(ord(self.infos_version)))+'\n')
 
 				#On dort 20 ms
 				sleep(0.5)

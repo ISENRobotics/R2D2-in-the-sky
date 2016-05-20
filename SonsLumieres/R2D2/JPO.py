@@ -256,7 +256,7 @@ if __name__ == "__main__":
     ecran.setRGB(255,255,255)
     #son=Speaker("P9_22")
     
-    ecran.setText("   Yes I ccannnnnnnnnnnnnnnn \n      #ISEN")
+    ecran.setText("   Yes I can \n      #ISEN")
     
     '''
     while True:

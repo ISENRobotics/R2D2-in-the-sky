@@ -13,7 +13,7 @@ class Surveillance_serveur(threading.Thread):
 	"""
 	Classe englobant la surveillance du Thread global du serveur de communications
 		Contient:
-			Une classe Serveur, partagée avec la classe Algorithmique
+			Une classe Serveur, partagée avec la classe traitement
 
 		Prend en entrée:
 			controleur : le controleur général du programme, contenant toutes les classes principales
