@@ -1,9 +1,12 @@
 package fr.pierreyvesmingam.robotr2d2;
 
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.app.Activity;
+import android.os.SystemClock;
 import android.support.v7.app.AppCompatActivity;
+import android.text.style.SubscriptSpan;
 import android.util.JsonReader;
 import android.view.MotionEvent;
 import android.view.View;
@@ -27,21 +30,23 @@ import android.widget.Toast;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class MainActivity extends AppCompatActivity implements Client.ClientListener {
+public class MainActivity extends AppCompatActivity implements Client.ClientListener,Serveur.ServerListener {
 
-    RelativeLayout layout_joystick, layout_joystick2,layout_joystick3;
+    RelativeLayout layout_joystick, layout_joystick2,layout_joystick3,background;
     ImageView image_joystick, image_border;
     TextView textView3, textView4, textView5,vitesse, etatBatterie, probleme, textView2,textView18;
 
     JoyStickClass js,js2,js3;
 
-    String vitesseG,vitesseD,valAccel,anglePortrait,vitessePortrait,tempsmm;
+    String vitesseG,vitesseD,valAccel,anglePortrait,vitessePortrait,tempsmm,deconexionJSONtoString;
     float intVitesseG,intVitesseD;
     private Integer intAngle;
     JSONObject donneEnvoiJSON = new JSONObject();
     JSONObject donneEnvoiJSONPortrait = new JSONObject();
+    JSONObject deconexionJSON = new JSONObject();
     private  Client socketLandscape;
-    private  Client socketPortrait;
+    private Serveur socketStream;
+    private Serveur serveur = null;
     private boolean AppuiConnexionPaysage = false;
     private boolean AppuiConnexionPortrait = false;
     private boolean ListenerOrNot1 = false;
@@ -55,24 +60,42 @@ public class MainActivity extends AppCompatActivity implements Client.ClientList
     private boolean appuiConnexion = true;
     private Client client = null;
     private String donneJsonToString;
+    private int btnConnexoion = 0;
+    private Button button;
+    private boolean etatServeur =false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        if (client == null) //a test
+        if (client == null)
         {
-        client = new Client();
-        client.addClientListener(this);
+            client = new Client();
+            client.addClientListener(this);
+            socketLandscape = client;
         }
+       /* if (serveur == null) //a test
+        {
+            try {
+                socketStream = new Serveur();
+                socketStream.addServeurListener(this);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        */
+
+
+
+
         textView3 = (TextView) findViewById(R.id.textView3);
         textView4 = (TextView) findViewById(R.id.textView4);
         textView5 = (TextView) findViewById(R.id.textView5);
         textView2 = (TextView) findViewById(R.id.textView2);
         textView18 = (TextView) findViewById(R.id.textView18);
         probleme = (TextView) findViewById(R.id.probleme);
-        //buttonArret = (TextView) findViewById(R.id.probleme);
+        background = (RelativeLayout) findViewById(R.id.ee);
         layout_joystick = (RelativeLayout) findViewById(R.id.layout_joystick);
         layout_joystick2 = (RelativeLayout) findViewById(R.id.layout_joystick2);
         layout_joystick3 = (RelativeLayout) findViewById(R.id.layout_joystick3);
@@ -85,30 +108,71 @@ public class MainActivity extends AppCompatActivity implements Client.ClientList
 
         MainActivity.IS_LANDSCAPE = getResources().getBoolean(R.bool.isLandscape);
 
-            socketLandscape = new Client(); //creation socket
-            Button button = (Button) findViewById(R.id.button8);
-            button.setOnClickListener(new View.OnClickListener() {
-                public void onClick(View v) {
-                    // Perform action on click
-                    System.out.println("Je suis dans le bouton connexion");
-                    AppuiConnexionPaysage = true;
 
-                    try {
-                        socketLandscape.startClient();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+          //  socketStream = serveur;
+            button = (Button) findViewById(R.id.button8);
+            //après la deco pour remettre un clientlistener pour la reco
+                if (btnConnexoion == 2)
+                {
+                    System.out.println("STP MARCHE >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
 
-                    //System.out.print("val du getConnect = " + socketLandscape.getConnected());
-
-                    if (socketLandscape.getConnxion() == 1) {
-                        System.out.println("je suis dans le toast connected!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-                        Toast.makeText(getApplicationContext(), "Connected", Toast.LENGTH_SHORT).show();
-                    } else if (socketLandscape.getConnxion() == 0){
-                        Toast.makeText(getApplicationContext(), "Connection refused", Toast.LENGTH_SHORT).show();
-                    }
                 }
-            });
+
+
+                button.setOnClickListener(new View.OnClickListener() {
+                    public void onClick(View v) {
+                        // Perform action on click
+                        if (btnConnexoion == 0) {
+                            System.out.println("Je suis dans le bouton connexion");
+                            AppuiConnexionPaysage = true;
+                            try {
+                                socketLandscape.startClient();
+                                if (etatServeur ==false)
+                                {
+                                    //socketStream.startServeur();
+                                    //System.out.println("Le serveur a demarer et écoute");
+                                    etatServeur = true;
+                                }
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+
+                            //System.out.print("val du getConnect = " + socketLandscape.getConnected());
+
+                            if (socketLandscape.getConnxion() == 0) {
+                                System.out.println("je suis dans le toast connected!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+                                Toast.makeText(getApplicationContext(), "Connected", Toast.LENGTH_SHORT).show();
+                            } else if (socketLandscape.getConnxion() == 1) {
+                                Toast.makeText(getApplicationContext(), "Connection refused", Toast.LENGTH_SHORT).show();
+                            }
+                            button.setText("Disconnect");
+                            button.setBackgroundColor(0xfff00000);
+                            btnConnexoion = 1;
+                        } else if (btnConnexoion == 1) {
+                            System.out.println("Je suis dans le bouton Deconnexion");
+                            AppuiConnexionPaysage = true;
+
+                            try {
+                                deconexionJSON.put("connexion", "false"); //vitesse moteur de gauche
+                            } catch (JSONException e) {
+                                // TODO Auto-generated catch block
+                                e.printStackTrace();
+                            }
+                            deconexionJSONtoString = deconexionJSON.toString(); // convertie le JSON en string pour l'envoyer
+                            socketLandscape.sendMessage(deconexionJSONtoString);
+                            SystemClock.sleep(100);
+                            socketLandscape.stopClient();
+                            //socketStream.stopServeur();
+                            ajouteListener(socketLandscape);
+                            button.setText("Connexion");
+                            button.setBackgroundColor(0xff00c700);
+
+                        }
+                    }
+
+                });
+
+
 
             if(MainActivity.IS_LANDSCAPE) {
                                                                                     //paysage
@@ -323,13 +387,12 @@ public class MainActivity extends AppCompatActivity implements Client.ClientList
                         }
 
 
-                        System.out.println("LE TEMPS EST PRESENT MGL"+millisToString);
-                        appui =2;
+                        System.out.println("LE TEMPS EST PRESENT MGL" + millisToString);
+                        appui = 2;
 
-                        if (appui ==2)
-                            if (jamaisAppuieG)
-                            {
-                                vitesseG = "0000"  ;
+                        if (appui == 2)
+                            if (jamaisAppuieG) {
+                                vitesseG = "0000";
                             }
                         try {
                             Calendar cal = Calendar.getInstance();
@@ -350,7 +413,6 @@ public class MainActivity extends AppCompatActivity implements Client.ClientList
                     }
                 });
 
-                probleme.setText("HEURE: " + millisToString);
             }
             else {
                                                  //portrait
@@ -364,89 +426,89 @@ public class MainActivity extends AppCompatActivity implements Client.ClientList
                 js.setOffset(90);
                 js.setMinimumDistance(50);
 
-            layout_joystick.setOnTouchListener(new OnTouchListener() {
-                public boolean onTouch(View arg0, MotionEvent arg3) {
-                    //AppuiConnexionPortrait = true;
-                    js.drawStick(arg3);
-                    if (arg3.getAction() == MotionEvent.ACTION_DOWN
-                            || arg3.getAction() == MotionEvent.ACTION_MOVE) {
+                layout_joystick.setOnTouchListener(new OnTouchListener() {
+                    public boolean onTouch(View arg0, MotionEvent arg3) {
+                        //AppuiConnexionPortrait = true;
+                        js.drawStick(arg3);
+                        if (arg3.getAction() == MotionEvent.ACTION_DOWN
+                                || arg3.getAction() == MotionEvent.ACTION_MOVE) {
 
-                        intAngle = Integer.valueOf(Math.round(js.getAngle()));
-                        anglePortrait = new String(String.valueOf(intAngle));
-                        vitesseP = new String(String.valueOf(Math.round(js.getDistance())));
-                        intVitesseP = new Integer(Math.round(js.getDistance()));
+                            intAngle = Integer.valueOf(Math.round(js.getAngle()));
+                            anglePortrait = new String(String.valueOf(intAngle));
+                            vitesseP = new String(String.valueOf(Math.round(js.getDistance())));
+                            intVitesseP = new Integer(Math.round(js.getDistance()));
 
-                        textView3.setText("Angle : " + anglePortrait);
-                        textView4.setText("Distance : " + vitesseP);
+                            textView3.setText("Angle : " + anglePortrait);
+                            textView4.setText("Distance : " + vitesseP);
 
-                        int direction = js.get8Direction();
-                        if (direction == JoyStickClass.STICK_UP) {
-                            textView5.setText("Direction : Up");
-                        } else if (direction == JoyStickClass.STICK_UPRIGHT) {
-                            textView5.setText("Direction : Up Right");
-                        } else if (direction == JoyStickClass.STICK_RIGHT) {
-                            textView5.setText("Direction : Right");
-                        } else if (direction == JoyStickClass.STICK_DOWNRIGHT) {
-                            textView5.setText("Direction : Down Right");
-                        } else if (direction == JoyStickClass.STICK_DOWN) {
-                            textView5.setText("Direction : Down");
-                        } else if (direction == JoyStickClass.STICK_DOWNLEFT) {
-                            textView5.setText("Direction : Down Left");
-                        } else if (direction == JoyStickClass.STICK_LEFT) {
-                            textView5.setText("Direction : Left");
-                        } else if (direction == JoyStickClass.STICK_UPLEFT) {
-                            textView5.setText("Direction : Up Left");
-                        } else if (direction == JoyStickClass.STICK_NONE) {
-                            textView5.setText("Direction : Center");
+                            int direction = js.get8Direction();
+                            if (direction == JoyStickClass.STICK_UP) {
+                                textView5.setText("Direction : Up");
+                            } else if (direction == JoyStickClass.STICK_UPRIGHT) {
+                                textView5.setText("Direction : Up Right");
+                            } else if (direction == JoyStickClass.STICK_RIGHT) {
+                                textView5.setText("Direction : Right");
+                            } else if (direction == JoyStickClass.STICK_DOWNRIGHT) {
+                                textView5.setText("Direction : Down Right");
+                            } else if (direction == JoyStickClass.STICK_DOWN) {
+                                textView5.setText("Direction : Down");
+                            } else if (direction == JoyStickClass.STICK_DOWNLEFT) {
+                                textView5.setText("Direction : Down Left");
+                            } else if (direction == JoyStickClass.STICK_LEFT) {
+                                textView5.setText("Direction : Left");
+                            } else if (direction == JoyStickClass.STICK_UPLEFT) {
+                                textView5.setText("Direction : Up Left");
+                            } else if (direction == JoyStickClass.STICK_NONE) {
+                                textView5.setText("Direction : Center");
+                            }
+                        } else if (arg3.getAction() == MotionEvent.ACTION_UP) {
+
+                            textView3.setText("Angle :");
+                            textView4.setText("Distance :");
+                            textView5.setText("Direction :");
                         }
-                    } else if (arg3.getAction() == MotionEvent.ACTION_UP) {
 
-                        textView3.setText("Angle :");
-                        textView4.setText("Distance :");
-                        textView5.setText("Direction :");
-                    }
-
-                    boolean megaPortrait = false;
-                    vitesseP = Integer.toString((Math.round(intVitesseP / (float) 100 * (float) 127)));
-                    intVitesseP = Math.round(intVitesseP / (float) 100 * (float)127);
-                    if (intVitesseP < 0) {
-                        megaPortrait = true;
-                    } else if (intVitesseP == 0) {
-                        vitesseP = "0000";
-                    }
-                    if (megaPortrait) {
-
-                        if (vitesseP.length() == 2) {
-                            vitesseP = "-00" + Integer.toString(Math.abs(Math.round(intVitesseP)));
+                        boolean megaPortrait = false;
+                        vitesseP = Integer.toString((Math.round(intVitesseP / (float) 100 * (float) 127)));
+                        intVitesseP = Math.round(intVitesseP / (float) 100 * (float) 127);
+                        if (intVitesseP < 0) {
+                            megaPortrait = true;
+                        } else if (intVitesseP == 0) {
+                            vitesseP = "0000";
                         }
-                        if (vitesseP.length() == 3) {
-                            vitesseP = "-0" + Integer.toString(Math.abs(Math.round(intVitesseP)));
-                            System.out.println("Are You Here My Brother Friend ?");
-                        }
-                    } else {
-                        if (vitesseP.length() == 1) {
-                            vitesseP = "000" + vitesseP;
-                        } else if (vitesseP.length() == 2) {
-                            vitesseP = "00" + vitesseP;
-                        } else if (vitesseP.length() == 3) {
-                            vitesseP = "0" + vitesseP;
-                        }
-                    }
-                    try {
-                        Calendar cal = Calendar.getInstance();
-                        millisToString = new String(String.valueOf(cal.getTimeInMillis()));
-                        donneEnvoiJSONPortrait.put("mode", "2"); //mode 0 pour landscape
-                        donneEnvoiJSONPortrait.put("angle", anglePortrait); //vitesse moteur de gauche
-                        donneEnvoiJSONPortrait.put("vitesse", vitesseP); //vitesse moteur de gauche
-                        donneEnvoiJSONPortrait.put("temps", millisToString);
-                    } catch (JSONException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-                    }
+                        if (megaPortrait) {
 
-                    donneJsonToString = donneEnvoiJSONPortrait.toString(); // convertie le JSON en string pour l'envoyer
-                    socketLandscape.sendMessage(donneJsonToString);
-                    return true;
+                            if (vitesseP.length() == 2) {
+                                vitesseP = "-00" + Integer.toString(Math.abs(Math.round(intVitesseP)));
+                            }
+                            if (vitesseP.length() == 3) {
+                                vitesseP = "-0" + Integer.toString(Math.abs(Math.round(intVitesseP)));
+                                System.out.println("Are You Here My Brother Friend ?");
+                            }
+                        } else {
+                            if (vitesseP.length() == 1) {
+                                vitesseP = "000" + vitesseP;
+                            } else if (vitesseP.length() == 2) {
+                                vitesseP = "00" + vitesseP;
+                            } else if (vitesseP.length() == 3) {
+                                vitesseP = "0" + vitesseP;
+                            }
+                        }
+                        try {
+                            Calendar cal = Calendar.getInstance();
+                            millisToString = new String(String.valueOf(cal.getTimeInMillis()));
+                            donneEnvoiJSONPortrait.put("mode", "2"); //mode 0 pour landscape
+                            donneEnvoiJSONPortrait.put("angle", anglePortrait); //vitesse moteur de gauche
+                            donneEnvoiJSONPortrait.put("vitesse", vitesseP); //vitesse moteur de gauche
+                            donneEnvoiJSONPortrait.put("temps", millisToString);
+                        } catch (JSONException e) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
+                        }
+
+                        donneJsonToString = donneEnvoiJSONPortrait.toString(); // convertie le JSON en string pour l'envoyer
+                        socketLandscape.sendMessage(donneJsonToString);
+                        return true;
                     }
                 });
 
@@ -456,7 +518,14 @@ public class MainActivity extends AppCompatActivity implements Client.ClientList
 
     }
 
+    public void ajouteListener(Client client)
+    {
+        socketLandscape = client;
+        socketLandscape = new Client();
+        socketLandscape.addClientListener(this);
+        btnConnexoion = 0;
 
+    }
 
     public void aide(View view){
         Intent intent = new Intent(this, AideActivity.class);
@@ -468,17 +537,51 @@ public class MainActivity extends AppCompatActivity implements Client.ClientList
         startActivity(intent);
 
     }
+    @Override
+    public void onVideoRecieved(String message) {
+        final String dataStream = message;
+        System.out.println("Le string recu du serveur est : " + dataStream);
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                background.setBackground(Drawable.createFromPath("Informations serveur:" + dataStream));
 
+                //   background.setBackground(Drawable.createFromPath(data));
+
+
+                //stuff that updates ui
+
+            }
+        });
+    }
 
     @Override
     public void onMessageReceived(String message) {
-        try {
-            JSONObject jObject = new JSONObject(message);
-            System.out.println(message);
-            probleme.setText("Problemes :" + jObject.getString("probleme"));
+        final String data = message;
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+
+                    System.out.println("Dans le MainActivity" + data);
+                    probleme.setText(data);
+
+                 //   background.setBackground(Drawable.createFromPath(data));
+
+
+            //stuff that updates ui
+
+            }
+        });
+        /*try {
+
+            //JSONObject jObject = new JSONObject(message);
+            System.out.println("Dans le MainActivity" + message);
+            probleme.setText("Problemes :" + message);
+
+            //probleme.setText("probleme: " + socketLandscape.getStringFromReception());
         } catch (JSONException e) {
             e.printStackTrace();
-        }
+        }*/
     }
 
 

@@ -124,26 +124,26 @@ public class JoyStickClass {
             System.out.println("Postion_Y : " + position_y);
             if (position_y < 0)
             {
-                if (distance > 400) {
+                if (distance > 500) {
                     return 100;
                 }
                 if (distance > 0) {
                     System.out.println("dans le positif");
-                    distance = (distance /(float) 400) * (float)100;
+                    distance = (distance /(float) 500) * (float)100;
                     System.out.println("VALEUR DE DISTANCE ENCULE: " + distance);
                     return distance;
                 }
             }
             if (position_y > 0)
                 {
-                    if(distance > 400)
+                    if(distance > 500)
                     {
                         return -100;
                     }
                     if (distance>0)
                     {
                         System.out.println("dans le negatif");
-                    distance = (distance/(float) 400) * (float)100;
+                    distance = (distance/(float) 500) * (float)100;
                     return  -distance;
                     }
 

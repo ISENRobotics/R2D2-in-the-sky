@@ -24,7 +24,7 @@ import org.json.JSONObject;
 
 public class Client extends Thread {
 
-    private String dstAddress,line;
+    private String dstAddress;
     private int dstPort;
     private String response = "";
     private TextView textResponse;
@@ -48,13 +48,13 @@ public class Client extends Thread {
     private Reception r;
     private Emission e;
 
+
     Client() {
-        this.textResponse=textResponse;
         this.stop = new AtomicBoolean(false);
         this.connected = false;
         this.envoieMessage = new String();
         this.JSONNul = new JSONObject();
-        this.enculeDeConnexion = 0;
+        enculeDeConnexion = 0;
         e = new Emission();
         r = new Reception();
 
@@ -64,52 +64,79 @@ public class Client extends Thread {
     // Permet le lancement du thread Client qui lui lance la connexion et le thread emission et reception
     //
     //
-        public void startClient() throws IOException {
-            //initialise ton socket
+
+
+
+    public void startClient() throws IOException {
+        //initialise ton socket
+        if (this.getState() == Thread.State.NEW)
+        {
             this.start();
         }
-        public void run()
-        {
-            System.out.println("ici");
-            try {
-                socket = new Socket("172.16.0.2", 12800);
-                System.out.println("La connexion a été faite");
-                e.setSocket(socket);
-                r.setSocket(socket);
-                r.start();
-                e.start();
-                System.out.println("Les threads on été correctement lancés");
-            } catch (IOException e1) {
-                e1.printStackTrace();
-            }
 
 
+    }
+
+    public void run()
+    {
+
+        System.out.println("ici");
+        try {
+            socket = new Socket("172.16.0.2", 12800);
+            enculeDeConnexion = 1;
+            System.out.println("La connexion a été faite");
+            e.setSocket(socket);
+            r.setSocket(socket);
+            r.start();
+            e.start();
+            System.out.println("Les threads on été correctement lancés");
+            //clientListener.onMessageReceived("Connexion faite!");
+        } catch (IOException e1) {
+            e1.printStackTrace();
         }
 
-        public void stopClient() {
-            stop.set(false);
-        }
 
-        public void addClientListener(ClientListener clientListener) {
-            this.clientListener = clientListener;
-        }
+    }
 
-        /*Methode sendMessage */
-        //
-        // Permet de recuperer le message envoyé de l'activity et de l'envoyer dans le thread emission
-        //
-        //
-        public void sendMessage(String message) {
 
-            this.envoieMessage = message;
-            System.out.println("initialisation message envoie");
-            System.out.println(this.envoieMessage);
-        }
+    public String getStringFromReception()
+    {
+        return r.line;
+    }
 
-        public int getConnxion()
-        {
-            return enculeDeConnexion = 0;
+    public void stopClient() {
+        try {
+            r.closeSocketR();
+            e.closeSocketE();
+            socket.close();
+            this.stop.set(false);
+            clientListener.onMessageReceived("Déconnexion faite...");
+        } catch (IOException e1) {
+            e1.printStackTrace();
+
         }
+    }
+
+    public void addClientListener(ClientListener clientListener) {
+        this.clientListener = clientListener;
+    }
+
+    /*Methode sendMessage */
+    //
+    // Permet de recuperer le message envoyé de l'activity et de l'envoyer dans le thread emission
+    //
+    //
+    public void sendMessage(String message) {
+
+        this.envoieMessage = message;
+        System.out.println("initialisation message envoie");
+        System.out.println(this.envoieMessage);
+    }
+
+    public Integer getConnxion()
+    {
+        return enculeDeConnexion;
+    }
 
     public interface ClientListener {
         public void onMessageReceived(String message);
@@ -120,13 +147,22 @@ public class Client extends Thread {
     /****************************************/
     private class Reception extends Thread
     {
-
+        public String line;
         private Socket socket;
 
         public void setSocket(Socket socket) {
             this.socket = socket;
-        }
 
+        }
+        public void closeSocketR() {
+            try {
+                this.socket.close();
+                System.out.println("socket reception close");
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
+
+        }
         public void run()
         {
             //lecture
@@ -134,27 +170,29 @@ public class Client extends Thread {
             BufferedReader in ;
             in = new BufferedReader(new InputStreamReader(this.socket.getInputStream()));
             line = null;
+            clientListener.onMessageReceived("Dans le run du thread reception");
             System.out.println("dans le thread reception");
             while ((line = in.readLine()) != null) {
-                System.out.println(line);
-                System.out.println("doit recevoir");
+                if(clientListener == null)
+                {
+                    System.out.println("null clientListener");
+                    clientListener.onMessageReceived("le message reçu est null");
+                }
+                else
+                {
+                    clientListener.onMessageReceived(line);
+                    System.out.println(line);
+                    System.out.println("doit recevoir");
+                }
+
             }
             System.out.println("Je suis sorti de ma boucle MGL");
             }catch (IOException e1) {
             e1.printStackTrace();
             System.out.println("La reception à été coupé");
             }
-
-            /*
-            java.util.Scanner s = new java.util.Scanner(is).useDelimiter("\\A");
-            if(s.hasNext())
-            {
-                String message = s.next(); // je prend le qlq chose pour le mettre dans le message
-                clientListener.onMessageReceived(message);
-                System.out.println(message);
-
-            }*/
         }
+
     }
 
     /******************************************/
@@ -169,11 +207,22 @@ public class Client extends Thread {
             dos = new DataOutputStream(os);
         }
 
+        public void closeSocketE() {
+            try {
+                this.socket.close();
+                System.out.println("socket emission close");
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
+
+        }
+
         public void run() {
 
             try {
                 while (!stop.get()) {
                     // ecriture
+                    System.out.println(envoieMessage);
                     if (!envoieMessage.isEmpty()) {
                         System.out.println("Je suis dans une magnifique boucle");
                         dos.writeUTF(envoieMessage);
@@ -208,75 +257,3 @@ public class Client extends Thread {
         }
     }
 }
-
-
-
-//  public void run() {
-           /* try {
-                System.out.println("ici");
-                this.socket = new Socket("172.16.0.2", 12800);
-                System.out.println("LAAAAAA");
-                this.enculeDeConnexion = 1;
-                this.is = socket.getInputStream();
-                this.os = socket.getOutputStream();
-                dos = new DataOutputStream(os);
-                dis = new DataInputStream(this.is);
-                // dos = DataOutputStream(OutputStream
-                connected = true;*/
-       /* while(!stop.get()){
-            // ecriture
-            if(!this.envoieMessage.isEmpty()) {
-                System.out.println("Je suis dans une magnifique boucle");
-                System.out.println("LE MESSAGE A L4ENVOI EST EXACTEMENT CELUI LA LALALALALLALALALALALALA : "+ this.envoieMessage);
-                this.dos.writeUTF(this.envoieMessage);
-                envoieMessage="";
-
-            }
-            else if (this.envoieMessage.isEmpty())
-            {
-                Calendar cal = Calendar.getInstance();
-                millisToString = new String(String.valueOf(cal.getTimeInMillis()));
-                System.out.println("Inactivité !");
-                JSONNul.put("mode", "8"); //mode 0 pour landscape
-                JSONNul.put("vitesseG", "0000"); //vitesse moteur de gauche
-                JSONNul.put("vitesseD", "0000"); //vitesse moteur de gauche
-                JSONNul.put("temps", millisToString); //vitesse moteur de gauche
-                System.out.println(JSONNul.toString());
-                stringNulQuandPasEnvoi = JSONNul.toString();
-                this.dos.writeUTF(this.stringNulQuandPasEnvoi);
-                stringNulQuandPasEnvoi="";
-
-            }
-
-            //lecture
-
-            BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            line = null;
-            while ((line = in.readLine()) != null) {
-                System.out.println(line);
-                System.out.println("doit recevoir");
-            }
-            System.out.println("Je suis sorti de ma boucle MGL");
-
-            java.util.Scanner s = new java.util.Scanner(is).useDelimiter("\\A");
-            if(s.hasNext())
-            {
-                String message = s.next(); // je prend le qlq chose pour le mettre dans le message
-                    this.clientListener.onMessageReceived(message);
-                    System.out.println(message);
-
-            }
-
-            this.sleep(80);
-        }
-        }catch (ConnectException ex){
-            enculeDeConnexion = 0;
-        }
-        catch(Exception e){
-
-            System.out.println("JE SUIS DANS LE CATCH DU CLIENT!");
-            e.printStackTrace();
-        }
-            }
-        }
-    }*/
