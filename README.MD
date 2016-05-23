@@ -23,8 +23,12 @@ This application needs a working implementation of Adafruit_BBIO and of pyserial
 
 ###Material Setup
 
+####Important Warning !
+The Python application MUST be launched with the root privileges ! The application adapt your system date and hour to the date and hour of the smartphone who's communicating with it. In order to change these settings, the script must be launched with root privileges.
+
+
 ####Clock setup
-The Python application is heavily dependant of your system date ! To detect frames that took too long to transit in the network (time > 2s), the python application use the UTC system hour. 
+The Python application is heavily dependant of your system date ! To detect frames that took too long to transit in the network (time > 2s), the python application use the UTC system hour of the smartphone. However, if for some reasons, the date of your system is screwed or irreliable, use the following guide : 
 
 #####Easy way:
 Install ntp and ntpdate to update your system to a reliable (and shared by many devices) hour:

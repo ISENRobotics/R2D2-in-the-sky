@@ -23,9 +23,10 @@ class Serveur(threading.Thread):
 			queue_output : Une queue d'items output, les informations que le serveur transmet au controleur : les commandes demandées par smartphone
 			stopevent : Une variable provoquant l'arrêt du thread, passée depuis le thread parent, qui permet l'arrêt en cascade
 	"""
-	def __init__(self, queue_input, queue_output,stopevent):
+	def __init__(self, controleur, queue_input, queue_output,stopevent):
 		#Initialisation du thread lui-même		
 		threading.Thread.__init__(self)
+		self.pere = controleur
 		self.input = queue_input
 		self.output = queue_output
 		self.infos_connexion = (('',''))

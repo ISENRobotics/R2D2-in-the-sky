@@ -47,6 +47,8 @@ class Reception_Serveur(threading.Thread):
 					self.connexion_avec_client, self.infos_connexion = self.socket_serveur.accept()
 					#On transmet les informations au serveur
 					self.serveur.infos_connexion = self.infos_connexion
+					#On transmet à l'algorithmique de remettre a jour l'heure du systeme dans l'algorithmique
+					self.serveur.pere.traitement.heure_mise_a_jour = False
 					#On attend plus
 					attente = False
 				try:

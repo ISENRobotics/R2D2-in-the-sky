@@ -27,7 +27,7 @@ class Surveillance_serveur(threading.Thread):
 		self.pere   =controleur
 		self.queue_input_reception = deque()
 		self.queue_output_emission = deque()
-		self.serveur=serveur.Serveur(self.queue_input_reception,self.queue_output_emission,stopevent)
+		self.serveur=serveur.Serveur(self.pere,self.queue_input_reception,self.queue_output_emission,stopevent)
 		self.stoprequest = stopevent
 		#Définition du logger de la classe
 		#Affiche les messages d'erreurs et critiques sur la console
