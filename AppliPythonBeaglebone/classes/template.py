@@ -7,6 +7,7 @@ class Template(threading.Thread):
 		#En cas de mise en place d'une surveillance d'une classe, un template de surveillance_partage est disponible
 		#contenant la classe à partager entre cette classe et la classe de surveillance
 		#self.template_partage=controleur.surveillance.template_partage 
+		self.pere = controleur
 		self.stoprequest = stopevent
 
 	def run(self):

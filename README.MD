@@ -121,3 +121,39 @@ Python application :
 
 Android Application:
   1. The .apk is available on Google Play, or in the ISEN ENT.
+
+
+## Templating
+Wanting to add new functionnalities to your robot ? We got you covered ! The procedure to add new process to this architecture is simple : copy-paste the file classes/template.py and add in the loop located in the run function your code.
+
+	def run(self):
+		while not self.stoprequest.isSet():
+			try:
+				#do something here
+				
+			except IndexError:
+				continue
+
+You've now created a independant thread capable of operating your code. Let's just add it in the controleur.py :
+	
+	import template
+
+Let's create it : 
+
+	self.template = template.Template(self,self.stopevent)
+
+Let's make it a daemon, so it runs in the background and stop when the whole program stops:
+
+	self.template.daemon = True
+
+And let's start it :
+
+	self.template.start()
+
+Finally, just add a call to stop your program when everything is shutting down in the 2 except and the finally :
+
+	self.template.stop()
+
+And that's it ! Your new functionnality is added and will run alongside the existing classes.
+
+
