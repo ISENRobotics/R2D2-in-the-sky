@@ -130,7 +130,6 @@ public class JoyStickClass {
                 if (distance > 0) {
                     System.out.println("dans le positif");
                     distance = (distance /(float) 500) * (float)100;
-                    System.out.println("VALEUR DE DISTANCE ENCULE: " + distance);
                     return distance;
                 }
             }

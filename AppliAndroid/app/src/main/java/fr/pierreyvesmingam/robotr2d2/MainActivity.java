@@ -75,16 +75,6 @@ public class MainActivity extends AppCompatActivity implements Client.ClientList
             client.addClientListener(this);
             socketLandscape = client;
         }
-       /* if (serveur == null) //a test
-        {
-            try {
-                socketStream = new Serveur();
-                socketStream.addServeurListener(this);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        */
 
 
 
@@ -108,8 +98,6 @@ public class MainActivity extends AppCompatActivity implements Client.ClientList
 
         MainActivity.IS_LANDSCAPE = getResources().getBoolean(R.bool.isLandscape);
 
-
-          //  socketStream = serveur;
             button = (Button) findViewById(R.id.button8);
             //après la deco pour remettre un clientlistener pour la reco
                 if (btnConnexoion == 2)
@@ -129,18 +117,14 @@ public class MainActivity extends AppCompatActivity implements Client.ClientList
                                 socketLandscape.startClient();
                                 if (etatServeur ==false)
                                 {
-                                    //socketStream.startServeur();
-                                    //System.out.println("Le serveur a demarer et écoute");
                                     etatServeur = true;
                                 }
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }
 
-                            //System.out.print("val du getConnect = " + socketLandscape.getConnected());
 
                             if (socketLandscape.getConnxion() == 0) {
-                                System.out.println("je suis dans le toast connected!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
                                 Toast.makeText(getApplicationContext(), "Connected", Toast.LENGTH_SHORT).show();
                             } else if (socketLandscape.getConnxion() == 1) {
                                 Toast.makeText(getApplicationContext(), "Connection refused", Toast.LENGTH_SHORT).show();
@@ -321,7 +305,6 @@ public class MainActivity extends AppCompatActivity implements Client.ClientList
 
                 layout_joystick2.setOnTouchListener(new OnTouchListener() {
                     public boolean onTouch(View arg8, MotionEvent arg1) {
-                        //AppuiConnexionPaysage = true;
                         js2.drawStick(arg1);
                         jamaisAppuieD = false;
                         if (arg1.getAction() == MotionEvent.ACTION_DOWN
@@ -537,6 +520,7 @@ public class MainActivity extends AppCompatActivity implements Client.ClientList
         startActivity(intent);
 
     }
+    //retour du thread serveur ici
     @Override
     public void onVideoRecieved(String message) {
         final String dataStream = message;
@@ -546,15 +530,10 @@ public class MainActivity extends AppCompatActivity implements Client.ClientList
             public void run() {
                 background.setBackground(Drawable.createFromPath("Informations serveur:" + dataStream));
 
-                //   background.setBackground(Drawable.createFromPath(data));
-
-
-                //stuff that updates ui
-
             }
         });
     }
-
+    //retour du thread client ici
     @Override
     public void onMessageReceived(String message) {
         final String data = message;
@@ -565,23 +544,10 @@ public class MainActivity extends AppCompatActivity implements Client.ClientList
                     System.out.println("Dans le MainActivity" + data);
                     probleme.setText(data);
 
-                 //   background.setBackground(Drawable.createFromPath(data));
-
-
-            //stuff that updates ui
 
             }
         });
-        /*try {
 
-            //JSONObject jObject = new JSONObject(message);
-            System.out.println("Dans le MainActivity" + message);
-            probleme.setText("Problemes :" + message);
-
-            //probleme.setText("probleme: " + socketLandscape.getStringFromReception());
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }*/
     }
 
 

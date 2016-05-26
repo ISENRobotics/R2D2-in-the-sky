@@ -53,34 +53,6 @@ public class Serveur extends Thread{
 
         }
     }
-
-
-
-    /**
-     * Thread event loop | this part wait for handle an event and apply a spcific function bind by on method
-     */
-    /*public void run() {
-        try {
-            while(( socket = serverSocket.accept()) != null )
-            {
-                BufferedReader in;
-                in = new BufferedReader(new InputStreamReader(this.socket.getInputStream()));
-                line = null;
-                System.out.println("dans le thread reception");
-                while ((line = in.readLine()) != null) {
-                    if (serveurListener == null) System.out.println("null clientListener");
-                    else
-                        serveurListener.onVideoRecieved(line);
-                    System.out.println(line);
-                    System.out.println("doit recevoir dans la CLASS SERVEURURURURURURRURURURU");
-                }
-                System.out.println("Je suis sorti de ma boucle MGL");
-            }
-        }catch (IOException e1) {
-            e1.printStackTrace();
-            System.out.println("La reception à été coupé");
-        }
-    }*/
     public void run() {
 
         this.socket2         = null;
@@ -93,7 +65,6 @@ public class Serveur extends Thread{
             serverSocket = new ServerSocket( 12801 );
             System.out.println("Je suis dans le run du serveur");
             while(( this.socket2 = serverSocket.accept()) != null ) {
-                System.out.println("                                           J AI RECU DES TRUCS OUAISSS ENFIN.............................");
                 in = new  BufferedReader(new InputStreamReader(this.socket2.getInputStream()));
                 line = null;
                 System.out.println("dans le thread reception");
@@ -102,9 +73,7 @@ public class Serveur extends Thread{
                     else
                     serveurListener.onVideoRecieved(line);
                     System.out.println(line);
-                    System.out.println("doit recevoir dans la CLASS SERVEURURURURURURRURURURU");
                 }
-                System.out.println("Je suis sorti de ma boucle MGL");
             }
 
 
