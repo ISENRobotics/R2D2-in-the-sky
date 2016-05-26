@@ -156,4 +156,4 @@ Finally, just add a call to stop your program when everything is shutting down i
 
 And that's it ! Your new functionnality is added and will run alongside the existing classes.
 
-
+Two other templates exist : a template to create a shared class between two classes (like our server class is shared by our algorithmic treament and our surveillance class), and a template to create a surveillance thread of other thread.
