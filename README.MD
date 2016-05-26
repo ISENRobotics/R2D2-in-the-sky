@@ -159,3 +159,10 @@ Finally, just add a call to stop your program when everything is shutting down i
 And that's it ! Your new functionnality is added and will run alongside the existing classes.
 
 Two other templates exist : a template to create a shared class between two classes (like our server class is shared by our algorithmic treament and our surveillance class), and a template to create a surveillance thread of other thread.
+
+
+##Logging
+The Server and Serie Thread are watched by two other threads, Surveillance_serveur and Surveillance_serie. Those two threads log all activities of those classes in two files. To show them and debug those two classes, just type :
+
+	cat /var/log/R2D2_surveillance_serveur.log
+	cat /var/log/R2D2_surveillance_serie.log
