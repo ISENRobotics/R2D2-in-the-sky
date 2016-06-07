@@ -38,11 +38,11 @@ public class MainActivity extends AppCompatActivity implements Client.ClientList
     * ************************************************************************
     */
     private float intVitesseG, intVitesseD;
-    private String vitesseG, vitesseD, anglePortrait, deconexionJSONtoString, millisToString, donneJsonToString, vitesseP, tempsmm, vitessePortrait, valAccel;
+    private String vitesseG, vitesseD, anglePortrait, millisToString, donneJsonToString, vitesseP, tempsmm, vitessePortrait, valAccel;
     private Integer intVitesseP, intAngle, appui;
-    private boolean etatServeur, mIsConnected, isFirstRightJoystickInit, isFirstLeftJoystickInit, ListenerOrNot1, AppuiConnexionPortrait, AppuiConnexionPaysage;
+    private boolean mIsConnected, isFirstRightJoystickInit, isFirstLeftJoystickInit, ListenerOrNot1, AppuiConnexionPortrait, AppuiConnexionPaysage;
     private Serveur socketStream, serveur;
-    private Client client, socketLandscape;
+    private Client client;
 
     /*
     * ************************************************************************
@@ -129,7 +129,6 @@ public class MainActivity extends AppCompatActivity implements Client.ClientList
     * ************************************************************************
     */
     private void initData() {
-        initClient();
         findAndInitViews();
         MainActivity.IS_LANDSCAPE = getResources().getBoolean(R.bool.isLandscape);
     }
@@ -149,7 +148,6 @@ public class MainActivity extends AppCompatActivity implements Client.ClientList
         if (client == null) {
             client = new Client();
             client.addClientListener(this);
-            socketLandscape = client;
         }
     }
 
@@ -187,7 +185,9 @@ public class MainActivity extends AppCompatActivity implements Client.ClientList
         }
 
         donneJsonToString = donneEnvoiJSON.toString(); // convertie le JSON en string pour l'envoyer
-        socketLandscape.sendMessage(donneJsonToString);
+        if (client != null) {
+            client.sendMessage(donneJsonToString);
+        }
     }
 
     private void initUIForLandscape() {
@@ -234,8 +234,6 @@ public class MainActivity extends AppCompatActivity implements Client.ClientList
                         mLeftDirectionTextView.setText("Direction G: Center");
                     }
                 } else if (arg2.getAction() == MotionEvent.ACTION_UP) {
-
-
                     mLeftSpeedTextView.setText("Distance G:");
                     mLeftDirectionTextView.setText("Direction G:");
                 }
@@ -273,7 +271,7 @@ public class MainActivity extends AppCompatActivity implements Client.ClientList
                 }
                 try {
                     Calendar cal = Calendar.getInstance();
-                    millisToString = new String(String.valueOf(cal.getTimeInMillis()));
+                    millisToString = String.valueOf(cal.getTimeInMillis());
                     donneEnvoiJSON.put("mode", "0"); //mode 0 pour landscape
                     donneEnvoiJSON.put("vitesseG", vitesseG); //vitesse moteur de gauche
                     donneEnvoiJSON.put("vitesseD", vitesseD); //vitesse moteur de gauche
@@ -284,8 +282,9 @@ public class MainActivity extends AppCompatActivity implements Client.ClientList
                 }
 
                 String donneJsonToString = donneEnvoiJSON.toString(); // convertie le JSON en string pour l'envoyer
-                socketLandscape.sendMessage(donneJsonToString);
-
+                if (client != null) {
+                    client.sendMessage(donneJsonToString);
+                }
                 appui = 0;
                 return true;
             }
@@ -307,9 +306,8 @@ public class MainActivity extends AppCompatActivity implements Client.ClientList
                 if (arg1.getAction() == MotionEvent.ACTION_DOWN
                         || arg1.getAction() == MotionEvent.ACTION_MOVE) {
 
-                    intVitesseD = new Float(Math.round(js2.getDistance()));
-                    vitesseD = new String(String.valueOf(intVitesseD));
-
+                    intVitesseD = Math.round(js2.getDistance());
+                    vitesseD = String.valueOf(intVitesseD);
 
                     mRightSpeedTextView.setText("Vitesse D: " + vitesseD);
 
@@ -384,7 +382,9 @@ public class MainActivity extends AppCompatActivity implements Client.ClientList
                 }
 
                 donneJsonToString = donneEnvoiJSON.toString(); // convertie le JSON en string pour l'envoyer
-                socketLandscape.sendMessage(donneJsonToString);
+                if (client != null) {
+                    client.sendMessage(donneJsonToString);
+                }
                 appui = 0;
                 return true;
             }
@@ -484,7 +484,9 @@ public class MainActivity extends AppCompatActivity implements Client.ClientList
                 }
 
                 donneJsonToString = donneEnvoiJSONPortrait.toString(); // convertie le JSON en string pour l'envoyer
-                socketLandscape.sendMessage(donneJsonToString);
+                if (client != null) {
+                    client.sendMessage(donneJsonToString);
+                }
                 return true;
             }
         });
@@ -493,25 +495,26 @@ public class MainActivity extends AppCompatActivity implements Client.ClientList
     private void onClickConnexionButton() {
         // Perform action on click
         if (!mIsConnected) {
+            initClient();
             Log.d("CONNEXION_BUTTON", "Je suis dans le bouton connexion");
             AppuiConnexionPaysage = true;
             try {
-                socketLandscape.startClient();
-                if (!etatServeur) {
-                    etatServeur = true;
-                }
+                client.startClient();
             } catch (IOException e) {
                 e.printStackTrace();
             }
 
-            if (socketLandscape.getConnxion() == 0) {
-                Toast.makeText(getApplicationContext(), "Connected", Toast.LENGTH_SHORT).show();
-            } else if (socketLandscape.getConnxion() == 1) {
-                Toast.makeText(getApplicationContext(), "Connection refused", Toast.LENGTH_SHORT).show();
+            if (!client.nullableSocket()) {
+                if (client.socketIsConnected()) {
+                    mIsConnected = true;
+                    Toast.makeText(getApplicationContext(), "Connected", Toast.LENGTH_SHORT).show();
+                    connexionButton.setText("Disconnect");
+                    connexionButton.setBackgroundColor(0xfff00000);
+                } else {
+                    Toast.makeText(getApplicationContext(), "Connection refused", Toast.LENGTH_SHORT).show();
+                    client = null;
+                }
             }
-            connexionButton.setText("Disconnect");
-            connexionButton.setBackgroundColor(0xfff00000);
-            mIsConnected = true;
         } else {
             Log.d("CONNEXION_BUTTON", "Je suis dans le bouton Deconnexion");
             AppuiConnexionPaysage = true;
@@ -522,18 +525,15 @@ public class MainActivity extends AppCompatActivity implements Client.ClientList
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }
-            deconexionJSONtoString = deconexionJSON.toString(); // convertie le JSON en string pour l'envoyer
-            socketLandscape.sendMessage(deconexionJSONtoString);
+            final String deconexionJSONtoString = deconexionJSON.toString(); // convertie le JSON en string pour l'envoyer
+            client.sendMessage(deconexionJSONtoString);
             SystemClock.sleep(100);
-            socketLandscape.stopClient();
+            client.stopClient();
             //socketStream.stopServeur();
-            createNewClient();
             connexionButton.setText("Connexion");
             connexionButton.setBackgroundColor(0xff00c700);
+            mIsConnected = false;
+            client = null;
         }
-    }
-    private void createNewClient() {
-        socketLandscape = new Client();
-        mIsConnected = true;
     }
 }
