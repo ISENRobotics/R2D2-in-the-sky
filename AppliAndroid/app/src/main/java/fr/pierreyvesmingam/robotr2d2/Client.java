@@ -94,10 +94,7 @@ public class Client extends Thread {
         } catch (IOException e1) {
             e1.printStackTrace();
         }
-
-
     }
-
 
     public String getStringFromReception()
     {
@@ -230,7 +227,7 @@ public class Client extends Thread {
 
                     } else if (envoieMessage.isEmpty()) {
                         Calendar cal = Calendar.getInstance();
-                        millisToString = new String(String.valueOf(cal.getTimeInMillis()));
+                        millisToString = String.valueOf(cal.getTimeInMillis());
                         System.out.println("Inactivité !");
 
                         JSONNul.put("mode", "8"); //mode 0 pour landscape
@@ -244,7 +241,7 @@ public class Client extends Thread {
                         stringNulQuandPasEnvoi = "";
 
                     }
-                    this.sleep(80);
+                    sleep(80);
                 }
             } catch (ConnectException ex) {
                 enculeDeConnexion = 0;

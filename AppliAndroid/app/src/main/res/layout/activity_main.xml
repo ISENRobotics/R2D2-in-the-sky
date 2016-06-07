@@ -8,7 +8,7 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="fr.pierreyvesmingam.robotr2d2.MainActivity"
-    android:id="@+id/ee">
+    android:id="@+id/rootView">
 
 
     <TextView
@@ -17,14 +17,14 @@
         android:text="Déplacement du Robot"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:id="@+id/textView" />
+        android:id="@+id/viewTitleTextView" />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="AIDE"
-        android:id="@+id/button"
-        android:onClick="aide"
+        android:id="@+id/helpButton"
+        android:onClick="startHelpActivity"
         android:layout_alignTop="@+id/button3"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
@@ -33,8 +33,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Connexion"
-        android:id="@+id/button8"
-        android:layout_above="@+id/layout_joystick"
+        android:id="@+id/connexionButton"
+        android:layout_above="@+id/layoutPortraitJoystick"
         android:layout_centerHorizontal="true"
         android:background="#2ecc71" />
 
@@ -43,10 +43,10 @@
         android:layout_height="wrap_content"
         android:text="Configuration"
         android:id="@+id/button2"
-        android:onClick="config"
+        android:onClick="startConfigActivity"
         android:layout_alignTop="@+id/button3"
-        android:layout_alignLeft="@+id/textView"
-        android:layout_alignStart="@+id/textView" />
+        android:layout_alignLeft="@+id/viewTitleTextView"
+        android:layout_alignStart="@+id/viewTitleTextView" />
 
     <Button
         android:layout_width="wrap_content"
@@ -61,7 +61,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="ARRET d&apos;urgence"
-        android:id="@+id/button4"
+        android:id="@+id/breakButton"
         android:background="#e74c3c"
         android:layout_marginBottom="40dp"
         android:layout_alignParentBottom="true"
@@ -71,15 +71,12 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Informations:"
-        android:id="@+id/probleme"
+        android:id="@+id/problemTextView"
         android:textColor="#444444"
         android:textSize="20dp"
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
-
-
-
 
     <LinearLayout
         android:id="@+id/linearLayout1"
@@ -90,15 +87,15 @@
 
     </LinearLayout>
     <RelativeLayout
-        android:id="@+id/layout_joystick"
+        android:id="@+id/layoutPortraitJoystick"
         android:layout_width="200dp"
         android:layout_height="200dp"
         android:background="@drawable/jaune"
-        android:layout_above="@+id/textView3"
+        android:layout_above="@+id/angleTextView"
         android:layout_centerHorizontal="true">
 
         <RelativeLayout
-            android:id="@+id/layout_joystick"
+            android:id="@id/layoutPortraitJoystick"
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:background="@drawable/rouge"
@@ -122,35 +119,35 @@
     </LinearLayout>
 
     <TextView
-        android:id="@+id/textView4"
+        android:id="@+id/leftSpeedTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Distance"
         android:textColor="#444444"
         android:textSize="20dp"
-        android:layout_above="@+id/button4"
+        android:layout_above="@+id/breakButton"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
 
     <TextView
-        android:id="@+id/textView5"
+        android:id="@+id/leftDirectionTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Direction"
         android:textColor="#444444"
         android:textSize="20dp"
-        android:layout_above="@+id/button4"
-        android:layout_toRightOf="@+id/textView"
-        android:layout_toEndOf="@+id/textView" />
+        android:layout_above="@+id/breakButton"
+        android:layout_toRightOf="@+id/viewTitleTextView"
+        android:layout_toEndOf="@+id/viewTitleTextView" />
 
     <TextView
-        android:id="@+id/textView3"
+        android:id="@+id/angleTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Angle"
         android:textColor="#444444"
         android:textSize="20dp"
-        android:layout_above="@+id/textView4"
+        android:layout_above="@+id/leftSpeedTextView"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
 

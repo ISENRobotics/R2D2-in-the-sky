@@ -10,9 +10,9 @@ import android.widget.TextView;
 
 public class AideActivity extends AppCompatActivity {
 
-    TextView response;
-    EditText editTextAddress, editTextPort;
-    Button buttonConnect;
+    private TextView response;
+    private EditText editTextAddress, editTextPort;
+    private Button buttonConnect;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,9 +22,7 @@ public class AideActivity extends AppCompatActivity {
         editTextAddress = (EditText) findViewById(R.id.addressEditText);
         editTextPort = (EditText) findViewById(R.id.portEditText);
         buttonConnect = (Button) findViewById(R.id.connectButton);
-
         response = (TextView) findViewById(R.id.responseTextView);
-
     }
 
     public void retour(View view){

@@ -12,7 +12,7 @@ import android.widget.Toast;
 
 public class configActivity extends AppCompatActivity {
 
-    TextView response;
+    private TextView response;
     EditText editTextAddress, editTextPort;
     Button buttonConnect;
     Integer speed;

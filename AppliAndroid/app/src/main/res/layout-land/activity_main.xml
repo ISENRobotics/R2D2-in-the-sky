@@ -9,16 +9,13 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="fr.pierreyvesmingam.robotr2d2.MainActivity"
     android:background="#ecf0f1"
-    android:id="@+id/ee">
-
-
-    
+    android:id="@+id/rootView">
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Déplacement du Robot"
-        android:id="@+id/textView"
+        android:id="@+id/viewTitleTextView"
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
@@ -28,7 +25,7 @@
         android:layout_height="wrap_content"
         android:text="Configuration"
         android:id="@+id/button2"
-        android:onClick="config"
+        android:onClick="startConfigActivity"
         android:layout_alignParentTop="true"
         android:layout_toLeftOf="@+id/button3"
         android:layout_toStartOf="@+id/button3" />
@@ -45,17 +42,17 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="ARRET d&apos;urgence"
-        android:id="@+id/button4"
+        android:text="ARRET d\'urgence"
+        android:id="@+id/breakButton"
         android:background="#ff0000"
-        android:layout_alignBottom="@+id/layout_joystick2"
+        android:layout_alignBottom="@+id/layoutLandscapeRightJoystick"
         android:layout_centerHorizontal="true" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Informations:"
-        android:id="@+id/probleme"
+        android:id="@+id/problemTextView"
         android:textColor="#444444"
         android:textSize="20dp"
         android:layout_below="@+id/textView19"
@@ -84,11 +81,11 @@
 
     </LinearLayout>
     <RelativeLayout
-        android:id="@+id/layout_joystick3"
+        android:id="@+id/layoutLandscapeLeftJoystick"
         android:layout_width="200dp"
         android:layout_height="200dp"
         android:background="@drawable/fleche"
-        android:layout_alignTop="@+id/layout_joystick2"
+        android:layout_alignTop="@+id/layoutLandscapeRightJoystick"
         android:layout_alignLeft="@+id/linearLayout1"
         android:layout_alignStart="@+id/linearLayout1">
 
@@ -105,7 +102,7 @@
 
 
     <TextView
-        android:id="@+id/textView4"
+        android:id="@+id/leftSpeedTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Vitesse G"
@@ -113,28 +110,28 @@
         android:textSize="10dp"
         android:layout_marginTop="56dp"
         android:singleLine="false"
-        android:layout_alignLeft="@+id/button4"
-        android:layout_alignStart="@+id/button4" />
+        android:layout_alignLeft="@+id/breakButton"
+        android:layout_alignStart="@+id/breakButton" />
 
     <TextView
-        android:id="@+id/textView5"
+        android:id="@+id/leftDirectionTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Direction G"
         android:textColor="#444444"
         android:textSize="10dp"
-        android:layout_below="@+id/textView4"
-        android:layout_alignLeft="@+id/textView4"
-        android:layout_alignStart="@+id/textView4" />
+        android:layout_below="@+id/leftSpeedTextView"
+        android:layout_alignLeft="@+id/leftSpeedTextView"
+        android:layout_alignStart="@+id/leftSpeedTextView" />
 
     <RelativeLayout
-        android:id="@+id/layout_joystick2"
+        android:id="@id/layoutLandscapeRightJoystick"
         android:layout_width="200dp"
         android:layout_height="200dp"
         android:background="@drawable/fleche"
         android:layout_centerVertical="true"
-        android:layout_toRightOf="@+id/button4"
-        android:layout_toEndOf="@+id/button4">
+        android:layout_toRightOf="@+id/breakButton"
+        android:layout_toEndOf="@+id/breakButton">
 
         <RelativeLayout
             android:layout_width="35dp"
@@ -148,30 +145,30 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Vitesse D"
-        android:id="@+id/textView2"
+        android:id="@+id/rightSpeedTextView"
         android:textColor="#444444"
         android:textSize="10dp"
-        android:layout_below="@+id/textView5"
-        android:layout_alignLeft="@+id/textView5"
-        android:layout_alignStart="@+id/textView5" />
+        android:layout_below="@+id/leftDirectionTextView"
+        android:layout_alignLeft="@+id/leftDirectionTextView"
+        android:layout_alignStart="@+id/leftDirectionTextView" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Direction D"
-        android:id="@+id/textView18"
+        android:id="@+id/rightDirectionTextView"
         android:textColor="#444444"
         android:textSize="10dp"
-        android:layout_below="@+id/textView2"
-        android:layout_alignRight="@+id/textView5"
-        android:layout_alignEnd="@+id/textView5" />
+        android:layout_below="@+id/rightSpeedTextView"
+        android:layout_alignRight="@+id/leftDirectionTextView"
+        android:layout_alignEnd="@+id/leftDirectionTextView" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Vitesse moteur gauche"
         android:id="@+id/textView19"
-        android:layout_below="@+id/layout_joystick3"
+        android:layout_below="@+id/layoutLandscapeLeftJoystick"
         android:layout_toRightOf="@+id/linearLayout1"
         android:layout_toEndOf="@+id/linearLayout1" />
 
@@ -180,9 +177,9 @@
         android:layout_height="wrap_content"
         android:text="Vitesse moteur droite"
         android:id="@+id/textView20"
-        android:layout_below="@+id/layout_joystick2"
-        android:layout_alignRight="@+id/layout_joystick2"
-        android:layout_alignEnd="@+id/layout_joystick2"
+        android:layout_below="@+id/layoutLandscapeRightJoystick"
+        android:layout_alignRight="@+id/layoutLandscapeRightJoystick"
+        android:layout_alignEnd="@+id/layoutLandscapeRightJoystick"
         android:layout_marginRight="21dp"
         android:layout_marginEnd="21dp" />
 
@@ -190,7 +187,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Connexion"
-        android:id="@+id/button8"
+        android:id="@+id/connexionButton"
         android:layout_centerHorizontal="true"
         android:background="#2ecc71" />
 

@@ -22,7 +22,7 @@
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:text="Projet M1 - 2015/2016"
-        android:id="@+id/textView5"
+        android:id="@+id/leftDirectionTextView"
         android:layout_marginBottom="42dp"
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
