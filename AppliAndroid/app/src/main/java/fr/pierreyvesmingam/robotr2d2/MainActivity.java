@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.SystemClock;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -19,9 +20,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.util.Calendar;
 
-public class MainActivity extends AppCompatActivity implements Client.ClientListener, Serveur.ServerListener, View.OnClickListener {
+import fr.pierreyvesmingam.robotr2d2.helper.RobotMoveHelper;
+
+public class MainActivity extends AppCompatActivity implements Client.ClientListener, Serveur.ServerListener, View.OnClickListener, OnTouchListener {
 
     /*
     * ************************************************************************
@@ -29,32 +31,29 @@ public class MainActivity extends AppCompatActivity implements Client.ClientList
     * ************************************************************************
     */
     public static boolean IS_LANDSCAPE = false;
-    private final JSONObject donneEnvoiJSON = new JSONObject();
-    private final JSONObject donneEnvoiJSONPortrait = new JSONObject();
-    private final JSONObject deconexionJSON = new JSONObject();
     /*
     * ************************************************************************
     * DATA PROPERTIES
     * ************************************************************************
     */
-    private float intVitesseG, intVitesseD;
-    private String vitesseG, vitesseD, anglePortrait, millisToString, donneJsonToString, vitesseP, tempsmm, vitessePortrait, valAccel;
-    private Integer intVitesseP, intAngle, appui;
-    private boolean mIsConnected, isFirstRightJoystickInit, isFirstLeftJoystickInit, ListenerOrNot1, AppuiConnexionPortrait, AppuiConnexionPaysage;
-    private Serveur socketStream, serveur;
-    private Client client;
+    private final JSONObject mDeconnectionJSON = new JSONObject();
+
+    private String mVitesseG, mVitesseD, mAnglePortrait, mMillisToString, mDonneJsonToString, mTempsmm, mVitessePortrait, mValAccel;
+    private boolean mIsConnected, mIsFirstRightJoystickInit, mIsFirstLeftJoystickInit, mListenerOrNot1, mPressConnectionPortrait, mPressConnectionLandscape;
+    private Serveur mSocketStream, mServeur;
+    private Client mClient;
 
     /*
     * ************************************************************************
     * UI PROPERTIES
     * ************************************************************************
     */
-    private RelativeLayout mLayoutPortraitJoystick, mLayoutLandscapeRightJoystick, mLayoutLandscapeLeftJoystick, mRootView;
-    private ImageView image_joystick, image_border;
-    private TextView mAngleTextView, mLeftSpeedTextView, mLeftDirectionTextView, mProblemTextView, mRightSpeedTextView, mRightDirectionTextView, mSpeedTextView, mBbatteryState;
-    private Button connexionButton, mBreakButton;
+    private RelativeLayout mLayoutPortraitJoystick, mRightLandscapeJoystickLayout, mLeftLandscapeJoystickLayout, mRootView;
+    private ImageView mImageJoystick, mImageBorder;
+    private TextView mAngleTextView, mLeftSpeedTextView, mProblemTextView, mRightSpeedTextView, mSpeedTextView, mBbatteryState;
+    private Button mConnexionButton, mBreakButton;
 
-    private JoyStickClass js, js2, js3;
+    private JoyStickClass mProtraitJoystick, mRightLandscapeJoystick, mLeftLandscapeJoystick;
 
     /*
     * ************************************************************************
@@ -73,12 +72,11 @@ public class MainActivity extends AppCompatActivity implements Client.ClientList
     @Override
     public void onVideoRecieved(String message) {
         final String dataStream = message;
-        System.out.println("Le string recu du serveur est : " + dataStream);
+        Log.d("VIDEO_RECIEVE", "Le string recu du serveur est : " + dataStream);
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 mRootView.setBackground(Drawable.createFromPath("Informations serveur:" + dataStream));
-
             }
         });
     }
@@ -90,7 +88,7 @@ public class MainActivity extends AppCompatActivity implements Client.ClientList
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                System.out.println("Dans le MainActivity" + data);
+                Log.d("MESSAGE_RECIEVE", "Dans le MainActivity " + data);
                 mProblemTextView.setText(data);
             }
         });
@@ -111,6 +109,22 @@ public class MainActivity extends AppCompatActivity implements Client.ClientList
                 onClickBreackButton();
                 break;
         }
+    }
+
+    @Override
+    public boolean onTouch(View view, MotionEvent motionEvent) {
+        switch (view.getId()) {
+            case R.id.rightLandscapeJoystickLayout:
+                onTouchRightLanscapeJoystick(motionEvent);
+                break;
+            case R.id.leftLandscapeJoystickLayout:
+                onTouchLeftLandscapeJoystick(motionEvent);
+                break;
+            case R.id.portraitJoystickLayout:
+                onTouchPortraitJoystick(motionEvent);
+                break;
+        }
+        return true;
     }
 
     public void startHelpActivity(View view) {
@@ -134,9 +148,9 @@ public class MainActivity extends AppCompatActivity implements Client.ClientList
     }
 
     private void initUI() {
-        boolean mega = false; // FIXME:: this variable is never used
+        //boolean mega = false; // FIXME:: this variable is never used
         mBreakButton.setOnClickListener(this);
-        connexionButton.setOnClickListener(this);
+        mConnexionButton.setOnClickListener(this);
         if (MainActivity.IS_LANDSCAPE) {
             initUIForLandscape();
         } else {
@@ -145,351 +159,110 @@ public class MainActivity extends AppCompatActivity implements Client.ClientList
     }
 
     private void initClient() {
-        if (client == null) {
-            client = new Client();
-            client.addClientListener(this);
+        if (mClient == null) {
+            mClient = new Client();
+            mClient.addClientListener(this);
         }
     }
 
     private void findAndInitViews() {
         mAngleTextView = (TextView) findViewById(R.id.angleTextView);
         mLeftSpeedTextView = (TextView) findViewById(R.id.leftSpeedTextView);
-        mLeftDirectionTextView = (TextView) findViewById(R.id.leftDirectionTextView);
         mRightSpeedTextView = (TextView) findViewById(R.id.rightSpeedTextView);
-        mRightDirectionTextView = (TextView) findViewById(R.id.rightDirectionTextView);
         mProblemTextView = (TextView) findViewById(R.id.problemTextView);
         mRootView = (RelativeLayout) findViewById(R.id.rootView);
-        mLayoutPortraitJoystick = (RelativeLayout) findViewById(R.id.layoutPortraitJoystick);
-        mLayoutLandscapeRightJoystick = (RelativeLayout) findViewById(R.id.layoutLandscapeRightJoystick);
-        mLayoutLandscapeLeftJoystick = (RelativeLayout) findViewById(R.id.layoutLandscapeLeftJoystick);
+        mLayoutPortraitJoystick = (RelativeLayout) findViewById(R.id.portraitJoystickLayout);
+        mRightLandscapeJoystickLayout = (RelativeLayout) findViewById(R.id.rightLandscapeJoystickLayout);
+        mLeftLandscapeJoystickLayout = (RelativeLayout) findViewById(R.id.leftLandscapeJoystickLayout);
 
         mBreakButton = (Button) findViewById(R.id.breakButton);
-        connexionButton = (Button) findViewById(R.id.connexionButton);
+        mConnexionButton = (Button) findViewById(R.id.connexionButton);
     }
 
     private void onClickBreackButton() {
         // Perform action on click
-        System.out.println("Arret d'urgence");
-        try {
-            vitesseD = "0000";
-            vitesseG = "0000";
-            Calendar cal = Calendar.getInstance();
-            millisToString = String.valueOf(cal.getTimeInMillis());
-            donneEnvoiJSON.put("mode", "8"); //mode 0 pour landscape
-            donneEnvoiJSON.put("vitesseG", vitesseG); //vitesse moteur de gauche
-            donneEnvoiJSON.put("vitesseD", vitesseD); //vitesse moteur de gauche
-            donneEnvoiJSON.put("temps", millisToString); //vitesse moteur de gauche
-        } catch (JSONException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-
-        donneJsonToString = donneEnvoiJSON.toString(); // convertie le JSON en string pour l'envoyer
-        if (client != null) {
-            client.sendMessage(donneJsonToString);
-        }
+        Log.d("STOP_ROBOT", "Frein d'urgence");
+        RobotMoveHelper.stopMotors(mClient);
     }
 
     private void initUIForLandscape() {
         //Landscape
         //joystick 1, a gauche sur vu paysage
-        js3 = new JoyStickClass(getApplicationContext(), mLayoutLandscapeLeftJoystick, R.drawable.rouge);
-        js3.setStickSize(150, 150);
-        js3.setLayoutSize(500, 500);
-        js3.setLayoutAlpha(150);
-        js3.setStickAlpha(100);
-        js3.setOffset(90);
-        js3.setMinimumDistance(0);
+        mLeftLandscapeJoystick = new JoyStickClass(getApplicationContext(), mLeftLandscapeJoystickLayout, R.drawable.rouge);
+        mLeftLandscapeJoystick.setStickSize(150, 150);
+        mLeftLandscapeJoystick.setLayoutSize(500, 500);
+        mLeftLandscapeJoystick.setLayoutAlpha(150);
+        mLeftLandscapeJoystick.setStickAlpha(100);
+        mLeftLandscapeJoystick.setOffset(90);
+        mLeftLandscapeJoystick.setMinimumDistance(0);
 
-        mLayoutLandscapeLeftJoystick.setOnTouchListener(new OnTouchListener() {
-            public boolean onTouch(View arg7, MotionEvent arg2) {
-                js3.drawStick(arg2);
-                isFirstLeftJoystickInit = false;
-                // ListenerOrNot1 = true;
-                if (arg2.getAction() == MotionEvent.ACTION_DOWN
-                        || arg2.getAction() == MotionEvent.ACTION_MOVE) {
-                    intVitesseG = Math.round(js3.getDistance());
-                    vitesseG = String.valueOf(intVitesseG);
-                    mLeftSpeedTextView.setText("Vitesse G : " + vitesseG);
-
-                    //mise en forme pour le JSON des vitesse
-                    int direction = js3.get8Direction();
-                    if (direction == JoyStickClass.STICK_UP) {
-                        mLeftDirectionTextView.setText("Direction G : Up");
-                    } else if (direction == JoyStickClass.STICK_UPRIGHT) {
-                        mLeftDirectionTextView.setText("Direction G: Up");
-                    } else if (direction == JoyStickClass.STICK_RIGHT) {
-                        mLeftDirectionTextView.setText("Direction G: Center");
-                    } else if (direction == JoyStickClass.STICK_DOWNRIGHT) {
-                        mLeftDirectionTextView.setText("Direction G: Down");
-                    } else if (direction == JoyStickClass.STICK_DOWN) {
-                        mLeftDirectionTextView.setText("Direction G: Down");
-                    } else if (direction == JoyStickClass.STICK_DOWNLEFT) {
-                        mLeftDirectionTextView.setText("Direction G: Down");
-                    } else if (direction == JoyStickClass.STICK_LEFT) {
-                        mLeftDirectionTextView.setText("Direction G: Center");
-                    } else if (direction == JoyStickClass.STICK_UPLEFT) {
-                        mLeftDirectionTextView.setText("Direction G: Up");
-                    } else if (direction == JoyStickClass.STICK_NONE) {
-                        mLeftDirectionTextView.setText("Direction G: Center");
-                    }
-                } else if (arg2.getAction() == MotionEvent.ACTION_UP) {
-                    mLeftSpeedTextView.setText("Distance G:");
-                    mLeftDirectionTextView.setText("Direction G:");
-                }
-                vitesseG = Integer.toString((Math.round(intVitesseG / 100 * 127)));
-                intVitesseG = Math.round(intVitesseG / 100 * 127);
-                boolean megaG = false;
-                if (intVitesseG < 0) {
-                    megaG = true;
-                } else if (intVitesseG == 0) {
-                    vitesseG = "0000";
-                }
-                if (megaG) {
-                    if (vitesseG.length() == 2) {
-
-                        vitesseG = "-00" + Integer.toString(Math.abs(Math.round(intVitesseG)));
-                        System.out.println(vitesseG);
-                    }
-                    if (vitesseG.length() == 3) {
-                        vitesseG = "-0" + Integer.toString(Math.abs(Math.round(intVitesseG)));
-                    }
-                } else {
-                    if (vitesseG.length() == 1) {
-                        vitesseG = "000" + vitesseG;
-                    } else if (vitesseG.length() == 2) {
-                        vitesseG = "00" + vitesseG;
-                    } else if (vitesseG.length() == 3) {
-                        vitesseG = "0" + vitesseG;
-                    }
-                }
-
-                appui = 1;
-
-                if (isFirstRightJoystickInit) { // FIXME : this is not a right way to init the value
-                    vitesseD = "0000";
-                }
-                try {
-                    Calendar cal = Calendar.getInstance();
-                    millisToString = String.valueOf(cal.getTimeInMillis());
-                    donneEnvoiJSON.put("mode", "0"); //mode 0 pour landscape
-                    donneEnvoiJSON.put("vitesseG", vitesseG); //vitesse moteur de gauche
-                    donneEnvoiJSON.put("vitesseD", vitesseD); //vitesse moteur de gauche
-                    donneEnvoiJSON.put("temps", millisToString);
-                } catch (JSONException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-
-                String donneJsonToString = donneEnvoiJSON.toString(); // convertie le JSON en string pour l'envoyer
-                if (client != null) {
-                    client.sendMessage(donneJsonToString);
-                }
-                appui = 0;
-                return true;
-            }
-        });
+        mLeftLandscapeJoystickLayout.setOnTouchListener(this);
 
         //joystick 2, a droite sur vu paysage
-        js2 = new JoyStickClass(this, mLayoutLandscapeRightJoystick, R.drawable.rouge);
-        js2.setStickSize(150, 150);
-        js2.setLayoutSize(500, 500);
-        js2.setLayoutAlpha(150);
-        js2.setStickAlpha(100);
-        js2.setOffset(90);
-        js2.setMinimumDistance(0);
+        mRightLandscapeJoystick = new JoyStickClass(this, mRightLandscapeJoystickLayout, R.drawable.rouge);
+        mRightLandscapeJoystick.setStickSize(150, 150);
+        mRightLandscapeJoystick.setLayoutSize(500, 500);
+        mRightLandscapeJoystick.setLayoutAlpha(150);
+        mRightLandscapeJoystick.setStickAlpha(100);
+        mRightLandscapeJoystick.setOffset(90);
+        mRightLandscapeJoystick.setMinimumDistance(0);
 
-        mLayoutLandscapeRightJoystick.setOnTouchListener(new OnTouchListener() {
-            public boolean onTouch(View arg8, MotionEvent arg1) {
-                js2.drawStick(arg1);
-                isFirstRightJoystickInit = false;
-                if (arg1.getAction() == MotionEvent.ACTION_DOWN
-                        || arg1.getAction() == MotionEvent.ACTION_MOVE) {
+        mRightLandscapeJoystickLayout.setOnTouchListener(this);
+    }
 
-                    intVitesseD = Math.round(js2.getDistance());
-                    vitesseD = String.valueOf(intVitesseD);
+    private void onTouchLeftLandscapeJoystick(@NonNull final MotionEvent motionEvent) {
+        mLeftLandscapeJoystick.drawStick(motionEvent);
+        int speed = Math.round(mLeftLandscapeJoystick.getDistance());
+        mVitesseG = RobotMoveHelper.motorSpeedCalcul(speed);
+        mLeftSpeedTextView.setText(String.format(getString(R.string.left_speed_with_value), mVitesseG));
+        RobotMoveHelper.launchMotorsWithModeZero(mClient, mVitesseD, mVitesseG);
+    }
 
-                    mRightSpeedTextView.setText("Vitesse D: " + vitesseD);
-
-                    int direction = js2.get8Direction();
-                    if (direction == JoyStickClass.STICK_UP) {
-                        mRightDirectionTextView.setText("Direction D: Up");
-                    } else if (direction == JoyStickClass.STICK_UPRIGHT) {
-                        mRightDirectionTextView.setText("Direction D: Up");
-                    } else if (direction == JoyStickClass.STICK_RIGHT) {
-                        mRightDirectionTextView.setText("Direction D: Center");
-                    } else if (direction == JoyStickClass.STICK_DOWNRIGHT) {
-                        mRightDirectionTextView.setText("Direction D: Down");
-                    } else if (direction == JoyStickClass.STICK_DOWN) {
-                        mRightDirectionTextView.setText("Direction D: Down");
-                    } else if (direction == JoyStickClass.STICK_DOWNLEFT) {
-                        mRightDirectionTextView.setText("Direction D: Down");
-                    } else if (direction == JoyStickClass.STICK_LEFT) {
-                        mRightDirectionTextView.setText("Direction D: Center");
-                    } else if (direction == JoyStickClass.STICK_UPLEFT) {
-                        mRightDirectionTextView.setText("Direction D: Up");
-                    } else if (direction == JoyStickClass.STICK_NONE) {
-                        mRightDirectionTextView.setText("Direction D: Center");
-                    }
-                } else if (arg1.getAction() == MotionEvent.ACTION_UP) {
-
-                    mRightSpeedTextView.setText("Distance D:");
-                    mRightDirectionTextView.setText("Direction D:");
-                }
-                boolean megaG = false;
-                vitesseD = Integer.toString((Math.round(intVitesseD / 100 * 127)));
-                intVitesseD = Math.round(intVitesseD / 100 * 127);
-                if (intVitesseD < 0) {
-                    megaG = true;
-                } else if (intVitesseD == 0) {
-                    vitesseD = "0000";
-                }
-                if (megaG) {
-
-                    if (vitesseD.length() == 2) {
-                        vitesseD = "-00" + Integer.toString(Math.abs(Math.round(intVitesseD)));
-                    }
-                    if (vitesseD.length() == 3) {
-                        vitesseD = "-0" + Integer.toString(Math.abs(Math.round(intVitesseD)));
-                        System.out.println("Are You Here My Brother Friend ?");
-                    }
-                } else {
-                    if (vitesseD.length() == 1) {
-                        vitesseD = "000" + vitesseD;
-                    } else if (vitesseD.length() == 2) {
-                        vitesseD = "00" + vitesseD;
-                    } else if (vitesseD.length() == 3) {
-                        vitesseD = "0" + vitesseD;
-                    }
-                }
-
-                System.out.println("LE TEMPS EST PRESENT MGL" + millisToString);
-                appui = 2;
-
-                if (isFirstLeftJoystickInit) {
-                    vitesseG = "0000";
-                }
-                try {
-                    Calendar cal = Calendar.getInstance();
-                    millisToString = String.valueOf(cal.getTimeInMillis());
-                    donneEnvoiJSON.put("mode", "0"); //mode 0 pour landscape
-                    donneEnvoiJSON.put("vitesseG", vitesseG); //vitesse moteur de gauche
-                    donneEnvoiJSON.put("vitesseD", vitesseD); //vitesse moteur de gauche
-                    donneEnvoiJSON.put("temps", millisToString);
-                } catch (JSONException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-
-                donneJsonToString = donneEnvoiJSON.toString(); // convertie le JSON en string pour l'envoyer
-                if (client != null) {
-                    client.sendMessage(donneJsonToString);
-                }
-                appui = 0;
-                return true;
-            }
-        });
-
+    private void onTouchRightLanscapeJoystick(@NonNull final MotionEvent motionEvent) {
+        mRightLandscapeJoystick.drawStick(motionEvent);
+        int speed = Math.round(mRightLandscapeJoystick.getDistance());
+        mVitesseD = RobotMoveHelper.motorSpeedCalcul(speed);
+        mRightSpeedTextView.setText(String.format(getString(R.string.right_speed_with_value), mVitesseD));
+        RobotMoveHelper.launchMotorsWithModeZero(mClient, mVitesseD, mVitesseG);
     }
 
     private void initUIForPortrait() {
         //portrait
         //joystick principale en mode portrait
-        js = new JoyStickClass(this, mLayoutPortraitJoystick, R.drawable.rouge);
-        js.setStickSize(150, 150);
-        js.setLayoutSize(500, 500);
-        js.setLayoutAlpha(150);
-        js.setStickAlpha(100);
-        js.setOffset(90);
-        js.setMinimumDistance(50);
+        mProtraitJoystick = new JoyStickClass(this, mLayoutPortraitJoystick, R.drawable.rouge);
+        mProtraitJoystick.setStickSize(150, 150);
+        mProtraitJoystick.setLayoutSize(500, 500);
+        mProtraitJoystick.setLayoutAlpha(150);
+        mProtraitJoystick.setStickAlpha(100);
+        mProtraitJoystick.setOffset(90);
+        mProtraitJoystick.setMinimumDistance(50);
 
-        mLayoutPortraitJoystick.setOnTouchListener(new OnTouchListener() {
-            public boolean onTouch(View arg0, MotionEvent arg3) {
-                //AppuiConnexionPortrait = true;
-                js.drawStick(arg3);
-                if (arg3.getAction() == MotionEvent.ACTION_DOWN
-                        || arg3.getAction() == MotionEvent.ACTION_MOVE) {
+        mLayoutPortraitJoystick.setOnTouchListener(this);
+    }
 
-                    intAngle = Math.round(js.getAngle());
-                    anglePortrait = String.valueOf(intAngle);
-                    vitesseP = String.valueOf(Math.round(js.getDistance()));
-                    intVitesseP = Math.round(js.getDistance());
+    private void onTouchPortraitJoystick(@NonNull final MotionEvent motionEvent) {
+        //mPressConnectionPortrait = true;
+        String speedString;
+        int speed = 0;
+        mProtraitJoystick.drawStick(motionEvent);
+        if (motionEvent.getAction() == MotionEvent.ACTION_DOWN
+                || motionEvent.getAction() == MotionEvent.ACTION_MOVE) {
 
-                    mAngleTextView.setText("Angle : " + anglePortrait);
-                    mLeftSpeedTextView.setText("Distance : " + vitesseP);
+            final int angle = Math.round(mProtraitJoystick.getAngle());
+            mAnglePortrait = String.valueOf(angle);
+            speedString = String.valueOf(Math.round(mProtraitJoystick.getDistance()));
+            speed = Math.round(mProtraitJoystick.getDistance());
 
-                    int direction = js.get8Direction();
-                    if (direction == JoyStickClass.STICK_UP) {
-                        mLeftDirectionTextView.setText("Direction : Up");
-                    } else if (direction == JoyStickClass.STICK_UPRIGHT) {
-                        mLeftDirectionTextView.setText("Direction : Up Right");
-                    } else if (direction == JoyStickClass.STICK_RIGHT) {
-                        mLeftDirectionTextView.setText("Direction : Right");
-                    } else if (direction == JoyStickClass.STICK_DOWNRIGHT) {
-                        mLeftDirectionTextView.setText("Direction : Down Right");
-                    } else if (direction == JoyStickClass.STICK_DOWN) {
-                        mLeftDirectionTextView.setText("Direction : Down");
-                    } else if (direction == JoyStickClass.STICK_DOWNLEFT) {
-                        mLeftDirectionTextView.setText("Direction : Down Left");
-                    } else if (direction == JoyStickClass.STICK_LEFT) {
-                        mLeftDirectionTextView.setText("Direction : Left");
-                    } else if (direction == JoyStickClass.STICK_UPLEFT) {
-                        mLeftDirectionTextView.setText("Direction : Up Left");
-                    } else if (direction == JoyStickClass.STICK_NONE) {
-                        mLeftDirectionTextView.setText("Direction : Center");
-                    }
-                } else if (arg3.getAction() == MotionEvent.ACTION_UP) {
+            mAngleTextView.setText(String.format(getString(R.string.angle_with_value), mAnglePortrait));
+            mLeftSpeedTextView.setText(String.format(getString(R.string.distance_with_value), speedString));
 
-                    mAngleTextView.setText("Angle :");
-                    mLeftSpeedTextView.setText("Distance :");
-                    mLeftDirectionTextView.setText("Direction :");
-                }
+        } else if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
+            mAngleTextView.setText(R.string.angle);
+            mLeftSpeedTextView.setText(R.string.distance);
+        }
 
-                boolean megaPortrait = false;
-                vitesseP = Integer.toString((Math.round(intVitesseP / (float) 100 * (float) 127)));
-                intVitesseP = Math.round(intVitesseP / (float) 100 * (float) 127);
-                if (intVitesseP < 0) {
-                    megaPortrait = true;
-                } else if (intVitesseP == 0) {
-                    vitesseP = "0000";
-                }
-                if (megaPortrait) {
-
-                    if (vitesseP.length() == 2) {
-                        vitesseP = "-00" + Integer.toString(Math.abs(Math.round(intVitesseP)));
-                    }
-                    if (vitesseP.length() == 3) {
-                        vitesseP = "-0" + Integer.toString(Math.abs(Math.round(intVitesseP)));
-                        System.out.println("Are You Here My Brother Friend ?");
-                    }
-                } else {
-                    if (vitesseP.length() == 1) {
-                        vitesseP = "000" + vitesseP;
-                    } else if (vitesseP.length() == 2) {
-                        vitesseP = "00" + vitesseP;
-                    } else if (vitesseP.length() == 3) {
-                        vitesseP = "0" + vitesseP;
-                    }
-                }
-                try {
-                    Calendar cal = Calendar.getInstance();
-                    millisToString = String.valueOf(cal.getTimeInMillis());
-                    donneEnvoiJSONPortrait.put("mode", "2"); //mode 0 pour landscape
-                    donneEnvoiJSONPortrait.put("angle", anglePortrait); //vitesse moteur de gauche
-                    donneEnvoiJSONPortrait.put("vitesse", vitesseP); //vitesse moteur de gauche
-                    donneEnvoiJSONPortrait.put("temps", millisToString);
-                } catch (JSONException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-
-                donneJsonToString = donneEnvoiJSONPortrait.toString(); // convertie le JSON en string pour l'envoyer
-                if (client != null) {
-                    client.sendMessage(donneJsonToString);
-                }
-                return true;
-            }
-        });
+        speedString = RobotMoveHelper.motorSpeedCalcul(speed);
+        RobotMoveHelper.launchMotorsWithModeTwo(mClient, mAnglePortrait, speedString);
     }
 
     private void onClickConnexionButton() {
@@ -497,43 +270,45 @@ public class MainActivity extends AppCompatActivity implements Client.ClientList
         if (!mIsConnected) {
             initClient();
             Log.d("CONNEXION_BUTTON", "Je suis dans le bouton connexion");
-            AppuiConnexionPaysage = true;
+            mPressConnectionLandscape = true;
             try {
-                client.startClient();
+                mClient.startClient();
             } catch (IOException e) {
                 e.printStackTrace();
             }
 
-            if (!client.nullableSocket()) {
-                if (client.socketIsConnected()) {
+            if (!mClient.nullableSocket()) {
+                if (mClient.socketIsConnected()) {
                     mIsConnected = true;
-                    Toast.makeText(getApplicationContext(), "Connected", Toast.LENGTH_SHORT).show();
-                    connexionButton.setText("Disconnect");
-                    connexionButton.setBackgroundColor(0xfff00000);
+                    Toast.makeText(getApplicationContext(), R.string.connected, Toast.LENGTH_SHORT).show();
+                    mConnexionButton.setText(R.string.disconnection);
+                    mConnexionButton.setBackgroundColor(0xfff00000);
                 } else {
-                    Toast.makeText(getApplicationContext(), "Connection refused", Toast.LENGTH_SHORT).show();
-                    client = null;
+                    Toast.makeText(getApplicationContext(), R.string.connection_refused, Toast.LENGTH_SHORT).show();
+                    mClient = null;
                 }
+            } else {
+                Toast.makeText(getApplicationContext(), R.string.connection_refused, Toast.LENGTH_SHORT).show();
             }
         } else {
             Log.d("CONNEXION_BUTTON", "Je suis dans le bouton Deconnexion");
-            AppuiConnexionPaysage = true;
+            mPressConnectionLandscape = false;
 
             try {
-                deconexionJSON.put("connexion", "false"); //vitesse moteur de gauche
+                mDeconnectionJSON.put("connexion", "false"); //vitesse moteur de gauche
             } catch (JSONException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }
-            final String deconexionJSONtoString = deconexionJSON.toString(); // convertie le JSON en string pour l'envoyer
-            client.sendMessage(deconexionJSONtoString);
+            final String deconexionJSONtoString = mDeconnectionJSON.toString(); // convertie le JSON en string pour l'envoyer
+            mClient.sendMessage(deconexionJSONtoString);
             SystemClock.sleep(100);
-            client.stopClient();
-            //socketStream.stopServeur();
-            connexionButton.setText("Connexion");
-            connexionButton.setBackgroundColor(0xff00c700);
+            mClient.stopClient();
+            //mSocketStream.stopServeur();
+            mConnexionButton.setText(R.string.connection);
+            mConnexionButton.setBackgroundColor(0xff00c700);
             mIsConnected = false;
-            client = null;
+            mClient = null;
         }
     }
 }

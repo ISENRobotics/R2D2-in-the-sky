@@ -1,4 +1,34 @@
 <resources>
     <string name="app_name">Robot R2D2</string>
     <string name="title_activity_config">configActivity</string>
+    <string name="up_right_direction">Direction D: Up</string>
+    <string name="center_right_direction">Direction D: Center</string>
+    <string name="down_right_direction">Direction D: Down</string>
+    <string name="up_left_direction">Direction G: Up</string>
+    <string name="center_left_direction">Direction G: Center</string>
+    <string name="down_left_direction">Direction G: Down</string>
+    <string name="left_speed_with_value">Vitesse G: %s</string>
+    <string name="left_distance">Distance G:</string>
+    <string name="left_direction">Direction G:</string>
+    <string name="right_speed_with_value">Vitesse D: %s</string>
+    <string name="right_distance">Distance D:</string>
+    <string name="right_direction">Direction D:</string>
+    <string name="angle_with_value">Angle: %s</string>
+    <string name="distance_with_value">Distance: %s</string>
+    <string name="angle">Angle:</string>
+    <string name="distance">Distance:</string>
+    <string name="direction">Direction:</string>
+    <string name="connection">Connexion</string>
+    <string name="disconnection">Disconnexion</string>
+    <string name="up_direction">Direction: Up</string>
+    <string name="right_up_direction">Direction: Up Right</string>
+    <string name="direction_right">Direction: Right</string>
+    <string name="right_down_direction">Direction : Down Right</string>
+    <string name="direction_down">Direction: Down</string>
+    <string name="left_down_direction">Direction: Down Left</string>
+    <string name="direction_left">Direction: Left</string>
+    <string name="left_up_direction">Direction: Up Left</string>
+    <string name="center_direction">Direction: Center</string>
+    <string name="connection_refused">Connection refused</string>
+    <string name="connected">Connected</string>
 </resources>

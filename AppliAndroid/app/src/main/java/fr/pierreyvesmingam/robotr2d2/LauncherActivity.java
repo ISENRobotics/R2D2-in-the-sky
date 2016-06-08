@@ -13,9 +13,8 @@ public class LauncherActivity extends AppCompatActivity {
         setContentView(R.layout.activity_luncher);
     }
 
-    public void mainacti(View view){
+    public void launchRobotActivity(View view){
         Intent intent1 = new Intent(this, MainActivity.class);
         startActivity(intent1);
-
     }
 }

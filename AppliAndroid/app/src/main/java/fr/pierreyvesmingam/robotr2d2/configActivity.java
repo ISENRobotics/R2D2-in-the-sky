@@ -50,7 +50,6 @@ public class configActivity extends AppCompatActivity {
         response = (TextView) findViewById(R.id.responseTextView);
 
         buttonConnect.setOnClickListener(new View.OnClickListener() {
-
             @Override
             public void onClick(View arg0) {
               /*  Client myClient = new Client(editTextAddress.getText()
@@ -61,21 +60,14 @@ public class configActivity extends AppCompatActivity {
         });
     }
 
-
-    public Integer getValAccle()
-    {
-
-        return speed;
-    }
+    public Integer getValAccle() { return speed; }
 
     public void retour(View view){
-
         /*Intent i = new Intent(this, MainActivity.class);
         String speedString = Integer.toString(this.speed);
         i.putExtra("speed", speedString);
         System.out.println("Dans la fonction retour" + Integer.toString(this.speed));
         startActivity(i);*/
         finish();
-
     }
 }

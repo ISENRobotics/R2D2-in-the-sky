@@ -34,7 +34,7 @@
         android:layout_height="wrap_content"
         android:text="Connexion"
         android:id="@+id/connexionButton"
-        android:layout_above="@+id/layoutPortraitJoystick"
+        android:layout_above="@+id/portraitJoystickLayout"
         android:layout_centerHorizontal="true"
         android:background="#2ecc71" />
 
@@ -60,7 +60,7 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="ARRET d&apos;urgence"
+        android:text="ARRET d'urgence"
         android:id="@+id/breakButton"
         android:background="#e74c3c"
         android:layout_marginBottom="40dp"
@@ -87,25 +87,13 @@
 
     </LinearLayout>
     <RelativeLayout
-        android:id="@+id/layoutPortraitJoystick"
+        android:id="@id/portraitJoystickLayout"
         android:layout_width="200dp"
         android:layout_height="200dp"
         android:background="@drawable/jaune"
         android:layout_above="@+id/angleTextView"
         android:layout_centerHorizontal="true">
-
-        <RelativeLayout
-            android:id="@id/layoutPortraitJoystick"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:background="@drawable/rouge"
-            android:layout_centerVertical="true"
-            android:layout_centerHorizontal="true">
-        </RelativeLayout>
     </RelativeLayout>
-
-
-
 
     <LinearLayout
         android:layout_width="wrap_content"

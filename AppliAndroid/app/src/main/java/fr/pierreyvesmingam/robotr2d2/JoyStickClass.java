@@ -62,7 +62,6 @@ public class JoyStickClass {
         distance = (float) Math.sqrt(Math.pow(position_x, 2) + Math.pow(position_y, 2));
         angle = (float) cal_angle(position_x, position_y);
 
-
         if(arg1.getAction() == MotionEvent.ACTION_DOWN) {
             if(distance <= (params.width / 2) - OFFSET) {
                 draw.position(arg1.getX(), arg1.getY());
@@ -280,7 +279,9 @@ public class JoyStickClass {
     private void draw() {
         try {
             mLayout.removeView(draw);
-        } catch (Exception e) { }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         mLayout.addView(draw);
     }
 
