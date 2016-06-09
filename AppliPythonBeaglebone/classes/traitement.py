@@ -33,6 +33,7 @@ class Traitement(threading.Thread):
 	def run(self):
 		#On envoie un message d'arrêt aux moteurs pour être sur
 		self.serie.input.appendleft((0,128,128,2))
+		self.previous_angle = 0
 		try:
 			while not self.stoprequest.isSet():
 				try:
@@ -118,11 +119,36 @@ class Traitement(threading.Thread):
 								#if(vitesse != default):
 								#	vitesse += 128
 								#On vérifie que la vitesse et l'angle ainsi récupérés sont conformes aux spécifications
-								result_vitesse = self.verif_commande_SETSPEED(vitesse)
-								turn = self.conversion_TURN_MODE_2(turn)
+								rotation_speed = (turn - self.previous_angle)/360 * 127
+								self.previous_angle = turn
+								speed_wheel1 = vitesse - rotation_speed/2
+								speed_wheel2 = vitesse + rotation_speed/2
+								if (speed_wheel1 > 127):
+									speed_wheel2 = speed_wheel2 - (speed_wheel1 - 127)
+									speed_wheel1 = 127
+								elif (speed_wheel1 < -128):
+									speed_wheel2 = speed_wheel2 + (speed_wheel1 + 128)
+									speed_wheel1 = -128
+								elif (speed_wheel2 > 127):
+									speed_wheel1 = speed_wheel1 - (speed_wheel2 - 127)
+									speed_wheel2 = 127
+								elif (speed_wheel2 < -128):
+									speed_wheel1 = speed_wheel1 + (speed_wheel2 + 128)
+									speed_wheel2 = -128
+	
+								vitesse_gauche = self.verif_commande_SETSPEED(speed_wheel1)
+								vitesse_droite = self.verif_commande_SETSPEED(speed_wheel2)
+								#result_vitesse = self.verif_commande_SETSPEED(vitesse)
+								#turn = self.conversion_TURN_MODE_2(turn)
 								#Si tout va bien, on envoie sur la liaison série
-								if(result_vitesse):
-									self.serie.input.appendleft((3,vitesse,int(turn),2))
+								#if(result_vitesse):
+								#	self.serie.input.appendleft((3,vitesse,int(turn),2))
+								if(vitesse_gauche && vitesse_droite):
+									if(sens_des_moteurs_moteur_1_a_gauche_moteur_2_a_droite):
+										self.serie.input.appendleft((1,vitesse_gauche,vitesse_droite,2))
+									else:
+										self.serie.input.appendleft((1,vitesse_droite,vitesse_gauche,2))
+
 							else:
 								#Mode paysage
 								#on commence par assigner une valeur par défaut médiane
