@@ -3,7 +3,6 @@ package fr.pierreyvesmingam.robotr2d2;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -16,10 +15,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.io.IOException;
 
 import fr.pierreyvesmingam.robotr2d2.helper.RobotMoveHelper;
 
@@ -38,7 +34,7 @@ public class MainActivity extends AppCompatActivity implements Client.ClientList
     */
     private final JSONObject mDeconnectionJSON = new JSONObject();
 
-    private String mVitesseG, mVitesseD, mAnglePortrait, mMillisToString, mDonneJsonToString, mTempsmm, mVitessePortrait, mValAccel;
+    private String mVitesseG, mVitesseD, mTempsmm, mValAccel;
     private boolean mIsConnected, mIsFirstRightJoystickInit, mIsFirstLeftJoystickInit, mListenerOrNot1, mPressConnectionPortrait, mPressConnectionLandscape;
     private Serveur mSocketStream, mServeur;
     private Client mClient;
@@ -48,7 +44,7 @@ public class MainActivity extends AppCompatActivity implements Client.ClientList
     * UI PROPERTIES
     * ************************************************************************
     */
-    private RelativeLayout mLayoutPortraitJoystick, mRightLandscapeJoystickLayout, mLeftLandscapeJoystickLayout, mRootView;
+    private RelativeLayout mPortraitJoystickLayout, mRightLandscapeJoystickLayout, mLeftLandscapeJoystickLayout, mRootView;
     private ImageView mImageJoystick, mImageBorder;
     private TextView mAngleTextView, mLeftSpeedTextView, mProblemTextView, mRightSpeedTextView, mSpeedTextView, mBbatteryState;
     private Button mConnexionButton, mBreakButton;
@@ -66,6 +62,12 @@ public class MainActivity extends AppCompatActivity implements Client.ClientList
         setContentView(R.layout.activity_main);
         initData();
         initUI();
+    }
+
+    @Override
+    protected void onPause() {
+        //RobotMoveHelper.robotDeconnection(mClient);
+        super.onPause();
     }
 
     //retour du thread serveur ici
@@ -158,12 +160,6 @@ public class MainActivity extends AppCompatActivity implements Client.ClientList
         }
     }
 
-    private void initClient() {
-        if (mClient == null) {
-            mClient = new Client();
-            mClient.addClientListener(this);
-        }
-    }
 
     private void findAndInitViews() {
         mAngleTextView = (TextView) findViewById(R.id.angleTextView);
@@ -171,7 +167,7 @@ public class MainActivity extends AppCompatActivity implements Client.ClientList
         mRightSpeedTextView = (TextView) findViewById(R.id.rightSpeedTextView);
         mProblemTextView = (TextView) findViewById(R.id.problemTextView);
         mRootView = (RelativeLayout) findViewById(R.id.rootView);
-        mLayoutPortraitJoystick = (RelativeLayout) findViewById(R.id.portraitJoystickLayout);
+        mPortraitJoystickLayout = (RelativeLayout) findViewById(R.id.portraitJoystickLayout);
         mRightLandscapeJoystickLayout = (RelativeLayout) findViewById(R.id.rightLandscapeJoystickLayout);
         mLeftLandscapeJoystickLayout = (RelativeLayout) findViewById(R.id.leftLandscapeJoystickLayout);
 
@@ -213,6 +209,7 @@ public class MainActivity extends AppCompatActivity implements Client.ClientList
     private void onTouchLeftLandscapeJoystick(@NonNull final MotionEvent motionEvent) {
         mLeftLandscapeJoystick.drawStick(motionEvent);
         int speed = Math.round(mLeftLandscapeJoystick.getDistance());
+
         mVitesseG = RobotMoveHelper.motorSpeedCalcul(speed);
         mLeftSpeedTextView.setText(String.format(getString(R.string.left_speed_with_value), mVitesseG));
         RobotMoveHelper.launchMotorsWithModeZero(mClient, mVitesseD, mVitesseG);
@@ -221,6 +218,7 @@ public class MainActivity extends AppCompatActivity implements Client.ClientList
     private void onTouchRightLanscapeJoystick(@NonNull final MotionEvent motionEvent) {
         mRightLandscapeJoystick.drawStick(motionEvent);
         int speed = Math.round(mRightLandscapeJoystick.getDistance());
+
         mVitesseD = RobotMoveHelper.motorSpeedCalcul(speed);
         mRightSpeedTextView.setText(String.format(getString(R.string.right_speed_with_value), mVitesseD));
         RobotMoveHelper.launchMotorsWithModeZero(mClient, mVitesseD, mVitesseG);
@@ -229,7 +227,7 @@ public class MainActivity extends AppCompatActivity implements Client.ClientList
     private void initUIForPortrait() {
         //portrait
         //joystick principale en mode portrait
-        mProtraitJoystick = new JoyStickClass(this, mLayoutPortraitJoystick, R.drawable.rouge);
+        mProtraitJoystick = new JoyStickClass(this, mPortraitJoystickLayout, R.drawable.rouge);
         mProtraitJoystick.setStickSize(150, 150);
         mProtraitJoystick.setLayoutSize(500, 500);
         mProtraitJoystick.setLayoutAlpha(150);
@@ -237,45 +235,27 @@ public class MainActivity extends AppCompatActivity implements Client.ClientList
         mProtraitJoystick.setOffset(90);
         mProtraitJoystick.setMinimumDistance(50);
 
-        mLayoutPortraitJoystick.setOnTouchListener(this);
+        mPortraitJoystickLayout.setOnTouchListener(this);
     }
 
     private void onTouchPortraitJoystick(@NonNull final MotionEvent motionEvent) {
         //mPressConnectionPortrait = true;
-        String speedString;
-        int speed = 0;
         mProtraitJoystick.drawStick(motionEvent);
-        if (motionEvent.getAction() == MotionEvent.ACTION_DOWN
-                || motionEvent.getAction() == MotionEvent.ACTION_MOVE) {
+        final int angle = Math.round(mProtraitJoystick.getAngle());
+        final String angleString = String.valueOf(angle);
 
-            final int angle = Math.round(mProtraitJoystick.getAngle());
-            mAnglePortrait = String.valueOf(angle);
-            speedString = String.valueOf(Math.round(mProtraitJoystick.getDistance()));
-            speed = Math.round(mProtraitJoystick.getDistance());
+        final int speed = Math.round(mProtraitJoystick.getDistance());
+        final String speedString = RobotMoveHelper.motorSpeedCalcul(speed);
 
-            mAngleTextView.setText(String.format(getString(R.string.angle_with_value), mAnglePortrait));
-            mLeftSpeedTextView.setText(String.format(getString(R.string.distance_with_value), speedString));
-
-        } else if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
-            mAngleTextView.setText(R.string.angle);
-            mLeftSpeedTextView.setText(R.string.distance);
-        }
-
-        speedString = RobotMoveHelper.motorSpeedCalcul(speed);
-        RobotMoveHelper.launchMotorsWithModeTwo(mClient, mAnglePortrait, speedString);
+        mAngleTextView.setText(String.format(getString(R.string.angle_with_value), angleString));
+        mLeftSpeedTextView.setText(String.format(getString(R.string.distance_with_value), speedString));
+        RobotMoveHelper.launchMotorsWithModeTwo(mClient, angleString, speedString);
     }
 
     private void onClickConnexionButton() {
         // Perform action on click
         if (!mIsConnected) {
-            initClient();
-            Log.d("CONNEXION_BUTTON", "Je suis dans le bouton connexion");
-            mPressConnectionLandscape = true;
-            try {
-                mClient.startClient();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            mClient = RobotMoveHelper.robotConnection(mClient, this);
 
             if (!mClient.nullableSocket()) {
                 if (mClient.socketIsConnected()) {
@@ -291,19 +271,7 @@ public class MainActivity extends AppCompatActivity implements Client.ClientList
                 Toast.makeText(getApplicationContext(), R.string.connection_refused, Toast.LENGTH_SHORT).show();
             }
         } else {
-            Log.d("CONNEXION_BUTTON", "Je suis dans le bouton Deconnexion");
-            mPressConnectionLandscape = false;
-
-            try {
-                mDeconnectionJSON.put("connexion", "false"); //vitesse moteur de gauche
-            } catch (JSONException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-            final String deconexionJSONtoString = mDeconnectionJSON.toString(); // convertie le JSON en string pour l'envoyer
-            mClient.sendMessage(deconexionJSONtoString);
-            SystemClock.sleep(100);
-            mClient.stopClient();
+            RobotMoveHelper.robotDeconnection(mClient);
             //mSocketStream.stopServeur();
             mConnexionButton.setText(R.string.connection);
             mConnexionButton.setBackgroundColor(0xff00c700);

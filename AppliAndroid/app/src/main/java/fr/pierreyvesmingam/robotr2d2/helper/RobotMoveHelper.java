@@ -1,15 +1,19 @@
 package fr.pierreyvesmingam.robotr2d2.helper;
 
+import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.io.IOException;
 import java.util.Calendar;
+
 import fr.pierreyvesmingam.robotr2d2.Client;
 
 /**
  * Created by steven_watremez on 08/06/16.
- *
  */
 public class RobotMoveHelper {
     /*
@@ -43,7 +47,7 @@ public class RobotMoveHelper {
 
     /**
      * mode 0 to move the robot with left and right speed for wheels
-     * */
+     */
     public static void launchMotorsWithModeZero(@Nullable final Client client, @NonNull final String rightSpeed, @NonNull final String leftSpeed) {
 
         final JSONObject emissionJSON = new JSONObject();
@@ -145,10 +149,36 @@ public class RobotMoveHelper {
         return speedString;
     }
 
-    /*
-    * ************************************************************************
-    * PRIVATE STATIC METHODS
-    * ************************************************************************
-    */
+
+    public static Client robotConnection(@Nullable Client client, @NonNull final Client.ClientListener listener) {
+        if (client == null) {
+            client = new Client();
+            client.addClientListener(listener);
+        }
+
+        try {
+            client.startClient();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return client;
+    }
+
+    public static void robotDeconnection(@NonNull final Client client) {
+
+        final JSONObject deconnectionJSON = new JSONObject();
+        try {
+            deconnectionJSON.put("connexion", "false"); //vitesse moteur de gauche
+        } catch (JSONException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        final String deconnectionJSONtoString = deconnectionJSON.toString(); // convertie le JSON en string pour l'envoyer
+        client.sendMessage(deconnectionJSONtoString);
+        SystemClock.sleep(100);
+        client.stopClient();
+    }
+
 
 }

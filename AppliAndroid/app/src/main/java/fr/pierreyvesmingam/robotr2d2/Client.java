@@ -43,7 +43,7 @@ public class Client extends Thread {
     private Reception r;
     public Emission e;
 
-    Client() {
+    public Client() {
         stop = new AtomicBoolean(false);
         JSONNul = new JSONObject();
         stringNulQuandPasEnvoi = "";

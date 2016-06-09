@@ -8,6 +8,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -113,21 +114,26 @@ public class JoyStickClass {
 
     public float getAngle() {
         if(distance > min_distance && touch_state) {
-            return angle;
+            // FIXME:: because it is so hard to code like this
+            final float monAngle = Math.round(angle - 270);
+            if (monAngle < 0) {
+                return 360 + monAngle;
+            }
+            return monAngle;
         }
         return 0;
     }
 
     public float getDistance() {
         if(distance > min_distance && touch_state) {
-            System.out.println("Postion_Y : " + position_y);
+            Log.d("JOYSTICK_Y_POSITION","Postion_Y : " + position_y);
             if (position_y < 0)
             {
                 if (distance > 500) {
                     return 100;
                 }
                 if (distance > 0) {
-                    System.out.println("dans le positif");
+                    Log.d("JOYSTICK_DISTANCE","dans le positif");
                     distance = (distance /(float) 500) * (float)100;
                     return distance;
                 }
@@ -140,7 +146,7 @@ public class JoyStickClass {
                     }
                     if (distance>0)
                     {
-                        System.out.println("dans le negatif");
+                        Log.d("JOYSTICK_DISTANCE","dans le negatif");
                     distance = (distance/(float) 500) * (float)100;
                     return  -distance;
                     }
