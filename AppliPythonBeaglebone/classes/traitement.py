@@ -5,6 +5,7 @@ import time
 import datetime
 import os
 import sys
+import logging
 sys.path.insert(0, '/root/R2D2/classes/sous-classes')
 
 import serveur
@@ -29,11 +30,25 @@ class Traitement(threading.Thread):
 		self.serie   = controleur.surveillance_serie.serie;
 		self.stoprequest = stopevent
 		self.heure_mise_a_jour = False
+		self.logger = logging.getLogger('R2D2_traitement')
+		self.logger.setLevel(logging.DEBUG)
+		self.formatter = logging.Formatter('%(asctime)s : %(message)s')
+		self.fileHandler = logging.FileHandler('/var/log/R2D2_traitement', mode='w')
+		self.fileHandler.setFormatter(self.formatter)
+		self.streamHandler = logging.StreamHandler(self.formatter)
+		self.streamHandler.setFormatter(self.formatter)
+		self.streamHandler.setLevel(logging.ERROR)
+		self.logger.addHandler(self.fileHandler)
+		self.logger.addHandler(self.streamHandler)
+		self.logger.debug("Démarrage thread traitement")
+		self.logger.debug("Thread traitement démarré")
 
 	def run(self):
 		#On envoie un message d'arrêt aux moteurs pour être sur
 		self.serie.input.appendleft((0,128,128,2))
 		self.previous_angle = 0
+		self.previous_speed = 0
+		self.direction = True
 		try:
 			while not self.stoprequest.isSet():
 				try:
@@ -66,7 +81,7 @@ class Traitement(threading.Thread):
 		#Bridage moteur, afin de diminuer la vitesse maximale
 		bridage = True
 		#Par combien la vitesse sera divisée
-		taux_de_bridage = 1.5
+		taux_de_bridage = 1 
 		try:
 			#On essaie de décoder le JSON recu
 			msg_recu_json = json.loads(trame)
@@ -99,9 +114,11 @@ class Traitement(threading.Thread):
 							#Si on est en mode 8, le smartphone est au repos, on envoie des trames d'arrêt aux moteurs pour immobiliser le robot
 							if(self.MODE == 8):
 								self.serie.input.appendleft((0,128,128,2))
+								#self.previous_angle=0
 							elif (self.MODE == 2):
 								#mode portrait, la valeur médiane des vitesses vaut 0
 								default = 0
+								rotation_speed = 0
 								#On assigne les informations recues aux variables vitesse et turn
 								#Si des bouts de message manquent, comme la vitesse, on leur assigne la valeur médiane
 								if(('vitesse' in msg_recu_json) & ('angle' in msg_recu_json)):
@@ -116,38 +133,64 @@ class Traitement(threading.Thread):
 								else:
 									#Si on n'a pas recu assez d'informations, on le fait remonter au smartphone
 									self.serveur.input.appendleft("La vitesse et l'angle n'ont pas été recues, les instructions n'ont pas été exécutées")
-								#if(vitesse != default):
-								#	vitesse += 128
-								#On vérifie que la vitesse et l'angle ainsi récupérés sont conformes aux spécifications
-								rotation_speed = (turn - self.previous_angle)/360 * 127
-								self.previous_angle = turn
-								speed_wheel1 = vitesse - rotation_speed/2
-								speed_wheel2 = vitesse + rotation_speed/2
-								if (speed_wheel1 > 127):
-									speed_wheel2 = speed_wheel2 - (speed_wheel1 - 127)
-									speed_wheel1 = 127
-								elif (speed_wheel1 < -128):
-									speed_wheel2 = speed_wheel2 + (speed_wheel1 + 128)
-									speed_wheel1 = -128
-								elif (speed_wheel2 > 127):
-									speed_wheel1 = speed_wheel1 - (speed_wheel2 - 127)
-									speed_wheel2 = 127
-								elif (speed_wheel2 < -128):
-									speed_wheel1 = speed_wheel1 + (speed_wheel2 + 128)
-									speed_wheel2 = -128
+								
+								if(self.previous_speed == 0):
+									self.logger.debug("YOUHOUHOUHOUOHOUOHOU")
+								if(vitesse < 0):
+									self.logger.debug("BLAAAAAAAAAA")
+								if ((self.previous_speed == 0) & (vitesse < 0)):
+									self.direction = False
+								elif ((self.previous_speed == 0) & (vitesse > 0)):
+									self.direction = True
+								#self.logger.debug("Inversion moteur : " + str(self.direction)+" previous vitesse : " +str(self.previous_speed)+ " vitesse : " +str(vitesse))
+												
+								self.previous_speed = vitesse
+								#self.logger.debug("vitesse : " + str(vitesse))
+								if(bridage):
+									vitesse= (int)((float)(vitesse)/taux_de_bridage)
+								if((self.direction & (vitesse < 0)) | ((not(self.direction)) & (vitesse > 0))):
+									vitesse *= -1
+
+								if(inversion_vitesse_moteur):
+									vitesse *= -1
+								if(not(self.direction) & (vitesse > 0)):
+									self.logger.debug(" Backward")
+								
+
+                                                               	#self.logger.debug("vitesse : "+str(vitesse))	
+								if (turn != self.previous_angle):
+									rotation_speed = self.conversion_TURN_MODE_2((turn - self.previous_angle))
+									#self.previous_angle = turn
+
+								speed_wheel1 = int(vitesse - rotation_speed/2)
+								speed_wheel2 = int(vitesse + rotation_speed/2)
+														
+								#Si les valeurs transmises sont inversées par rapport à la réalité, on les réajustent
+								
+								if(speed_wheel1!= default):
+									speed_wheel1 += 128
+								if(speed_wheel2 != default):
+									speed_wheel2 += 128
+								if (speed_wheel1 > 255):
+									speed_wheel2 = speed_wheel2 - (speed_wheel1 - 255)
+									speed_wheel1 = 255							
+								elif (speed_wheel1 < 0):
+									speed_wheel2 = speed_wheel2 + (speed_wheel1)
+									speed_wheel1 = 0
+								if (speed_wheel2 > 255):
+									speed_wheel1 = speed_wheel1 - (speed_wheel2 - 255)
+									speed_wheel2 = 255
+								elif (speed_wheel2 < 0):
+									speed_wheel1 = speed_wheel1 + (speed_wheel2)
+									speed_wheel2 = 0
+		
 	
-								vitesse_gauche = self.verif_commande_SETSPEED(speed_wheel1)
-								vitesse_droite = self.verif_commande_SETSPEED(speed_wheel2)
-								#result_vitesse = self.verif_commande_SETSPEED(vitesse)
-								#turn = self.conversion_TURN_MODE_2(turn)
-								#Si tout va bien, on envoie sur la liaison série
-								#if(result_vitesse):
-								#	self.serie.input.appendleft((3,vitesse,int(turn),2))
-								if(vitesse_gauche && vitesse_droite):
-									if(sens_des_moteurs_moteur_1_a_gauche_moteur_2_a_droite):
-										self.serie.input.appendleft((1,vitesse_gauche,vitesse_droite,2))
-									else:
-										self.serie.input.appendleft((1,vitesse_droite,vitesse_gauche,2))
+								self.logger.debug("vitesse globale : "+str(vitesse)+"vitesse gauche : "+ str(speed_wheel1) + ", vitesse_droite : " + str(speed_wheel2)+ ", Angle voulue : " + str(turn)+ ", ancien angle : " + str(self.previous_angle)+ ", vitesse de rotation : " + str(rotation_speed))
+								self.previous_angle = turn
+								if (sens_des_moteurs_moteur_1_a_gauche_moteur_2_a_droite):
+									self.serie.input.appendleft((0,speed_wheel1,speed_wheel2,2))
+								else:
+									self.serie.input.appendleft((0,speed_wheel2,speed_wheel1,2))
 
 							else:
 								#Mode paysage
@@ -232,14 +275,20 @@ class Traitement(threading.Thread):
 	#
 	#On a ici divisé par deux tous les résultats finaux afin d'obtenir un adoucissement des virages et variations
 	def conversion_TURN_MODE_2(self,turn_value):
-		if(turn_value <=90.0):
-			return int((127-(turn_value/90.0)*127.0)/2.0)
-		elif((turn_value>90.0) & (turn_value<=180.0)):
-			return int((((turn_value/90.0)-1)*(-127))/2.0)
-		elif((turn_value>180.0) & (turn_value<=270.0)):
-			return int((127.0 - ((turn_value/90.0)-2)*127.0)/2.0)
+		#if(turn_value <=90.0):
+		#	return int((127-(turn_value/90.0)*127.0)/2.0)
+		#elif((turn_value>90.0) & (turn_value<=180.0)):
+		#	return int((((turn_value/90.0)-1)*(-127))/2.0)
+		#elif((turn_value>180.0) & (turn_value<=270.0)):
+		#	return int((127.0 - ((turn_value/90.0)-2)*127.0)/2.0)
+		#else:
+		#	return int((((turn_value/90.0)-3)*(-127))/2.0)	
+		if (turn_value > 90):
+			return int((turn_value - 180)/90.0*127)
+		elif (turn_value < -90):
+			return int((turn_value + 180)/90.0*127)
 		else:
-			return int((((turn_value/90.0)-3)*(-127))/2.0)
-
+			return int(turn_value/90*127) 
+		
 	def stop(self):
 		self.stoprequest.set()
