@@ -57,7 +57,7 @@ public class Client extends Thread {
     // Permet le lancement du thread Client qui lui lance la connexion et le thread emission et reception
     //
     //
-    public void startClient() throws IOException {
+    public void startClient() {
         //initialise ton socket
         if (this.getState() == Thread.State.NEW) {
             this.start();
@@ -142,7 +142,6 @@ public class Client extends Thread {
             } catch (IOException e1) {
                 e1.printStackTrace();
             }
-
         }
 
         public void run() {
@@ -204,7 +203,7 @@ public class Client extends Thread {
                     if (!envoieMessage.isEmpty()) {
                         System.out.println("Je suis dans une magnifique boucle");
                         dos.writeUTF(envoieMessage);
-                        envoieMessage = "";
+                        envoieMessage = envoieMessage;
 
                     } else if (envoieMessage.isEmpty()) {
                         Calendar cal = Calendar.getInstance();

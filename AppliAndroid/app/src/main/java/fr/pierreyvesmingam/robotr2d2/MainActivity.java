@@ -1,5 +1,6 @@
 package fr.pierreyvesmingam.robotr2d2;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -13,11 +14,15 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import org.json.JSONObject;
+import com.afollestad.materialdialogs.DialogAction;
+import com.afollestad.materialdialogs.MaterialDialog;
+
+import java.net.ServerSocket;
+import java.net.Socket;
 
 import fr.pierreyvesmingam.robotr2d2.helper.RobotMoveHelper;
+import rx.subscriptions.CompositeSubscription;
 
 public class MainActivity extends AppCompatActivity implements Client.ClientListener, Serveur.ServerListener, View.OnClickListener, OnTouchListener {
 
@@ -32,12 +37,12 @@ public class MainActivity extends AppCompatActivity implements Client.ClientList
     * DATA PROPERTIES
     * ************************************************************************
     */
-    private final JSONObject mDeconnectionJSON = new JSONObject();
-
-    private String mVitesseG, mVitesseD, mTempsmm, mValAccel;
-    private boolean mIsConnected, mIsFirstRightJoystickInit, mIsFirstLeftJoystickInit, mListenerOrNot1, mPressConnectionPortrait, mPressConnectionLandscape;
-    private Serveur mSocketStream, mServeur;
+    private String mVitesseG, mVitesseD, mValAccel;
+    private Serveur mServer;
     private Client mClient;
+    private Socket mSocket;
+    private ServerSocket mServerSocket;
+    private CompositeSubscription mCompositeSubscription;
 
     /*
     * ************************************************************************
@@ -49,7 +54,17 @@ public class MainActivity extends AppCompatActivity implements Client.ClientList
     private TextView mAngleTextView, mLeftSpeedTextView, mProblemTextView, mRightSpeedTextView, mSpeedTextView, mBbatteryState;
     private Button mConnexionButton, mBreakButton;
 
-    private JoyStickClass mProtraitJoystick, mRightLandscapeJoystick, mLeftLandscapeJoystick;
+    private JoyStickClass mPortraitJoystick, mRightLandscapeJoystick, mLeftLandscapeJoystick;
+
+    /*
+    * ************************************************************************
+    * STARTER METHOD
+    * ************************************************************************
+    */
+    public static void start(Context context) {
+        Intent starter = new Intent(context, MainActivity.class);
+        context.startActivity(starter);
+    }
 
     /*
     * ************************************************************************
@@ -66,7 +81,7 @@ public class MainActivity extends AppCompatActivity implements Client.ClientList
 
     @Override
     protected void onPause() {
-        //RobotMoveHelper.robotDeconnection(mClient);
+        stopClientAndServeur();
         super.onPause();
     }
 
@@ -130,13 +145,11 @@ public class MainActivity extends AppCompatActivity implements Client.ClientList
     }
 
     public void startHelpActivity(View view) {
-        Intent intent = new Intent(this, AideActivity.class);
-        startActivity(intent);
+        AideActivity.start(this);
     }
 
     public void startConfigActivity(View view) {
-        Intent intent = new Intent(this, configActivity.class);
-        startActivity(intent);
+        configActivity.start(this);
     }
 
     /*
@@ -146,11 +159,40 @@ public class MainActivity extends AppCompatActivity implements Client.ClientList
     */
     private void initData() {
         findAndInitViews();
+        startClientAndServeur();
         MainActivity.IS_LANDSCAPE = getResources().getBoolean(R.bool.isLandscape);
+    }
+
+    private void startClientAndServeur() {
+        mClient = RobotMoveHelper.robotConnection(mClient, MainActivity.this);
+        mServer = new Serveur();
+        mServer.startServeur();
+        mServer.addServeurListener(MainActivity.this);
+    }
+
+    private void showErrorDialog() {
+        new MaterialDialog.Builder(this)
+                .title(R.string.connection_error_title)
+                .content(R.string.connection_error_content)
+                .neutralText(R.string.connection_error_button)
+                .onNeutral(new MaterialDialog.SingleButtonCallback() {
+                    @Override
+                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                        finish();
+                    }
+                })
+                .show();
+    }
+
+    private void stopClientAndServeur() {
+        if (mClient != null) {
+            RobotMoveHelper.robotDeconnection(mClient, getApplicationContext());
+        }
     }
 
     private void initUI() {
         //boolean mega = false; // FIXME:: this variable is never used
+        mConnexionButton.setText(R.string.disconnection);
         mBreakButton.setOnClickListener(this);
         mConnexionButton.setOnClickListener(this);
         if (MainActivity.IS_LANDSCAPE) {
@@ -159,7 +201,6 @@ public class MainActivity extends AppCompatActivity implements Client.ClientList
             initUIForPortrait();
         }
     }
-
 
     private void findAndInitViews() {
         mAngleTextView = (TextView) findViewById(R.id.angleTextView);
@@ -212,7 +253,11 @@ public class MainActivity extends AppCompatActivity implements Client.ClientList
 
         mVitesseG = RobotMoveHelper.motorSpeedCalcul(speed);
         mLeftSpeedTextView.setText(String.format(getString(R.string.left_speed_with_value), mVitesseG));
-        RobotMoveHelper.launchMotorsWithModeZero(mClient, mVitesseD, mVitesseG);
+        if (motionEvent.getAction() == motionEvent.ACTION_UP) {
+            RobotMoveHelper.stopMotors(mClient);
+        } else {
+            RobotMoveHelper.launchMotorsWithModeZero(mClient, mVitesseD, mVitesseG);
+        }
     }
 
     private void onTouchRightLanscapeJoystick(@NonNull final MotionEvent motionEvent) {
@@ -221,62 +266,44 @@ public class MainActivity extends AppCompatActivity implements Client.ClientList
 
         mVitesseD = RobotMoveHelper.motorSpeedCalcul(speed);
         mRightSpeedTextView.setText(String.format(getString(R.string.right_speed_with_value), mVitesseD));
-        RobotMoveHelper.launchMotorsWithModeZero(mClient, mVitesseD, mVitesseG);
+        if (motionEvent.getAction() == motionEvent.ACTION_UP) {
+            RobotMoveHelper.stopMotors(mClient);
+        } else {
+            RobotMoveHelper.launchMotorsWithModeZero(mClient, mVitesseD, mVitesseG);
+        }
     }
 
     private void initUIForPortrait() {
         //portrait
         //joystick principale en mode portrait
-        mProtraitJoystick = new JoyStickClass(this, mPortraitJoystickLayout, R.drawable.rouge);
-        mProtraitJoystick.setStickSize(150, 150);
-        mProtraitJoystick.setLayoutSize(500, 500);
-        mProtraitJoystick.setLayoutAlpha(150);
-        mProtraitJoystick.setStickAlpha(100);
-        mProtraitJoystick.setOffset(90);
-        mProtraitJoystick.setMinimumDistance(50);
+        mPortraitJoystick = new JoyStickClass(this, mPortraitJoystickLayout, R.drawable.rouge);
+        mPortraitJoystick.setStickSize(150, 150);
+        //mPortraitJoystick.setStickAlpha(50);
+        mPortraitJoystick.setOffset(130);
+        mPortraitJoystick.setMinimumDistance(50);
 
         mPortraitJoystickLayout.setOnTouchListener(this);
     }
 
     private void onTouchPortraitJoystick(@NonNull final MotionEvent motionEvent) {
-        //mPressConnectionPortrait = true;
-        mProtraitJoystick.drawStick(motionEvent);
-        final int angle = Math.round(mProtraitJoystick.getAngle());
+
+        mPortraitJoystick.drawStick(motionEvent);
+        final int angle = Math.round(mPortraitJoystick.getAngle());
         final String angleString = String.valueOf(angle);
 
-        final int speed = Math.round(mProtraitJoystick.getDistance());
+        final int speed = Math.round(mPortraitJoystick.getDistance());
         final String speedString = RobotMoveHelper.motorSpeedCalcul(speed);
 
         mAngleTextView.setText(String.format(getString(R.string.angle_with_value), angleString));
         mLeftSpeedTextView.setText(String.format(getString(R.string.distance_with_value), speedString));
-        RobotMoveHelper.launchMotorsWithModeTwo(mClient, angleString, speedString);
+        if (motionEvent.getAction() == motionEvent.ACTION_UP) {
+            RobotMoveHelper.stopMotors(mClient);
+        } else {
+            RobotMoveHelper.launchMotorsWithModeTwo(mClient, angleString, speedString);
+        }
     }
 
     private void onClickConnexionButton() {
-        // Perform action on click
-        if (!mIsConnected) {
-            mClient = RobotMoveHelper.robotConnection(mClient, this);
-
-            if (!mClient.nullableSocket()) {
-                if (mClient.socketIsConnected()) {
-                    mIsConnected = true;
-                    Toast.makeText(getApplicationContext(), R.string.connected, Toast.LENGTH_SHORT).show();
-                    mConnexionButton.setText(R.string.disconnection);
-                    mConnexionButton.setBackgroundColor(0xfff00000);
-                } else {
-                    Toast.makeText(getApplicationContext(), R.string.connection_refused, Toast.LENGTH_SHORT).show();
-                    mClient = null;
-                }
-            } else {
-                Toast.makeText(getApplicationContext(), R.string.connection_refused, Toast.LENGTH_SHORT).show();
-            }
-        } else {
-            RobotMoveHelper.robotDeconnection(mClient);
-            //mSocketStream.stopServeur();
-            mConnexionButton.setText(R.string.connection);
-            mConnexionButton.setBackgroundColor(0xff00c700);
-            mIsConnected = false;
-            mClient = null;
-        }
+        finish();
     }
 }

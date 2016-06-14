@@ -19,10 +19,10 @@ public class Serveur extends Thread {
     private String envoiVideo;
     private ServerListener serveurListener;
 
-    Serveur() throws IOException {
+    Serveur() {
     }
 
-    public void startServeur() throws IOException {
+    public void startServeur() {
         //initialise ton socket
         this.start();
     }
