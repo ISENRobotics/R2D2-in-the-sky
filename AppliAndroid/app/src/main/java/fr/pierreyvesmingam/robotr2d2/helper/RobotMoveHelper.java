@@ -4,16 +4,13 @@ import android.content.Context;
 import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.widget.Toast;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.net.Socket;
 import java.util.Calendar;
 
 import fr.pierreyvesmingam.robotr2d2.Client;
-import fr.pierreyvesmingam.robotr2d2.R;
 
 /**
  * Created by steven_watremez on 08/06/16.
@@ -97,7 +94,6 @@ public class RobotMoveHelper {
         }
     }
 
-
     public static String motorSpeedCalcul(int speed) {
         boolean megaG = false;
 
@@ -108,23 +104,17 @@ public class RobotMoveHelper {
         } else if (speed == 0) {
             speedString = "0000";
         }
-        if (megaG) {
 
-            if (speedString.length() == 2) {
-                speedString = "-00" + Integer.toString(Math.abs(Math.round(speed)));
-            }
-            if (speedString.length() == 3) {
-                speedString = "-0" + Integer.toString(Math.abs(Math.round(speed)));
-                System.out.println("Are You Here My Brother Friend ?");
-            }
-        } else {
-            if (speedString.length() == 1) {
-                speedString = "000" + speedString;
-            } else if (speedString.length() == 2) {
-                speedString = "00" + speedString;
-            } else if (speedString.length() == 3) {
-                speedString = "0" + speedString;
-            }
+        switch (speedString.length()) {
+            case 1:
+                speedString = megaG ? speedString : "000" + speedString;
+                break;
+            case 2:
+                speedString = megaG ? "-00" + Integer.toString(Math.abs(Math.round(speed))) : "00" + speedString;
+                break;
+            case 3:
+                speedString = megaG ? "-0" + Integer.toString(Math.abs(Math.round(speed))) : "0" + speedString;
+                break;
         }
         return speedString;
     }
@@ -148,12 +138,12 @@ public class RobotMoveHelper {
 
         final JSONObject deconnectionJSON = new JSONObject();
         try {
-            deconnectionJSON.put("connexion", "false"); //vitesse moteur de gauche
+            deconnectionJSON.put("connexion", "false");
         } catch (JSONException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        final String deconnectionJSONtoString = deconnectionJSON.toString(); // convertie le JSON en string pour l'envoyer
+        final String deconnectionJSONtoString = deconnectionJSON.toString(); // converti le JSON en string pour l'envoyer
         client.sendMessage(deconnectionJSONtoString);
         SystemClock.sleep(100);
         client.stopClient();
