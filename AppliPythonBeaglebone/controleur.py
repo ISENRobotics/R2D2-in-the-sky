@@ -12,6 +12,7 @@ import surveillance_serie
 import traitement
 import video
 import LED
+import speed
 #import template
 #import template_surveillance
 
@@ -42,6 +43,7 @@ class Controleur(object):
 		self.traitement        = traitement.Traitement(self,self.stop_event)
 		self.video        		  = video.Video(self.stop_event)
 		self.led 				  = LED.LED(self.stop_event)
+		self.speed = speed.Speed(self,self.stop_event)
 
 		#On met les threads en mode daemon, quand le controleur est tué, on tue tous les threads
 		self.surveillance_serveur.daemon = True
@@ -49,6 +51,7 @@ class Controleur(object):
 		self.traitement.daemon        = True
 		self.video.daemon        		 = True
 		self.led.daemon        			 = True
+		self.speed.daemon = True
 		####################################
 		#	Partie Template
 		####################################
@@ -66,6 +69,7 @@ class Controleur(object):
 			self.traitement.start()
 			self.video.start()
 			self.led.start()
+			self.speed.start()
 			
 			#Tant que l'arrêt du programme n'a pas été détecté (ctrl+c au clavier ou évènement système important)
 			#On boucle indéfiniment juste pour rester vivant
@@ -90,7 +94,7 @@ class Controleur(object):
 				self.traitement.stop()
 				self.video.stop()
 				self.led.stop()
-				
+				self.speed.stop()
 				####################################
 				#	Partie Template
 				####################################
@@ -109,6 +113,7 @@ class Controleur(object):
 				self.traitement.stop()
 				self.video.stop()
 				self.led.stop()
+				self.speed.stop()
 				####################################
 				#	Partie Template
 				####################################
@@ -127,6 +132,7 @@ class Controleur(object):
 				self.traitement.stop()
 				self.video.stop()
 				self.led.stop()
+				self.speed.stop()
 				####################################
 				#	Partie Template
 				####################################
