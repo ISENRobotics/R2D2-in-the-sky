@@ -1,5 +1,6 @@
 package fr.pierreyvesmingam.robotr2d2.helper;
 
+import android.content.Context;
 import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -7,7 +8,6 @@ import android.support.annotation.Nullable;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.IOException;
 import java.util.Calendar;
 
 import fr.pierreyvesmingam.robotr2d2.Client;
@@ -21,6 +21,10 @@ public class RobotMoveHelper {
     * PUBLIC STATIC METHODS
     * ************************************************************************
     */
+
+    /**
+     * mode 8 to stop robot's motors
+     */
     public static void stopMotors(@Nullable final Client client) {
         // Perform action on click
         final JSONObject deconnectionJSON = new JSONObject();
@@ -35,7 +39,6 @@ public class RobotMoveHelper {
             deconnectionJSON.put("vitesseD", leftSpeed); //vitesse moteur de gauche
             deconnectionJSON.put("temps", millisecondToString); //vitesse moteur de gauche
         } catch (JSONException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
 
@@ -59,7 +62,6 @@ public class RobotMoveHelper {
             emissionJSON.put("vitesseD", rightSpeed); //vitesse moteur de gauche
             emissionJSON.put("temps", millisecondToString);
         } catch (JSONException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
 
@@ -69,6 +71,9 @@ public class RobotMoveHelper {
         }
     }
 
+    /**
+     * mode 2 to move the robot with just angle and speed value
+     */
     public static void launchMotorsWithModeTwo(@Nullable final Client client, @NonNull final String angle, @NonNull final String speed) {
         //mode 2 to use angle with the robot
         final JSONObject emissionJSON = new JSONObject();
@@ -80,7 +85,6 @@ public class RobotMoveHelper {
             emissionJSON.put("vitesse", speed);
             emissionJSON.put("temps", millisecondToString);
         } catch (JSONException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
 
@@ -100,81 +104,46 @@ public class RobotMoveHelper {
         } else if (speed == 0) {
             speedString = "0000";
         }
-        if (megaG) {
 
-            if (speedString.length() == 2) {
-                speedString = "-00" + Integer.toString(Math.abs(Math.round(speed)));
-            }
-            if (speedString.length() == 3) {
-                speedString = "-0" + Integer.toString(Math.abs(Math.round(speed)));
-                System.out.println("Are You Here My Brother Friend ?");
-            }
-        } else {
-            if (speedString.length() == 1) {
-                speedString = "000" + speedString;
-            } else if (speedString.length() == 2) {
-                speedString = "00" + speedString;
-            } else if (speedString.length() == 3) {
-                speedString = "0" + speedString;
-            }
+        switch (speedString.length()) {
+            case 1:
+                speedString = megaG ? speedString : "000" + speedString;
+                break;
+            case 2:
+                speedString = megaG ? "-00" + Integer.toString(Math.abs(Math.round(speed))) : "00" + speedString;
+                break;
+            case 3:
+                speedString = megaG ? "-0" + Integer.toString(Math.abs(Math.round(speed))) : "0" + speedString;
+                break;
         }
         return speedString;
     }
 
-    public static String portraitMotorSpeedCalcul(int speed) {
-        boolean megaPortrait = false;
-        speed = Math.round(speed / (float) 100 * (float) 127);
-        String speedString = Integer.toString((Math.round(speed)));
-        if (speed < 0) {
-            megaPortrait = true;
-        } else if (speed == 0) {
-            speedString = "0000";
-        }
-        if (megaPortrait) {
-            if (speedString.length() == 2) {
-                speedString = "-00" + Integer.toString(Math.abs(Math.round(speed)));
-            } else if (speedString.length() == 3) {
-                speedString = "-0" + Integer.toString(Math.abs(Math.round(speed)));
-                System.out.println("Are You Here My Brother Friend ?");
-            }
-        } else {
-            if (speedString.length() == 1) {
-                speedString = "000" + speedString;
-            } else if (speedString.length() == 2) {
-                speedString = "00" + speedString;
-            } else if (speedString.length() == 3) {
-                speedString = "0" + speedString;
-            }
-        }
-        return speedString;
-    }
-
-
+    /**
+     * start the connexion to the robot
+     */
     public static Client robotConnection(@Nullable Client client, @NonNull final Client.ClientListener listener) {
         if (client == null) {
             client = new Client();
             client.addClientListener(listener);
         }
-
-        try {
-            client.startClient();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
+        client.startClient();
         return client;
     }
 
-    public static void robotDeconnection(@NonNull final Client client) {
+    /**
+     * stop the connexion to the robot
+     */
+    public static void robotDeconnection(@NonNull final Client client, @NonNull final Context context) {
 
         final JSONObject deconnectionJSON = new JSONObject();
         try {
-            deconnectionJSON.put("connexion", "false"); //vitesse moteur de gauche
+            deconnectionJSON.put("connexion", "false");
         } catch (JSONException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        final String deconnectionJSONtoString = deconnectionJSON.toString(); // convertie le JSON en string pour l'envoyer
+        final String deconnectionJSONtoString = deconnectionJSON.toString(); // converti le JSON en string pour l'envoyer
         client.sendMessage(deconnectionJSONtoString);
         SystemClock.sleep(100);
         client.stopClient();

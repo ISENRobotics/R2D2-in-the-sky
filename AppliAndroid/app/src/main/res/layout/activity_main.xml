@@ -1,144 +1,93 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/rootView"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:paddingBottom="@dimen/activity_vertical_margin"
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="fr.pierreyvesmingam.robotr2d2.MainActivity"
-    android:id="@+id/rootView">
+    tools:context="fr.pierreyvesmingam.robotr2d2.MainActivity">
 
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Déplacement du Robot"
-        android:layout_alignParentTop="true"
+    <Button
         android:layout_centerHorizontal="true"
-        android:id="@+id/viewTitleTextView" />
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="AIDE"
-        android:id="@+id/helpButton"
-        android:onClick="startHelpActivity"
-        android:layout_alignTop="@+id/button3"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Connexion"
-        android:id="@+id/connexionButton"
-        android:layout_above="@+id/portraitJoystickLayout"
-        android:layout_centerHorizontal="true"
-        android:background="#2ecc71" />
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Configuration"
-        android:id="@+id/button2"
-        android:onClick="startConfigActivity"
-        android:layout_alignTop="@+id/button3"
-        android:layout_alignLeft="@+id/viewTitleTextView"
-        android:layout_alignStart="@+id/viewTitleTextView" />
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="autonome"
+        android:backgroundTint="@color/colorPrimaryDark"
+        android:textColor="#FFF"
         android:id="@+id/button3"
-        android:layout_below="@+id/linearLayout1"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true" />
-
-    <Button
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="ARRET d'urgence"
-        android:id="@+id/breakButton"
-        android:background="#e74c3c"
-        android:layout_marginBottom="40dp"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Informations:"
-        android:id="@+id/problemTextView"
-        android:textColor="#444444"
-        android:textSize="20dp"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+        android:text="autonome" />
 
     <LinearLayout
-        android:id="@+id/linearLayout1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        android:orientation="vertical" >
+        android:id="@+id/button_layout"
+        android:layout_marginTop="50dp"
+        android:layout_width="match_parent"
+        android:orientation="horizontal"
+        android:layout_height="wrap_content">
 
+        <Button
+            android:layout_weight="1"
+            android:backgroundTint="@color/colorPrimaryDark"
+            android:id="@+id/helpButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="startHelpActivity"
+            android:textColor="#FFF"
+            android:text="AIDE" />
+
+        <Button
+            android:backgroundTint="@color/colorPrimaryDark"
+            android:textColor="#FFF"
+            android:layout_marginLeft="50dp"
+            android:layout_weight="1"
+            android:id="@+id/button2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="startConfigActivity"
+            android:text="Configuration" />
     </LinearLayout>
+
     <RelativeLayout
-        android:id="@id/portraitJoystickLayout"
-        android:layout_width="200dp"
-        android:layout_height="200dp"
-        android:background="@drawable/jaune"
-        android:layout_above="@+id/angleTextView"
-        android:layout_centerHorizontal="true">
+        android:id="@+id/portraitJoystickLayout"
+        android:layout_width="500dp"
+        android:layout_height="500dp"
+        android:layout_centerHorizontal="true"
+        android:layout_centerInParent="true">
+        <RelativeLayout
+            android:layout_width="300dp"
+            android:layout_height="300dp"
+            android:layout_centerHorizontal="true"
+            android:layout_centerInParent="true"
+            android:background="@drawable/round_background">
+        </RelativeLayout>
     </RelativeLayout>
 
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true"
-        android:layout_margin="30dp"
-        android:orientation="vertical"
-        android:id="@+id/linearLayout">
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal">
 
+        <Button
+            android:id="@+id/connexionButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_weight="1"
+            android:background="#FF0000"
+            android:text="Déconnexion"
+            android:textColor="#FFF" />
+
+        <Button
+            android:id="@+id/breakButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="40dp"
+            android:layout_marginLeft="100dp"
+            android:layout_weight="1"
+            android:background="#FF0000"
+            android:text="Frein d'urgence"
+            android:textColor="#FFF" />
     </LinearLayout>
-
-    <TextView
-        android:id="@+id/leftSpeedTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Distance"
-        android:textColor="#444444"
-        android:textSize="20dp"
-        android:layout_above="@+id/breakButton"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
-
-    <TextView
-        android:id="@+id/leftDirectionTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Direction"
-        android:textColor="#444444"
-        android:textSize="20dp"
-        android:layout_above="@+id/breakButton"
-        android:layout_toRightOf="@+id/viewTitleTextView"
-        android:layout_toEndOf="@+id/viewTitleTextView" />
-
-    <TextView
-        android:id="@+id/angleTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Angle"
-        android:textColor="#444444"
-        android:textSize="20dp"
-        android:layout_above="@+id/leftSpeedTextView"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
-
-
-
 </RelativeLayout>

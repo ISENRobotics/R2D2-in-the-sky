@@ -14,17 +14,14 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme.NoActionBar">
-        <activity android:name=".MainActivity"
-            android:configChanges="orientation|keyboardHidden">
+        android:theme="@style/AppTheme">
+        <activity android:name=".MainActivity">
             <action android:name="android.intent.action.MAIN" />
 
             <category android:name="android.intent.category.LAUNCHER" />
         </activity>
-        <activity android:name=".AideActivity"
-            android:configChanges="orientation|keyboardHidden"/>
-        <activity android:name=".LauncherActivity"
-            android:configChanges="orientation|keyboardHidden">
+        <activity android:name=".AideActivity"/>
+        <activity android:name=".LauncherActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

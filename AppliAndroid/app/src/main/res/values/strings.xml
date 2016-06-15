@@ -31,4 +31,7 @@
     <string name="center_direction">Direction: Center</string>
     <string name="connection_refused">Connection refused</string>
     <string name="connected">Connected</string>
+    <string name="connection_error_title">Erreur de connexion</string>
+    <string name="connection_error_content">La connexion au robot n\'a pas pu être éffectuée.</string>
+    <string name="connection_error_button">ok</string>
 </resources>
