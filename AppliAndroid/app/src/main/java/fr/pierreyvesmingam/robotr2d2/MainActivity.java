@@ -51,7 +51,7 @@ public class MainActivity extends AppCompatActivity implements Client.ClientList
     */
     private RelativeLayout mPortraitJoystickLayout, mRightLandscapeJoystickLayout, mLeftLandscapeJoystickLayout, mRootView;
     private ImageView mImageJoystick, mImageBorder;
-    private TextView mAngleTextView, mLeftSpeedTextView, mProblemTextView, mRightSpeedTextView, mSpeedTextView, mBbatteryState;
+    private TextView mLeftSpeedTextView, mRightSpeedTextView, mSpeedTextView, mBbatteryState;
     private Button mConnexionButton, mBreakButton;
 
     private JoyStickClass mPortraitJoystick, mRightLandscapeJoystick, mLeftLandscapeJoystick;
@@ -106,7 +106,7 @@ public class MainActivity extends AppCompatActivity implements Client.ClientList
             @Override
             public void run() {
                 Log.d("MESSAGE_RECIEVE", "Dans le MainActivity " + data);
-                mProblemTextView.setText(data);
+
             }
         });
     }
@@ -203,10 +203,10 @@ public class MainActivity extends AppCompatActivity implements Client.ClientList
     }
 
     private void findAndInitViews() {
-        mAngleTextView = (TextView) findViewById(R.id.angleTextView);
+
         mLeftSpeedTextView = (TextView) findViewById(R.id.leftSpeedTextView);
         mRightSpeedTextView = (TextView) findViewById(R.id.rightSpeedTextView);
-        mProblemTextView = (TextView) findViewById(R.id.problemTextView);
+
         mRootView = (RelativeLayout) findViewById(R.id.rootView);
         mPortraitJoystickLayout = (RelativeLayout) findViewById(R.id.portraitJoystickLayout);
         mRightLandscapeJoystickLayout = (RelativeLayout) findViewById(R.id.rightLandscapeJoystickLayout);
@@ -294,8 +294,6 @@ public class MainActivity extends AppCompatActivity implements Client.ClientList
         final int speed = Math.round(mPortraitJoystick.getDistance());
         final String speedString = RobotMoveHelper.motorSpeedCalcul(speed);
 
-        mAngleTextView.setText(String.format(getString(R.string.angle_with_value), angleString));
-        mLeftSpeedTextView.setText(String.format(getString(R.string.distance_with_value), speedString));
         if (motionEvent.getAction() == motionEvent.ACTION_UP) {
             RobotMoveHelper.stopMotors(mClient);
         } else {
