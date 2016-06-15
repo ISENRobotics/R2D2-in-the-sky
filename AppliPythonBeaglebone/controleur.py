@@ -43,7 +43,7 @@ class Controleur(object):
 		self.traitement        = traitement.Traitement(self,self.stop_event)
 		self.video        		  = video.Video(self.stop_event)
 		self.led 				  = LED.LED(self.stop_event)
-		self.speed = speed.Speed(self,self.stop_event)
+		#self.speed = speed.Speed(self,self.stop_event)
 
 		#On met les threads en mode daemon, quand le controleur est tué, on tue tous les threads
 		self.surveillance_serveur.daemon = True
@@ -94,7 +94,7 @@ class Controleur(object):
 				self.traitement.stop()
 				self.video.stop()
 				self.led.stop()
-				self.speed.stop()
+				#self.speed.stop()
 				####################################
 				#	Partie Template
 				####################################
@@ -113,7 +113,7 @@ class Controleur(object):
 				self.traitement.stop()
 				self.video.stop()
 				self.led.stop()
-				self.speed.stop()
+				#self.speed.stop()
 				####################################
 				#	Partie Template
 				####################################
@@ -132,7 +132,7 @@ class Controleur(object):
 				self.traitement.stop()
 				self.video.stop()
 				self.led.stop()
-				self.speed.stop()
+				#self.speed.stop()
 				####################################
 				#	Partie Template
 				####################################
