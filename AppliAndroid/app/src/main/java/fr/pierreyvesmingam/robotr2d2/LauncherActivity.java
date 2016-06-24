@@ -1,21 +1,28 @@
 package fr.pierreyvesmingam.robotr2d2;
 
-import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
 public class LauncherActivity extends AppCompatActivity {
 
+    /*
+    * ************************************************************************
+    * LIFE CYCLE METHODS
+    * ************************************************************************
+    */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_luncher);
     }
 
-    public void mainacti(View view){
-        Intent intent1 = new Intent(this, MainActivity.class);
-        startActivity(intent1);
-
+    /*
+    * ************************************************************************
+    * USER INTERACTION METHODS
+    * ************************************************************************
+    */
+    public void launchRobotActivity(View view) {
+        MainActivity.start(this);
     }
 }

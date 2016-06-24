@@ -14,7 +14,7 @@
         android:layout_height="wrap_content"
         android:id="@+id/imageView"
         android:src="@drawable/logo2"
-        android:layout_above="@+id/textView5"
+        android:layout_above="@+id/leftDirectionTextView"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
 
@@ -23,7 +23,7 @@
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:text="Projet M1 - 2015/2016"
-        android:id="@+id/textView5"
+        android:id="@+id/leftDirectionTextView"
         android:layout_marginBottom="42dp"
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
@@ -54,7 +54,7 @@
         android:layout_height="wrap_content"
         android:text="Démarrer"
         android:id="@+id/button5"
-        android:onClick="mainacti"
+        android:onClick="launchRobotActivity"
         android:layout_marginBottom="75dp"
         android:layout_alignBottom="@+id/imageView"
         android:layout_toRightOf="@+id/imageView"

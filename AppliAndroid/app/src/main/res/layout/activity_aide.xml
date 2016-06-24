@@ -63,7 +63,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Il faut s&apos;assurer d&apos;être connecté au réseau Wifi généré par le robot."
+        android:text="Il faut s'assurer d'être connecté au réseau Wifi généré par le robot."
         android:id="@+id/textView29"
         android:layout_below="@+id/textView28"
         android:layout_toRightOf="@+id/textView25" />
@@ -71,7 +71,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Pourquoi le robot s&apos;arrête ?"
+        android:text="Pourquoi le robot s'arrête ?"
         android:id="@+id/textView30"
         android:textColor="#444444"
         android:textSize="15dp"
@@ -81,7 +81,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Si le niveau de batterie est jugé trop faible, le robot se met en sécurité et s&apos;éteint."
+        android:text="Si le niveau de batterie est jugé trop faible, le robot se met en sécurité et s'éteint."
         android:id="@+id/textView31"
         android:layout_below="@+id/textView30"
         android:layout_toRightOf="@+id/textView25" />
@@ -99,7 +99,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Dans un premier temps, redémarrer l&apos;application, se reconnecter au réseaux Wifi et réessayer."
+        android:text="Dans un premier temps, redémarrer l'application, se reconnecter au réseaux Wifi et réessayer."
         android:id="@+id/textView33"
         android:layout_below="@+id/textView32"
         android:layout_toRightOf="@+id/textView25" />
@@ -107,7 +107,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Si le problème perciste, contacter les personnes en charges de la maintenance de l&apos;application pour retourner le bug."
+        android:text="Si le problème perciste, contacter les personnes en charges de la maintenance de l'application pour retourner le bug."
         android:id="@+id/textView34"
         android:layout_below="@+id/textView33"
         android:layout_toRightOf="@+id/textView25" />

@@ -12,6 +12,7 @@ import surveillance_serie
 import traitement
 import video
 import LED
+
 #import template
 #import template_surveillance
 
@@ -49,6 +50,7 @@ class Controleur(object):
 		self.traitement.daemon        = True
 		self.video.daemon        		 = True
 		self.led.daemon        			 = True
+		
 		####################################
 		#	Partie Template
 		####################################
@@ -90,7 +92,6 @@ class Controleur(object):
 				self.traitement.stop()
 				self.video.stop()
 				self.led.stop()
-				
 				####################################
 				#	Partie Template
 				####################################
